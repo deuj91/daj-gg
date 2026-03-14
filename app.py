@@ -1,34 +1,14 @@
 from flask import Flask, render_template, request, redirect
 import requests
-import time
+import os
 
 app = Flask(__name__)
 
-API_KEY = "RGAPI-17629850-7fb2-4282-ad49-3607656edeb0"
+API_KEY = os.environ.get("RGAPI-17629850-7fb2-4282-ad49-3607656edeb0")
 REGION = "europe"
-MATCH_REGION = "europe"
+PLATFORM = "euw1"
 
-CACHE = {}
-
-
-def cached_request(url):
-
-    if url in CACHE and time.time() - CACHE[url]["time"] < 60:
-        return CACHE[url]["data"]
-
-    r = requests.get(url)
-
-    if r.status_code != 200:
-        return None
-
-    data = r.json()
-
-    CACHE[url] = {
-        "data": data,
-        "time": time.time()
-    }
-
-    return data
+DD_VERSION = "14.1.1"
 
 
 def get_rank_icon(tier):
@@ -36,81 +16,9 @@ def get_rank_icon(tier):
     return f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier}.png"
 
 
-def player_score(player):
-
-    kills = player["kills"]
-    deaths = player["deaths"]
-    assists = player["assists"]
-
-    cs = player["totalMinionsKilled"] + player["neutralMinionsKilled"]
-
-    vision = player["visionScore"]
-
-    damage = player["totalDamageDealtToChampions"]
-
-    kda = (kills + assists) / max(1, deaths)
-
-    score = 0
-
-    score += min(kda * 10, 40)
-    score += min(cs / 10, 20)
-    score += min(vision, 20)
-    score += min(damage / 2000, 20)
-
-    return int(score)
-
-
-def win_probability(player):
-
-    kills = player["kills"]
-    deaths = player["deaths"]
-    assists = player["assists"]
-
-    cs = player["totalMinionsKilled"]
-
-    gold = player["goldEarned"]
-
-    damage = player["totalDamageDealtToChampions"]
-
-    score = 0
-
-    score += (kills + assists) * 2
-    score -= deaths * 2
-    score += cs / 10
-    score += gold / 1000
-    score += damage / 5000
-
-    return max(0, min(int(score), 100))
-
-
-def detect_feeder(team):
-
-    worst = None
-    worst_score = 999
-
-    for p in team:
-
-        deaths = p["deaths"]
-        kda = (p["kills"] + p["assists"]) / max(1, deaths)
-
-        score = kda - deaths
-
-        if score < worst_score:
-            worst_score = score
-            worst = p
-
-    if worst:
-        name = worst.get("riotIdGameName", "Unknown")
-        champ = worst["championName"]
-
-        return f"⚠️ Game difficile à cause de {name} ({champ})"
-
-    return ""
-
-
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", games=None)
 
 
 @app.route("/search")
@@ -121,108 +29,120 @@ def search():
     if not player or "#" not in player:
         return redirect("/")
 
-    name, tag = player.split("#")
+    try:
 
-    account_url = f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
+        name, tag = player.split("#")
 
-    account = cached_request(account_url)
+        # ACCOUNT
+        url = f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
+        r = requests.get(url)
 
-    if not account:
-        return render_template("index.html")
+        if r.status_code != 200:
+            return render_template("index.html", games=[], player=player)
 
-    puuid = account["puuid"]
+        account = r.json()
+        puuid = account["puuid"]
 
-    summoner_url = f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={API_KEY}"
+        # SUMMONER
+        url = f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={API_KEY}"
+        r = requests.get(url)
 
-    summoner = cached_request(summoner_url)
+        if r.status_code != 200:
+            return render_template("index.html", games=[], player=player)
 
-    summoner_id = summoner["id"]
+        summoner = r.json()
+        summoner_id = summoner["id"]
 
-    rank_url = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={API_KEY}"
+        # RANK
+        rank = "Unranked"
+        rank_icon = ""
 
-    ranked_data = cached_request(rank_url)
+        url = f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={API_KEY}"
+        r = requests.get(url)
 
-    rank = "Unranked"
-    rank_icon = ""
+        if r.status_code == 200 and len(r.json()) > 0:
+            ranked = r.json()[0]
 
-    if ranked_data and len(ranked_data) > 0:
+            tier = ranked["tier"]
+            division = ranked["rank"]
 
-        ranked = ranked_data[0]
+            rank = f"{tier} {division}"
+            rank_icon = get_rank_icon(tier)
 
-        tier = ranked["tier"]
-        div = ranked["rank"]
+        # MATCHES
+        url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={API_KEY}"
+        r = requests.get(url)
 
-        rank = f"{tier} {div}"
+        if r.status_code != 200:
+            return render_template(
+                "index.html",
+                player=player,
+                rank=rank,
+                rank_icon=rank_icon,
+                games=[]
+            )
 
-        rank_icon = get_rank_icon(tier)
+        match_ids = r.json()
 
-    matches_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5&api_key={API_KEY}"
+        games = []
 
-    match_ids = cached_request(matches_url)
+        for match_id in match_ids:
 
-    games = []
+            url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={API_KEY}"
+            r = requests.get(url)
 
-    for match_id in match_ids:
+            if r.status_code != 200:
+                continue
 
-        url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={API_KEY}"
+            match = r.json()
+            info = match["info"]
+            participants = info["participants"]
 
-        match = cached_request(url)
+            player_data = None
 
-        if not match:
-            continue
+            for p in participants:
+                if p["puuid"] == puuid:
+                    player_data = p
+                    break
 
-        info = match["info"]
+            if not player_data:
+                continue
 
-        participants = info["participants"]
+            champion = player_data["championName"]
 
-        player_data = None
+            k = player_data["kills"]
+            d = player_data["deaths"]
+            a = player_data["assists"]
 
-        for p in participants:
-            if p["puuid"] == puuid:
-                player_data = p
-                break
+            kda = f"{k}/{d}/{a}"
 
-        if not player_data:
-            continue
+            cs = player_data["totalMinionsKilled"]
+            gold = player_data["goldEarned"]
+            vision = player_data["visionScore"]
 
-        champion = player_data["championName"]
+            result = "Victory" if player_data["win"] else "Defeat"
 
-        kills = player_data["kills"]
-        deaths = player_data["deaths"]
-        assists = player_data["assists"]
+            champion_img = f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{champion}.png"
 
-        cs = player_data["totalMinionsKilled"]
+            items = []
 
-        gold = player_data["goldEarned"]
+            for i in range(7):
 
-        vision = player_data["visionScore"]
+                item = player_data[f"item{i}"]
 
-        result = "Victory" if player_data["win"] else "Defeat"
+                if item != 0:
+                    items.append(
+                        f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/item/{item}.png"
+                    )
 
-        champion_img = f"https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/{champion}.png"
+            allies = []
 
-        items = []
+            team_id = player_data["teamId"]
 
-        for i in range(7):
+            for p in participants:
 
-            item = player_data[f"item{i}"]
-
-            if item != 0:
-                items.append(
-                    f"https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/{item}.png"
-                )
-
-        team = []
-        allies = []
-
-        team_id = player_data["teamId"]
-
-        for p in participants:
-
-            if p["teamId"] == team_id:
-                team.append(p)
-
-            if p["teamId"] == team_id and p["puuid"] != puuid:
+                if p["teamId"] != team_id or p["puuid"] == puuid:
+                    continue
 
                 ally_items = []
 
@@ -232,46 +152,60 @@ def search():
 
                     if item != 0:
                         ally_items.append(
-                            f"https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/{item}.png"
+                            f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/item/{item}.png"
                         )
 
                 allies.append({
                     "name": p.get("riotIdGameName", "Unknown"),
                     "champion": p["championName"],
-                    "champion_img": f"https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/{p['championName']}.png",
+                    "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{p['championName']}.png",
                     "kda": f"{p['kills']}/{p['deaths']}/{p['assists']}",
                     "items_list": ally_items
                 })
 
-        score = player_score(player_data)
+            # ANALYSE SIMPLE
+            analysis = "Game difficile"
 
-        probability = win_probability(player_data)
+            if cs > 180:
+                analysis = "Très bon farm"
 
-        feeder = detect_feeder(team)
+            if k > 10:
+                analysis = "Très bonne performance"
 
-        games.append({
+            games.append({
+                "champion_img": champion_img,
+                "kda": kda,
+                "cs": cs,
+                "gold": gold,
+                "vision": vision,
+                "result": result,
+                "items_list": items,
+                "analysis": analysis,
+                "analysis_details": [
+                    f"Kills : {k}",
+                    f"CS : {cs}",
+                    f"Vision : {vision}"
+                ],
+                "allies": allies
+            })
 
-            "champion_img": champion_img,
-            "kda": f"{kills}/{deaths}/{assists}",
-            "cs": cs,
-            "gold": gold,
-            "vision": vision,
-            "result": result,
-            "items_list": items,
-            "score": score,
-            "probability": probability,
-            "feeder": feeder,
-            "allies": allies
+        return render_template(
+            "index.html",
+            games=games,
+            player=player,
+            rank=rank,
+            rank_icon=rank_icon
+        )
 
-        })
+    except Exception as e:
 
-    return render_template(
-        "index.html",
-        games=games,
-        player=player,
-        rank=rank,
-        rank_icon=rank_icon
-    )
+        print("ERROR :", e)
+
+        return render_template(
+            "index.html",
+            games=[],
+            player=player
+        )
 
 
 if __name__ == "__main__":
