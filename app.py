@@ -13,7 +13,6 @@ DD_VERSION = "14.1.1"
 
 CACHE = {}
 
-
 def cached_get(url):
 
     if url in CACHE:
@@ -31,29 +30,33 @@ def cached_get(url):
     return data
 
 
-def analyze_game(player):
+def ai_analysis(player):
 
     kills = player["kills"]
     deaths = player["deaths"]
     assists = player["assists"]
     cs = player["totalMinionsKilled"]
     vision = player["visionScore"]
+    gold = player["goldEarned"]
 
-    score = kills*2 + assists - deaths
+    score = kills*3 + assists*2 - deaths
 
-    if score > 20:
-        return "MVP performance 🔥"
+    if score > 25:
+        return "🔥 MVP performance"
 
     if deaths > 10:
-        return "Too many deaths ⚠️"
+        return "⚠️ Too many deaths"
 
     if cs > 200:
-        return "Great farming 💰"
+        return "💰 Excellent farming"
 
-    if vision > 30:
-        return "Excellent vision 👁️"
+    if vision > 35:
+        return "👁️ Great vision control"
 
-    return "Average performance"
+    if gold > 15000:
+        return "💎 Strong economy"
+
+    return "👍 Solid game"
 
 
 @app.route("/")
@@ -102,12 +105,13 @@ def search():
 
             rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier.lower()}.png"
 
-        url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={API_KEY}"
+        url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10&api_key={API_KEY}"
         match_ids = cached_get(url)
 
         games = []
 
         wins = 0
+        total_k = total_d = total_a = total_cs = 0
 
         for match_id in match_ids:
 
@@ -132,9 +136,19 @@ def search():
             if player_data["win"]:
                 wins += 1
 
+            kills = player_data["kills"]
+            deaths = player_data["deaths"]
+            assists = player_data["assists"]
+            cs = player_data["totalMinionsKilled"]
+
+            total_k += kills
+            total_d += deaths
+            total_a += assists
+            total_cs += cs
+
             champion = player_data["championName"]
 
-            analysis = analyze_game(player_data)
+            analysis = ai_analysis(player_data)
 
             games.append({
 
@@ -142,9 +156,9 @@ def search():
 
                 "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{champion}.png",
 
-                "kda": f"{player_data['kills']}/{player_data['deaths']}/{player_data['assists']}",
+                "kda": f"{kills}/{deaths}/{assists}",
 
-                "cs": player_data["totalMinionsKilled"],
+                "cs": cs,
 
                 "vision": player_data["visionScore"],
 
@@ -155,7 +169,13 @@ def search():
                 "analysis": analysis
             })
 
-        winrate = int((wins/len(games))*100) if games else 0
+        count = len(games)
+
+        winrate = int((wins/count)*100) if count else 0
+
+        avg_kda = f"{round(total_k/count,1)}/{round(total_d/count,1)}/{round(total_a/count,1)}" if count else "0/0/0"
+
+        avg_cs = int(total_cs/count) if count else 0
 
         return render_template(
 
@@ -166,8 +186,9 @@ def search():
             rank=rank,
             rank_icon=rank_icon,
             games=games,
-            winrate=winrate
-
+            winrate=winrate,
+            avg_kda=avg_kda,
+            avg_cs=avg_cs
         )
 
     except Exception as e:
