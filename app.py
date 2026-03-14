@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # récupération de la clé API depuis Render
-API_KEY = os.environ.get("RGAPI-01a0c419-b7e4-4597-a53e-dc7d7e7efffd")
+API_KEY = "RGAPI-01a0c419-b7e4-4597-a53e-dc7d7e7efffd"
 
 REGION = "europe"
 PLATFORM = "euw1"
