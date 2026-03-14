@@ -7,33 +7,55 @@ padding:40px;
 }
 
 .container{
-max-width:1000px;
+max-width:900px;
 margin:auto;
+}
+
+.rank{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:20px;
+}
+
+.rank-icon{
+width:40px;
 }
 
 .game{
 background:#1e293b;
-padding:20px;
-margin-top:20px;
 border-radius:10px;
+margin-top:20px;
+overflow:hidden;
 }
 
 .game-header{
 display:flex;
 gap:20px;
-align-items:center;
+padding:15px;
+cursor:pointer;
+transition:0.2s;
+}
+
+.game-header:hover{
+background:#334155;
 }
 
 .champ{
-width:70px;
+width:60px;
 border-radius:8px;
+}
+
+.game-details{
+padding:15px;
+border-top:1px solid #334155;
 }
 
 .players{
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:6px;
-margin-top:15px;
+margin-top:10px;
 }
 
 .player{
@@ -44,6 +66,10 @@ display:flex;
 align-items:center;
 gap:8px;
 font-size:13px;
+}
+
+.name{
+flex:1;
 }
 
 .victory{
