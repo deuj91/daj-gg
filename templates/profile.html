@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<div class="profile">
+
+<h2>{{player}}</h2>
+
+<p>Level {{level}}</p>
+
+<img src="{{rank_icon}}" width="80">
+
+<p>{{rank}}</p>
+
+<p>Winrate: {{winrate}}%</p>
+
+</div>
+
+<div class="games">
+
+{% for game in games %}
+
+<div class="game {{game.result}}">
+
+<img src="{{game.champion_img}}" class="champion">
+
+<div>
+
+<p>KDA {{game.kda}}</p>
+<p>CS {{game.cs}}</p>
+<p>Vision {{game.vision}}</p>
+
+</div>
+
+<div class="analysis">
+
+{{game.analysis}}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</body>
+
+</html>
