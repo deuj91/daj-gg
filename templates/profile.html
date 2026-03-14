@@ -4,6 +4,7 @@
 <head>
 
 <title>{{name}} - DAJ.GG</title>
+
 <link rel="stylesheet" href="/static/style.css">
 
 </head>
@@ -36,7 +37,8 @@
 
 <div class="summary" onclick="toggle({{loop.index}})">
 
-<img class="champ"
+<img
+class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{game.champion}}.png">
 
 <span class="kda">
@@ -59,7 +61,8 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{game.champion
 
 <div class="player">
 
-<img class="champ-small"
+<img
+class="champ-small"
 src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{player.champion}}.png">
 
 <span>{{player.name}}</span>
@@ -67,12 +70,14 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{player.champi
 <div class="items">
 
 {% for item in player.items %}
+
 {% if item != 0 %}
 
 <img
 src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
 
 {% endif %}
+
 {% endfor %}
 
 </div>
@@ -105,4 +110,5 @@ el.style.display==="block"
 </script>
 
 </body>
+
 </html>
