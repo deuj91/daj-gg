@@ -4,8 +4,8 @@ import os
 
 app = Flask(__name__)
 
-# récupération de la clé API depuis Render
-API_KEY = "RGAPI-01a0c419-b7e4-4597-a53e-dc7d7e7efffd"
+# clé API Riot
+API_KEY = os.environ.get("RGAPI-01a0c419-b7e4-4597-a53e-dc7d7e7efffd")
 
 REGION = "europe"
 PLATFORM = "euw1"
@@ -28,13 +28,14 @@ def riot_get(url):
 
 
 def ai_coach(player):
+
     tips = []
 
-    kills = player["kills"]
-    deaths = player["deaths"]
-    assists = player["assists"]
-    cs = player["totalMinionsKilled"]
-    vision = player["visionScore"]
+    kills = player.get("kills", 0)
+    deaths = player.get("deaths", 0)
+    assists = player.get("assists", 0)
+    cs = player.get("totalMinionsKilled", 0)
+    vision = player.get("visionScore", 0)
 
     kda = (kills + assists) / max(1, deaths)
 
@@ -84,7 +85,8 @@ def search():
     account_url = f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
     account = riot_get(account_url)
 
-    if not account:
+    if not account or "puuid" not in account:
+        print("ACCOUNT ERROR:", account)
         return render_template("error.html", message="Player not found")
 
     puuid = account["puuid"]
@@ -93,10 +95,11 @@ def search():
     summoner_url = f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={API_KEY}"
     summoner = riot_get(summoner_url)
 
-    if not summoner:
-        return render_template("error.html", message="Summoner error")
+    if not summoner or "id" not in summoner:
+        print("SUMMONER ERROR:", summoner)
+        return render_template("error.html", message="Summoner not found")
 
-    level = summoner["summonerLevel"]
+    level = summoner.get("summonerLevel", 0)
     summoner_id = summoner["id"]
 
     # rank
@@ -146,36 +149,33 @@ def search():
 
         games.append({
 
-            "champion": player_data["championName"],
+            "champion": player_data.get("championName", ""),
 
-            "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{player_data['championName']}.png",
+            "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{player_data.get('championName','')} .png",
 
-            "kda": f"{player_data['kills']}/{player_data['deaths']}/{player_data['assists']}",
+            "kda": f"{player_data.get('kills',0)}/{player_data.get('deaths',0)}/{player_data.get('assists',0)}",
 
-            "cs": player_data["totalMinionsKilled"],
+            "cs": player_data.get("totalMinionsKilled", 0),
 
-            "vision": player_data["visionScore"],
+            "vision": player_data.get("visionScore", 0),
 
-            "gold": player_data["goldEarned"],
+            "gold": player_data.get("goldEarned", 0),
 
-            "result": "Victory" if player_data["win"] else "Defeat",
+            "result": "Victory" if player_data.get("win") else "Defeat",
 
             "coach": coach
 
         })
 
     return render_template(
-
         "profile.html",
-
         player=player,
         level=level,
         rank=rank,
         rank_icon=rank_icon,
         games=games
-
     )
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
