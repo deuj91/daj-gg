@@ -4,7 +4,6 @@ import os
 
 app = Flask(__name__)
 
-# clé API Riot
 API_KEY = os.environ.get("RIOT_API_KEY")
 
 REGION = "europe"
@@ -81,7 +80,7 @@ def search():
     if not API_KEY:
         return render_template("error.html", message="API key missing")
 
-    # compte riot
+    # ACCOUNT
     account_url = f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
     account = riot_get(account_url)
 
@@ -91,32 +90,36 @@ def search():
 
     puuid = account["puuid"]
 
-    # summoner
+    # SUMMONER
     summoner_url = f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={API_KEY}"
     summoner = riot_get(summoner_url)
 
-    if not summoner or "id" not in summoner:
+    if not summoner:
         print("SUMMONER ERROR:", summoner)
         return render_template("error.html", message="Summoner not found")
 
     level = summoner.get("summonerLevel", 0)
-    summoner_id = summoner["id"]
 
-    # rank
-    rank_url = f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={API_KEY}"
-    ranks = riot_get(rank_url)
+    summoner_id = summoner.get("id")
 
+    ranks = []
     rank = "Unranked"
     rank_icon = ""
 
-    if ranks and len(ranks) > 0:
-        tier = ranks[0]["tier"]
-        div = ranks[0]["rank"]
-        rank = f"{tier} {div}"
+    if summoner_id:
 
-        rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier.lower()}.png"
+        rank_url = f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={API_KEY}"
+        ranks = riot_get(rank_url)
 
-    # matchs
+        if ranks and len(ranks) > 0:
+            tier = ranks[0]["tier"]
+            div = ranks[0]["rank"]
+
+            rank = f"{tier} {div}"
+
+            rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier.lower()}.png"
+
+    # MATCHES
     matches_url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={API_KEY}"
     match_ids = riot_get(matches_url)
 
@@ -147,11 +150,13 @@ def search():
 
         coach = ai_coach(player_data)
 
+        champion = player_data.get("championName", "Unknown")
+
         games.append({
 
-            "champion": player_data.get("championName", ""),
+            "champion": champion,
 
-            "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{player_data.get('championName','')} .png",
+            "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{champion}.png",
 
             "kda": f"{player_data.get('kills',0)}/{player_data.get('deaths',0)}/{player_data.get('assists',0)}",
 
