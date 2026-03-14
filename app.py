@@ -18,7 +18,7 @@ CACHE_TIME = 300
 def ai_coach(games):
 
     if not games:
-        return ["No match data yet."]
+        return ["No matches found."]
 
     kills = sum(g["kills"] for g in games)
     deaths = sum(g["deaths"] for g in games)
@@ -29,16 +29,16 @@ def ai_coach(games):
     tips = []
 
     if deaths / len(games) > 7:
-        tips.append("Try dying less. Work on positioning.")
+        tips.append("Try dying less and improve positioning.")
 
     if kills / len(games) < 4:
-        tips.append("Low kill impact. Try roaming more.")
+        tips.append("Low kill participation. Try roaming more.")
 
     if kda > 4:
         tips.append("Excellent KDA. Keep it up.")
 
     if not tips:
-        tips.append("Your performance is balanced. Improve map awareness.")
+        tips.append("Balanced performance overall.")
 
     return tips
 
@@ -56,12 +56,14 @@ def search():
     if not player:
         return render_template("error.html", message="Enter Riot ID like Caps#EUW")
 
+    if "#" not in player:
+        return render_template("error.html", message="Use Riot ID format Name#TAG")
+
     if player in CACHE:
 
         data, timestamp = CACHE[player]
 
         if time.time() - timestamp < CACHE_TIME:
-
             return render_template(
                 "profile.html",
                 name=player,
@@ -73,17 +75,22 @@ def search():
 
         name, tag = player.split("#")
 
-        acc_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+        account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
-        acc = session.get(
-            acc_url,
+        acc_response = session.get(
+            account_url,
             headers={"X-Riot-Token": API_KEY}
-        ).json()
+        )
 
-        if "puuid" not in acc:
+        if acc_response.status_code != 200:
             return render_template("error.html", message="Player not found")
 
-        puuid = acc["puuid"]
+        account = acc_response.json()
+
+        puuid = account.get("puuid")
+
+        if not puuid:
+            return render_template("error.html", message="PUUID not found")
 
         matches_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=10"
 
@@ -98,10 +105,15 @@ def search():
 
             match_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
 
-            match = session.get(
+            match_response = session.get(
                 match_url,
                 headers={"X-Riot-Token": API_KEY}
-            ).json()
+            )
+
+            if match_response.status_code != 200:
+                continue
+
+            match = match_response.json()
 
             info = match["info"]["participants"]
 
@@ -111,15 +123,15 @@ def search():
 
                 players.append({
 
-                    "name": p.get("riotIdGameName","Unknown"),
-                    "champion": p.get("championName","Unknown"),
-                    "items":[
-                        p.get("item0",0),
-                        p.get("item1",0),
-                        p.get("item2",0),
-                        p.get("item3",0),
-                        p.get("item4",0),
-                        p.get("item5",0)
+                    "name": p.get("riotIdGameName", "Unknown"),
+                    "champion": p.get("championName", "Unknown"),
+                    "items": [
+                        p.get("item0", 0),
+                        p.get("item1", 0),
+                        p.get("item2", 0),
+                        p.get("item3", 0),
+                        p.get("item4", 0),
+                        p.get("item5", 0)
                     ]
 
                 })
@@ -131,11 +143,11 @@ def search():
 
             games.append({
 
-                "champion": me["championName"],
-                "kills": me["kills"],
-                "deaths": me["deaths"],
-                "assists": me["assists"],
-                "win": me["win"],
+                "champion": me.get("championName", "Unknown"),
+                "kills": me.get("kills", 0),
+                "deaths": me.get("deaths", 0),
+                "assists": me.get("assists", 0),
+                "win": me.get("win", False),
                 "players": players
 
             })
@@ -156,9 +168,9 @@ def search():
 
     except Exception as e:
 
-        print("ERROR:", e)
+        print("SERVER ERROR:", e)
 
-        return render_template("error.html", message="Server error")
+        return render_template("error.html", message="Server error. Check API key.")
 
 
 if __name__ == "__main__":
