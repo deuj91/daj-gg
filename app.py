@@ -9,16 +9,16 @@ API_KEY = os.environ.get("RIOT_API_KEY")
 
 MATCH_REGION = "europe"
 
+session = requests.Session()
+
 CACHE = {}
 CACHE_TIME = 300
-
-session = requests.Session()
 
 
 def ai_coach(games):
 
     if not games:
-        return ["No matches found."]
+        return ["No match data yet."]
 
     kills = sum(g["kills"] for g in games)
     deaths = sum(g["deaths"] for g in games)
@@ -28,17 +28,17 @@ def ai_coach(games):
 
     tips = []
 
-    if deaths/len(games) > 7:
-        tips.append("You die too much. Try safer positioning.")
+    if deaths / len(games) > 7:
+        tips.append("Try dying less. Work on positioning.")
 
-    if kills/len(games) < 4:
-        tips.append("Your damage seems low. Try more aggressive plays.")
+    if kills / len(games) < 4:
+        tips.append("Low kill impact. Try roaming more.")
 
     if kda > 4:
         tips.append("Excellent KDA. Keep it up.")
 
     if not tips:
-        tips.append("Solid performance overall.")
+        tips.append("Your performance is balanced. Improve map awareness.")
 
     return tips
 
@@ -54,13 +54,13 @@ def search():
     player = request.args.get("player")
 
     if not player:
-        return "Enter a Riot ID (Name#Tag)"
+        return render_template("error.html", message="Enter Riot ID like Caps#EUW")
 
     if player in CACHE:
 
-        data, t = CACHE[player]
+        data, timestamp = CACHE[player]
 
-        if time.time() - t < CACHE_TIME:
+        if time.time() - timestamp < CACHE_TIME:
 
             return render_template(
                 "profile.html",
@@ -81,7 +81,7 @@ def search():
         ).json()
 
         if "puuid" not in acc:
-            return "Summoner not found"
+            return render_template("error.html", message="Player not found")
 
         puuid = acc["puuid"]
 
@@ -96,10 +96,10 @@ def search():
 
         for match_id in match_ids:
 
-            murl = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
+            match_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
 
             match = session.get(
-                murl,
+                match_url,
                 headers={"X-Riot-Token": API_KEY}
             ).json()
 
@@ -158,7 +158,7 @@ def search():
 
         print("ERROR:", e)
 
-        return "Server error (check logs)"
+        return render_template("error.html", message="Server error")
 
 
 if __name__ == "__main__":
