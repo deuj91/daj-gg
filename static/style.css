@@ -14,7 +14,8 @@ flex-direction:column;
 justify-content:center;
 align-items:center;
 
-background-image:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg");
+background-image:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg");
+
 background-size:cover;
 
 }
@@ -28,8 +29,7 @@ width:250px;
 
 button{
 
-padding:12px 25px;
-cursor:pointer;
+padding:12px 20px;
 
 }
 
@@ -50,8 +50,6 @@ margin-top:40px;
 
 .game{
 
-display:flex;
-flex-direction:column;
 background:#1e293b;
 padding:15px;
 margin-bottom:15px;
