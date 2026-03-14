@@ -13,6 +13,7 @@ DD_VERSION = "14.1.1"
 
 CACHE = {}
 
+
 def cached_get(url):
 
     if url in CACHE:
@@ -32,26 +33,32 @@ def cached_get(url):
 
 def analyze_game(player):
 
-    score = player["kills"]*2 + player["assists"] - player["deaths"]
+    kills = player["kills"]
+    deaths = player["deaths"]
+    assists = player["assists"]
+    cs = player["totalMinionsKilled"]
+    vision = player["visionScore"]
 
-    if score > 15:
+    score = kills*2 + assists - deaths
+
+    if score > 20:
         return "MVP performance 🔥"
 
-    if player["deaths"] > 10:
-        return "Feeding too much ⚠️"
+    if deaths > 10:
+        return "Too many deaths ⚠️"
 
-    if player["visionScore"] > 30:
-        return "Excellent vision control 👁️"
-
-    if player["totalMinionsKilled"] > 200:
+    if cs > 200:
         return "Great farming 💰"
 
-    return "Average game"
+    if vision > 30:
+        return "Excellent vision 👁️"
+
+    return "Average performance"
 
 
 @app.route("/")
 def index():
-    return render_template("index.html", games=None)
+    return render_template("index.html")
 
 
 @app.route("/search")
@@ -66,30 +73,25 @@ def search():
 
     try:
 
-        # ACCOUNT
         url = f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
         account = cached_get(url)
 
         if not account:
-            return render_template("index.html", games=[])
+            return redirect("/")
 
         puuid = account["puuid"]
 
-        # SUMMONER
         url = f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={API_KEY}"
         summoner = cached_get(url)
 
-        if not summoner:
-            return render_template("index.html", games=[])
-
+        level = summoner["summonerLevel"]
         summoner_id = summoner["id"]
-
-        # RANK
-        rank = "Unranked"
-        rank_icon = ""
 
         url = f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={API_KEY}"
         rank_data = cached_get(url)
+
+        rank = "Unranked"
+        rank_icon = ""
 
         if rank_data and len(rank_data) > 0:
 
@@ -100,14 +102,12 @@ def search():
 
             rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier.lower()}.png"
 
-        # MATCH LIST
-        url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=3&api_key={API_KEY}"
+        url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={API_KEY}"
         match_ids = cached_get(url)
 
-        if not match_ids:
-            return render_template("index.html", games=[])
-
         games = []
+
+        wins = 0
 
         for match_id in match_ids:
 
@@ -117,9 +117,7 @@ def search():
             if not match:
                 continue
 
-            info = match["info"]
-
-            participants = info["participants"]
+            participants = match["info"]["participants"]
 
             player_data = None
 
@@ -131,52 +129,53 @@ def search():
             if not player_data:
                 continue
 
-            champion = player_data["championName"]
+            if player_data["win"]:
+                wins += 1
 
-            result = "Victory" if player_data["win"] else "Defeat"
+            champion = player_data["championName"]
 
             analysis = analyze_game(player_data)
 
-            champion_img = f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{champion}.png"
-
-            items = []
-
-            for i in range(7):
-
-                item = player_data[f"item{i}"]
-
-                if item != 0:
-
-                    items.append(
-                        f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/item/{item}.png"
-                    )
-
             games.append({
 
-                "champion_img": champion_img,
+                "champion": champion,
+
+                "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{champion}.png",
+
                 "kda": f"{player_data['kills']}/{player_data['deaths']}/{player_data['assists']}",
+
                 "cs": player_data["totalMinionsKilled"],
+
                 "vision": player_data["visionScore"],
+
                 "gold": player_data["goldEarned"],
-                "result": result,
-                "analysis": analysis,
-                "items": items
+
+                "result": "Victory" if player_data["win"] else "Defeat",
+
+                "analysis": analysis
             })
 
+        winrate = int((wins/len(games))*100) if games else 0
+
         return render_template(
-            "index.html",
+
+            "profile.html",
+
             player=player,
+            level=level,
             rank=rank,
             rank_icon=rank_icon,
-            games=games
+            games=games,
+            winrate=winrate
+
         )
 
     except Exception as e:
 
         print("ERROR:", e)
 
-        return render_template("index.html", games=[])
-        
+        return redirect("/")
+
 
 if __name__ == "__main__":
     app.run(debug=True)
