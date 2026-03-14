@@ -32,7 +32,7 @@ def ai_coach(games):
         tips.append("Try dying less and improve positioning.")
 
     if kills / len(games) < 4:
-        tips.append("Low kill participation. Try roaming more.")
+        tips.append("Your damage impact seems low. Try playing more aggressively.")
 
     if kda > 4:
         tips.append("Excellent KDA. Keep it up.")
@@ -94,10 +94,15 @@ def search():
 
         matches_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=10"
 
-        match_ids = session.get(
+        matches_response = session.get(
             matches_url,
             headers={"X-Riot-Token": API_KEY}
-        ).json()
+        )
+
+        if matches_response.status_code != 200:
+            return render_template("error.html", message="Match history unavailable")
+
+        match_ids = matches_response.json()
 
         games = []
 
@@ -170,7 +175,10 @@ def search():
 
         print("SERVER ERROR:", e)
 
-        return render_template("error.html", message="Server error. Check API key.")
+        return render_template(
+            "error.html",
+            message="Server error. Check API key or logs."
+        )
 
 
 if __name__ == "__main__":
