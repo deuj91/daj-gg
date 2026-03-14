@@ -4,16 +4,49 @@ import os
 
 app = Flask(__name__)
 
-API_KEY = os.environ.get("RGAPI-17629850-7fb2-4282-ad49-3607656edeb0")
+API_KEY = os.environ.get("RIOT_API_KEY")
+
 REGION = "europe"
 PLATFORM = "euw1"
 
 DD_VERSION = "14.1.1"
 
+CACHE = {}
 
-def get_rank_icon(tier):
-    tier = tier.lower()
-    return f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier}.png"
+def cached_get(url):
+
+    if url in CACHE:
+        return CACHE[url]
+
+    r = requests.get(url, timeout=5)
+
+    if r.status_code != 200:
+        return None
+
+    data = r.json()
+
+    CACHE[url] = data
+
+    return data
+
+
+def analyze_game(player):
+
+    score = player["kills"]*2 + player["assists"] - player["deaths"]
+
+    if score > 15:
+        return "MVP performance 🔥"
+
+    if player["deaths"] > 10:
+        return "Feeding too much ⚠️"
+
+    if player["visionScore"] > 30:
+        return "Excellent vision control 👁️"
+
+    if player["totalMinionsKilled"] > 200:
+        return "Great farming 💰"
+
+    return "Average game"
 
 
 @app.route("/")
@@ -29,28 +62,26 @@ def search():
     if not player or "#" not in player:
         return redirect("/")
 
-    try:
+    name, tag = player.split("#")
 
-        name, tag = player.split("#")
+    try:
 
         # ACCOUNT
         url = f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
-        r = requests.get(url)
+        account = cached_get(url)
 
-        if r.status_code != 200:
-            return render_template("index.html", games=[], player=player)
+        if not account:
+            return render_template("index.html", games=[])
 
-        account = r.json()
         puuid = account["puuid"]
 
         # SUMMONER
         url = f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={API_KEY}"
-        r = requests.get(url)
+        summoner = cached_get(url)
 
-        if r.status_code != 200:
-            return render_template("index.html", games=[], player=player)
+        if not summoner:
+            return render_template("index.html", games=[])
 
-        summoner = r.json()
         summoner_id = summoner["id"]
 
         # RANK
@@ -58,44 +89,36 @@ def search():
         rank_icon = ""
 
         url = f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={API_KEY}"
-        r = requests.get(url)
+        rank_data = cached_get(url)
 
-        if r.status_code == 200 and len(r.json()) > 0:
-            ranked = r.json()[0]
+        if rank_data and len(rank_data) > 0:
 
-            tier = ranked["tier"]
-            division = ranked["rank"]
+            tier = rank_data[0]["tier"]
+            div = rank_data[0]["rank"]
 
-            rank = f"{tier} {division}"
-            rank_icon = get_rank_icon(tier)
+            rank = f"{tier} {div}"
 
-        # MATCHES
-        url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={API_KEY}"
-        r = requests.get(url)
+            rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier.lower()}.png"
 
-        if r.status_code != 200:
-            return render_template(
-                "index.html",
-                player=player,
-                rank=rank,
-                rank_icon=rank_icon,
-                games=[]
-            )
+        # MATCH LIST
+        url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=3&api_key={API_KEY}"
+        match_ids = cached_get(url)
 
-        match_ids = r.json()
+        if not match_ids:
+            return render_template("index.html", games=[])
 
         games = []
 
         for match_id in match_ids:
 
             url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={API_KEY}"
-            r = requests.get(url)
+            match = cached_get(url)
 
-            if r.status_code != 200:
+            if not match:
                 continue
 
-            match = r.json()
             info = match["info"]
+
             participants = info["participants"]
 
             player_data = None
@@ -110,17 +133,9 @@ def search():
 
             champion = player_data["championName"]
 
-            k = player_data["kills"]
-            d = player_data["deaths"]
-            a = player_data["assists"]
-
-            kda = f"{k}/{d}/{a}"
-
-            cs = player_data["totalMinionsKilled"]
-            gold = player_data["goldEarned"]
-            vision = player_data["visionScore"]
-
             result = "Victory" if player_data["win"] else "Defeat"
+
+            analysis = analyze_game(player_data)
 
             champion_img = f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{champion}.png"
 
@@ -131,82 +146,37 @@ def search():
                 item = player_data[f"item{i}"]
 
                 if item != 0:
+
                     items.append(
                         f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/item/{item}.png"
                     )
 
-            allies = []
-
-            team_id = player_data["teamId"]
-
-            for p in participants:
-
-                if p["teamId"] != team_id or p["puuid"] == puuid:
-                    continue
-
-                ally_items = []
-
-                for i in range(7):
-
-                    item = p[f"item{i}"]
-
-                    if item != 0:
-                        ally_items.append(
-                            f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/item/{item}.png"
-                        )
-
-                allies.append({
-                    "name": p.get("riotIdGameName", "Unknown"),
-                    "champion": p["championName"],
-                    "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{p['championName']}.png",
-                    "kda": f"{p['kills']}/{p['deaths']}/{p['assists']}",
-                    "items_list": ally_items
-                })
-
-            # ANALYSE SIMPLE
-            analysis = "Game difficile"
-
-            if cs > 180:
-                analysis = "Très bon farm"
-
-            if k > 10:
-                analysis = "Très bonne performance"
-
             games.append({
+
                 "champion_img": champion_img,
-                "kda": kda,
-                "cs": cs,
-                "gold": gold,
-                "vision": vision,
+                "kda": f"{player_data['kills']}/{player_data['deaths']}/{player_data['assists']}",
+                "cs": player_data["totalMinionsKilled"],
+                "vision": player_data["visionScore"],
+                "gold": player_data["goldEarned"],
                 "result": result,
-                "items_list": items,
                 "analysis": analysis,
-                "analysis_details": [
-                    f"Kills : {k}",
-                    f"CS : {cs}",
-                    f"Vision : {vision}"
-                ],
-                "allies": allies
+                "items": items
             })
 
         return render_template(
             "index.html",
-            games=games,
             player=player,
             rank=rank,
-            rank_icon=rank_icon
+            rank_icon=rank_icon,
+            games=games
         )
 
     except Exception as e:
 
-        print("ERROR :", e)
+        print("ERROR:", e)
 
-        return render_template(
-            "index.html",
-            games=[],
-            player=player
-        )
-
+        return render_template("index.html", games=[])
+        
 
 if __name__ == "__main__":
     app.run(debug=True)
