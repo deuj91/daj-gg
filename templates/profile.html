@@ -3,7 +3,7 @@
 
 <head>
 
-<title>{{ name }} - DAJ.GG</title>
+<title>{{name}} - DAJ.GG</title>
 <link rel="stylesheet" href="/static/style.css">
 
 </head>
@@ -12,7 +12,7 @@
 
 <div class="container">
 
-<h1>{{ name }}</h1>
+<h1>{{name}}</h1>
 
 <div class="coach">
 
@@ -21,7 +21,7 @@
 <ul>
 
 {% for tip in tips %}
-<li>{{ tip }}</li>
+<li>{{tip}}</li>
 {% endfor %}
 
 </ul>
@@ -34,34 +34,32 @@
 
 <div class="match">
 
-<div class="match-summary" onclick="toggle({{ loop.index }})">
+<div class="summary" onclick="toggle({{loop.index}})">
 
-<img class="champion"
+<img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{game.champion}}.png">
 
-<div class="kda">
+<span class="kda">
 
 {{game.kills}} / {{game.deaths}} / {{game.assists}}
 
-</div>
+</span>
 
-<div class="result {% if game.win %}win{% else %}lose{% endif %}">
+<span class="{% if game.win %}win{% else %}lose{% endif %}">
 
 {% if game.win %}Victory{% else %}Defeat{% endif %}
 
-</div>
+</span>
 
 </div>
 
-<div class="match-details" id="match{{loop.index}}">
-
-<div class="players">
+<div id="match{{loop.index}}" class="details">
 
 {% for player in game.players %}
 
 <div class="player">
 
-<img class="champion-small"
+<img class="champ-small"
 src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{player.champion}}.png">
 
 <span>{{player.name}}</span>
@@ -71,7 +69,7 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{player.champi
 {% for item in player.items %}
 {% if item != 0 %}
 
-<img class="item"
+<img
 src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
 
 {% endif %}
@@ -87,8 +85,6 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
 
 </div>
 
-</div>
-
 {% endfor %}
 
 </div>
@@ -97,13 +93,12 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
 
 function toggle(id){
 
-let el = document.getElementById("match"+id)
+let el=document.getElementById("match"+id)
 
-if(el.style.display === "block"){
-el.style.display = "none"
-}else{
-el.style.display = "block"
-}
+el.style.display =
+el.style.display==="block"
+? "none"
+: "block"
 
 }
 
