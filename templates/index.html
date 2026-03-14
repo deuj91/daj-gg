@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
 <title>DAJ.GG</title>
@@ -10,81 +11,22 @@
 
 <body>
 
-<div class="header">
+<div class="hero">
 
 <h1>DAJ.GG</h1>
 
+<p>League of Legends Match Analyzer</p>
+
 <form action="/search">
 
-<input type="text" name="player" placeholder="Pseudo#TAG">
+<input name="player" placeholder="Pseudo#TAG">
 
-<button type="submit">Search</button>
+<button>Search</button>
 
 </form>
 
 </div>
 
-{% if player %}
-
-<div class="profile">
-
-<h2>{{player}}</h2>
-
-{% if rank_icon %}
-
-<img src="{{rank_icon}}" width="80">
-
-<p>{{rank}}</p>
-
-{% endif %}
-
-</div>
-
-{% endif %}
-
-
-{% if games %}
-
-<div class="games">
-
-{% for game in games %}
-
-<div class="game {{game.result}}">
-
-<img src="{{game.champion_img}}" class="champion">
-
-<div class="stats">
-
-<p>KDA : {{game.kda}}</p>
-<p>CS : {{game.cs}}</p>
-<p>Vision : {{game.vision}}</p>
-<p>Gold : {{game.gold}}</p>
-
-</div>
-
-<div class="analysis">
-
-{{game.analysis}}
-
-</div>
-
-<div class="items">
-
-{% for item in game.items %}
-
-<img src="{{item}}">
-
-{% endfor %}
-
-</div>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-{% endif %}
-
 </body>
+
 </html>
