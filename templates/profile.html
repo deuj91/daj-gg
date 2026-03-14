@@ -3,25 +3,61 @@
 
 <head>
 
-<title>DAJ.GG</title>
 <link rel="stylesheet" href="/static/style.css">
 
 </head>
 
 <body>
 
-<div class="hero">
+<div class="profile">
 
-<h1>DAJ.GG</h1>
-<p>League of Legends AI Match Analyzer</p>
+<h2>{{player}}</h2>
 
-<form action="/search">
+<p>Level {{level}}</p>
 
-<input name="player" placeholder="Pseudo#TAG">
+<img src="{{rank_icon}}" width="90">
 
-<button type="submit">Search</button>
+<p>{{rank}}</p>
 
-</form>
+<p>Winrate: {{winrate}}%</p>
+
+<p>Average KDA: {{avg_kda}}</p>
+
+<p>Average CS: {{avg_cs}}</p>
+
+</div>
+
+<div class="games">
+
+{% for game in games %}
+
+<div class="game {{game.result}}">
+
+<img src="{{game.champion_img}}" class="champion">
+
+<p>KDA {{game.kda}}</p>
+
+<p>CS {{game.cs}}</p>
+
+<p>Vision {{game.vision}}</p>
+
+<p>Kill participation {{game.kp}}%</p>
+
+<p>MVP: {{game.mvp}}</p>
+
+<p>Worst player: {{game.feeder}}</p>
+
+<ul>
+
+{% for tip in game.coach %}
+<li>{{tip}}</li>
+{% endfor %}
+
+</ul>
+
+</div>
+
+{% endfor %}
 
 </div>
 
