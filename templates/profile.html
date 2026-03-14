@@ -1,26 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 
-<title>{{ player }}</title>
+<title>{{ name }} - DAJ.GG</title>
 
 <link rel="stylesheet" href="/static/style.css">
-
-<script>
-
-function toggleGame(id){
-
-const el = document.getElementById(id)
-
-if(el.classList.contains("open")){
-el.classList.remove("open")
-}else{
-el.classList.add("open")
-}
-
-}
-
-</script>
 
 </head>
 
@@ -28,86 +13,75 @@ el.classList.add("open")
 
 <div class="container">
 
-<div class="profile-header">
+<h1>{{ name }}</h1>
 
-<h1>{{ player }}</h1>
-
-<div class="rank">
-
-{% if rank_icon %}
-<img src="{{ rank_icon }}" class="rank-icon">
-{% endif %}
-
-<span>{{ rank }}</span>
-
-</div>
-
-</div>
-
-<h2>Recent Games</h2>
+<p>Recent Matches</p>
 
 {% for game in games %}
 
-<div class="game">
+<div class="game" id="game{{ loop.index }}">
 
 <div class="game-summary" onclick="toggleGame('game{{ loop.index }}')">
 
-<img src="{{ game.champion_img }}" class="champ">
+<img
+class="champ"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{ game.champion }}.png"
+>
 
-<div class="summary-stats">
+<div>
 
-<div class="champ-name">{{ game.champion }}</div>
+<b>{{ game.champion }}</b><br>
 
-<div class="kda">{{ game.kda }}</div>
+{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
 
-<div class="extra">
-CS {{ game.cs }} • Vision {{ game.vision }} • Gold {{ game.gold }}
+</div>
+
+<div class="result {% if game.win %}victory{% else %}defeat{% endif %}">
+
+{% if game.win %}
+
+Victory
+
+{% else %}
+
+Defeat
+
+{% endif %}
+
 </div>
 
 </div>
 
-<div class="result {{ game.result|lower }}">
-{{ game.result }}
-</div>
-
-</div>
-
-<div class="game-details" id="game{{ loop.index }}">
-
-<h3>AI Coach</h3>
-
-<ul class="coach">
-
-{% for tip in game.coach %}
-<li>{{ tip }}</li>
-{% endfor %}
-
-</ul>
-
-<h3>Players</h3>
+<div class="game-details">
 
 <div class="players">
 
-{% for p in game.players %}
+{% for player in game.players %}
 
 <div class="player">
 
-<img src="{{ p.champion_img }}" class="champ-small">
+<img
+class="champ-small"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{ player.champion }}.png"
+>
 
-<div class="player-name">
-{{ p.summoner }}
-</div>
+<span>
 
-<div class="player-kda">
-{{ p.kda }}
-</div>
+{{ player.name }}
+
+</span>
 
 <div class="items">
 
-{% for item in p.items %}
+{% for item in player.items %}
 
 {% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/{{ item }}.png" class="item">
+
+<img
+class="item"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png"
+>
+
 {% endif %}
 
 {% endfor %}
@@ -128,5 +102,22 @@ CS {{ game.cs }} • Vision {{ game.vision }} • Gold {{ game.gold }}
 
 </div>
 
+<script>
+
+function toggleGame(id){
+
+const game = document.getElementById(id)
+
+if(game.classList.contains("open")){
+game.classList.remove("open")
+}else{
+game.classList.add("open")
+}
+
+}
+
+</script>
+
 </body>
+
 </html>
