@@ -1,1 +1,237 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+
+<title>LoL Match Analyzer</title>
+
+<style>
+
+body{
+background:#0f172a;
+color:#e5e7eb;
+font-family:Arial;
+display:flex;
+justify-content:center;
+}
+
+.container{
+width:1100px;
+padding:40px;
+}
+
+h1{
+text-align:center;
+color:#60a5fa;
+}
+
+.search{
+text-align:center;
+margin-bottom:30px;
+}
+
+input{
+padding:10px;
+width:260px;
+border:none;
+border-radius:6px;
+}
+
+button{
+padding:10px 16px;
+background:#3b82f6;
+border:none;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+.match{
+background:#1e293b;
+padding:15px;
+border-radius:8px;
+margin-bottom:12px;
+cursor:pointer;
+}
+
+.row{
+display:grid;
+grid-template-columns:60px 100px 120px 100px 120px 120px 140px 1fr;
+align-items:center;
+gap:15px;
+}
+
+.champion img{
+width:40px;
+border-radius:6px;
+}
+
+.items img{
+width:32px;
+margin-right:4px;
+}
+
+.victory{color:#22c55e;}
+.defeat{color:#ef4444;}
+
+.ai{
+color:#fbbf24;
+font-size:13px;
+}
+
+.allies{
+display:none;
+margin-top:12px;
+border-top:1px solid #334155;
+padding-top:12px;
+}
+
+.player{
+display:grid;
+grid-template-columns:50px 260px 140px 1fr;
+align-items:center;
+padding:8px 0;
+gap:25px;
+}
+
+.player img{
+width:36px;
+border-radius:6px;
+}
+
+.player .items{
+display:flex;
+justify-content:flex-end;
+gap:4px;
+}
+
+</style>
+
+<script>
+
+function toggle(id){
+
+let el=document.getElementById(id)
+
+if(el.style.display=="block"){
+el.style.display="none"
+}else{
+el.style.display="block"
+}
+
+}
+
+</script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>LoL Match Analyzer</h1>
+
+<form class="search" action="/search">
+
+<input name="player" placeholder="pseudo#tag">
+
+<button>Search</button>
+
+</form>
+
+{% if rank %}
+
+<div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:25px;">
+
+<img src="{{rank_icon}}" width="60">
+
+<h2>{{player}} — {{rank}}</h2>
+
+</div>
+
+{% endif %}
+
+{% for g in games %}
+
+<div class="match" onclick="toggle('m{{loop.index}}')">
+
+<div class="row">
+
+<div class="champion">
+<img src="{{g.champion_img}}">
+</div>
+
+<div class="{% if g.result=='Victory' %}victory{% else %}defeat{% endif %}">
+{{g.result}}
+</div>
+
+<div>{{g.kda}}</div>
+
+<div>CS {{g.cs}}</div>
+
+<div>Gold {{g.gold}}</div>
+
+<div>Vision {{g.vision}}</div>
+
+<div class="ai">
+{{g.analysis}}
+</div>
+
+<div class="items">
+
+{% for item in g.items_list %}
+<img src="{{item}}">
+{% endfor %}
+
+</div>
+
+</div>
+
+
+<div id="m{{loop.index}}" class="allies">
+
+<div class="ai">
+
+{% for a in g.analysis_details %}
+<div>{{a}}</div>
+{% endfor %}
+
+</div>
+
+{% for ally in g.allies %}
+
+<div class="player">
+
+<img src="{{ally.champion_img}}">
+
+<div>
+{{ally.name}} ({{ally.champion}})
+</div>
+
+<div>
+KDA {{ally.kda}}
+</div>
+
+<div class="items">
+
+{% for item in ally.items_list %}
+<img src="{{item}}">
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</body>
+
+</html>
