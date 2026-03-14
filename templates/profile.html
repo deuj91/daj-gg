@@ -4,7 +4,6 @@
 <head>
 
 <title>{{ name }} - DAJ.GG</title>
-
 <link rel="stylesheet" href="/static/style.css">
 
 </head>
@@ -15,44 +14,46 @@
 
 <h1>{{ name }}</h1>
 
-<p>Recent Matches</p>
+<div class="coach">
+
+<h2>AI Coach</h2>
+
+<ul>
+
+{% for tip in tips %}
+<li>{{ tip }}</li>
+{% endfor %}
+
+</ul>
+
+</div>
+
+<h2>Match History</h2>
 
 {% for game in games %}
 
-<div class="game" id="game{{ loop.index }}">
+<div class="match">
 
-<div class="game-summary" onclick="toggleGame('game{{ loop.index }}')">
+<div class="match-summary" onclick="toggle({{ loop.index }})">
 
-<img
-class="champ"
-src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{ game.champion }}.png"
->
+<img class="champion"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{game.champion}}.png">
 
-<div>
+<div class="kda">
 
-<b>{{ game.champion }}</b><br>
-
-{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
+{{game.kills}} / {{game.deaths}} / {{game.assists}}
 
 </div>
 
-<div class="result {% if game.win %}victory{% else %}defeat{% endif %}">
+<div class="result {% if game.win %}win{% else %}lose{% endif %}">
 
-{% if game.win %}
-
-Victory
-
-{% else %}
-
-Defeat
-
-{% endif %}
+{% if game.win %}Victory{% else %}Defeat{% endif %}
 
 </div>
 
 </div>
 
-<div class="game-details">
+<div class="match-details" id="match{{loop.index}}">
 
 <div class="players">
 
@@ -60,30 +61,20 @@ Defeat
 
 <div class="player">
 
-<img
-class="champ-small"
-src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{ player.champion }}.png"
->
+<img class="champion-small"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{player.champion}}.png">
 
-<span>
-
-{{ player.name }}
-
-</span>
+<span>{{player.name}}</span>
 
 <div class="items">
 
 {% for item in player.items %}
-
 {% if item != 0 %}
 
-<img
-class="item"
-src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png"
->
+<img class="item"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
 
 {% endif %}
-
 {% endfor %}
 
 </div>
@@ -104,14 +95,14 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png"
 
 <script>
 
-function toggleGame(id){
+function toggle(id){
 
-const game = document.getElementById(id)
+let el = document.getElementById("match"+id)
 
-if(game.classList.contains("open")){
-game.classList.remove("open")
+if(el.style.display === "block"){
+el.style.display = "none"
 }else{
-game.classList.add("open")
+el.style.display = "block"
 }
 
 }
@@ -119,5 +110,4 @@ game.classList.add("open")
 </script>
 
 </body>
-
 </html>
