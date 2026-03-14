@@ -12,7 +12,7 @@ cache = Cache(config={
 
 cache.init_app(app)
 
-API_KEY = os.environ.get("RGAPI-17629850-7fb2-4282-ad49-3607656edeb0")
+API_KEY = os.environ.get("RGAPI-01a0c419-b7e4-4597-a53e-dc7d7e7efffd")
 
 REGION = "europe"
 PLATFORM = "euw1"
