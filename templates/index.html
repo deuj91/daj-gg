@@ -4,7 +4,6 @@
 <head>
 
 <title>DAJ.GG</title>
-
 <link rel="stylesheet" href="/static/style.css">
 
 </head>
@@ -13,37 +12,23 @@
 
 <div class="hero">
 
-<h1 class="logo">DAJ.GG</h1>
+<h1>DAJ.GG</h1>
 
-<p class="subtitle">
-League of Legends Player Analyzer
-</p>
+<p>League of Legends player analytics</p>
 
-<form action="/search" class="search-box">
+<form action="/search">
 
 <input
 type="text"
 name="player"
-placeholder="Search player (Name#TAG)"
-required
->
+placeholder="Enter Riot ID (Caps#EUW)"
+required>
 
-<button type="submit">
-Search
-</button>
+<button type="submit">Search</button>
 
 </form>
-
-<div class="examples">
-
-Try:
-<span>Caps#EUW</span>
-<span>Faker#KR1</span>
-
-</div>
 
 </div>
 
 </body>
-
 </html>
