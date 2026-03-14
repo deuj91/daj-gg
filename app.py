@@ -4,7 +4,7 @@ import time
 
 app = Flask(__name__)
 
-API_KEY = "RGAPI-xxxxxxxxxxxxxxxx"
+API_KEY = "RGAPI-17629850-7fb2-4282-ad49-3607656edeb0"
 REGION = "europe"
 MATCH_REGION = "europe"
 
