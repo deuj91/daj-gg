@@ -1,49 +1,101 @@
 body{
 
-background:#0b1220;
-color:white;
-font-family:Arial, Helvetica, sans-serif;
 margin:0;
-padding:40px;
+font-family:Arial, Helvetica, sans-serif;
+background:linear-gradient(180deg,#0f172a,#020617);
+color:white;
 
 }
+
+/* HERO */
+
+.hero{
+
+height:100vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+
+}
+
+.logo{
+
+font-size:70px;
+font-weight:bold;
+color:#38bdf8;
+
+}
+
+.subtitle{
+
+color:#94a3b8;
+margin-bottom:30px;
+
+}
+
+/* SEARCH */
+
+.search-box{
+
+display:flex;
+background:#0f172a;
+padding:10px;
+border-radius:10px;
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+
+}
+
+.search-box input{
+
+padding:12px;
+width:260px;
+border:none;
+background:none;
+color:white;
+font-size:16px;
+
+}
+
+.search-box button{
+
+background:#38bdf8;
+border:none;
+padding:12px 20px;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+
+}
+
+.examples{
+
+margin-top:15px;
+color:#64748b;
+
+}
+
+.examples span{
+
+margin:0 8px;
+}
+
+/* PROFILE PAGE */
 
 .container{
 
 max-width:1100px;
 margin:auto;
-
-}
-
-.profile-header{
-
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:30px;
-
-}
-
-.rank{
-
-display:flex;
-align-items:center;
-gap:10px;
-
-}
-
-.rank-icon{
-
-width:40px;
+padding:30px;
 
 }
 
 .game{
 
 background:#111827;
-border-radius:10px;
 margin-bottom:15px;
-overflow:hidden;
+border-radius:10px;
 
 }
 
@@ -54,13 +106,6 @@ align-items:center;
 gap:15px;
 padding:15px;
 cursor:pointer;
-transition:0.2s;
-
-}
-
-.game-summary:hover{
-
-background:#1f2937;
 
 }
 
@@ -71,55 +116,26 @@ border-radius:8px;
 
 }
 
-.summary-stats{
-
-flex:1;
-
-}
-
-.champ-name{
-
-font-size:18px;
-font-weight:bold;
-
-}
-
-.kda{
-
-font-size:16px;
-margin-top:4px;
-
-}
-
-.extra{
-
-font-size:13px;
-color:#9ca3af;
-margin-top:3px;
-
-}
-
 .result{
 
+margin-left:auto;
 font-weight:bold;
-padding:6px 12px;
-border-radius:6px;
 
 }
 
 .victory{
 
-background:#065f46;
-color:#10b981;
+color:#22c55e;
 
 }
 
 .defeat{
 
-background:#7f1d1d;
 color:#ef4444;
 
 }
+
+/* DROPDOWN */
 
 .game-details{
 
@@ -129,18 +145,19 @@ border-top:1px solid #1f2937;
 
 }
 
-.game-details.open{
+.game.open .game-details{
 
 display:block;
 
 }
 
+/* PLAYERS */
+
 .players{
 
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:15px;
+gap:8px;
 
 }
 
@@ -148,37 +165,23 @@ margin-top:15px;
 
 display:flex;
 align-items:center;
-gap:10px;
-background:#0b1220;
-padding:8px;
+gap:8px;
+background:#020617;
+padding:6px;
 border-radius:6px;
+font-size:13px;
 
 }
 
 .champ-small{
 
-width:35px;
-border-radius:6px;
-
-}
-
-.player-name{
-
-flex:1;
-font-size:14px;
-
-}
-
-.player-kda{
-
-width:70px;
-font-size:13px;
-color:#9ca3af;
+width:30px;
 
 }
 
 .items{
 
+margin-left:auto;
 display:flex;
 gap:3px;
 
@@ -186,15 +189,6 @@ gap:3px;
 
 .item{
 
-width:22px;
-border-radius:3px;
-
-}
-
-.coach{
-
-margin-top:10px;
-margin-bottom:20px;
-color:#cbd5f5;
+width:20px;
 
 }
