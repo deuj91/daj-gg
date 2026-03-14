@@ -1,81 +1,132 @@
-body{
-background:#0f172a;
-color:white;
-font-family:Arial;
-margin:0;
-padding:40px;
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>{{ player }}</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+<script>
+
+function toggleGame(id){
+
+const el = document.getElementById(id)
+
+if(el.classList.contains("open")){
+el.classList.remove("open")
+}else{
+el.classList.add("open")
 }
 
-.container{
-max-width:900px;
-margin:auto;
 }
 
-.rank{
-display:flex;
-align-items:center;
-gap:10px;
-margin-bottom:20px;
-}
+</script>
 
-.rank-icon{
-width:40px;
-}
+</head>
 
-.game{
-background:#1e293b;
-border-radius:10px;
-margin-top:20px;
-overflow:hidden;
-}
+<body>
 
-.game-header{
-display:flex;
-gap:20px;
-padding:15px;
-cursor:pointer;
-transition:0.2s;
-}
+<div class="container">
 
-.game-header:hover{
-background:#334155;
-}
+<div class="profile-header">
 
-.champ{
-width:60px;
-border-radius:8px;
-}
+<h1>{{ player }}</h1>
 
-.game-details{
-padding:15px;
-border-top:1px solid #334155;
-}
+<div class="rank">
 
-.players{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:6px;
-margin-top:10px;
-}
+{% if rank_icon %}
+<img src="{{ rank_icon }}" class="rank-icon">
+{% endif %}
 
-.player{
-background:#0f172a;
-padding:6px;
-border-radius:6px;
-display:flex;
-align-items:center;
-gap:8px;
-font-size:13px;
-}
+<span>{{ rank }}</span>
 
-.name{
-flex:1;
-}
+</div>
 
-.victory{
-color:#22c55e;
-}
+</div>
 
-.defeat{
-color:#ef4444;
-}
+<h2>Recent Games</h2>
+
+{% for game in games %}
+
+<div class="game">
+
+<div class="game-summary" onclick="toggleGame('game{{ loop.index }}')">
+
+<img src="{{ game.champion_img }}" class="champ">
+
+<div class="summary-stats">
+
+<div class="champ-name">{{ game.champion }}</div>
+
+<div class="kda">{{ game.kda }}</div>
+
+<div class="extra">
+CS {{ game.cs }} • Vision {{ game.vision }} • Gold {{ game.gold }}
+</div>
+
+</div>
+
+<div class="result {{ game.result|lower }}">
+{{ game.result }}
+</div>
+
+</div>
+
+<div class="game-details" id="game{{ loop.index }}">
+
+<h3>AI Coach</h3>
+
+<ul class="coach">
+
+{% for tip in game.coach %}
+<li>{{ tip }}</li>
+{% endfor %}
+
+</ul>
+
+<h3>Players</h3>
+
+<div class="players">
+
+{% for p in game.players %}
+
+<div class="player">
+
+<img src="{{ p.champion_img }}" class="champ-small">
+
+<div class="player-name">
+{{ p.summoner }}
+</div>
+
+<div class="player-kda">
+{{ p.kda }}
+</div>
+
+<div class="items">
+
+{% for item in p.items %}
+
+{% if item != 0 %}
+<img src="https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/{{ item }}.png" class="item">
+{% endif %}
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</body>
+</html>
