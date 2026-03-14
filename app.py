@@ -13,21 +13,26 @@ DD_VERSION = "14.1.1"
 
 CACHE = {}
 
+
 def cached_get(url):
 
     if url in CACHE:
         return CACHE[url]
 
-    r = requests.get(url, timeout=5)
+    try:
+        r = requests.get(url, timeout=5)
 
-    if r.status_code != 200:
+        if r.status_code != 200:
+            return None
+
+        data = r.json()
+
+        CACHE[url] = data
+
+        return data
+
+    except:
         return None
-
-    data = r.json()
-
-    CACHE[url] = data
-
-    return data
 
 
 def ai_analysis(player):
@@ -35,9 +40,6 @@ def ai_analysis(player):
     kills = player["kills"]
     deaths = player["deaths"]
     assists = player["assists"]
-    cs = player["totalMinionsKilled"]
-    vision = player["visionScore"]
-    gold = player["goldEarned"]
 
     score = kills*3 + assists*2 - deaths
 
@@ -47,16 +49,48 @@ def ai_analysis(player):
     if deaths > 10:
         return "⚠️ Too many deaths"
 
-    if cs > 200:
-        return "💰 Excellent farming"
+    if score > 10:
+        return "👍 Good game"
 
-    if vision > 35:
-        return "👁️ Great vision control"
+    return "⚖️ Average performance"
+
+
+def ai_coach(player, game):
+
+    tips = []
+
+    kills = player["kills"]
+    deaths = player["deaths"]
+    assists = player["assists"]
+    cs = player["totalMinionsKilled"]
+    vision = player["visionScore"]
+    gold = player["goldEarned"]
+
+    duration = game["info"]["gameDuration"] / 60
+
+    cs_min = cs / duration
+
+    kda = (kills + assists) / max(1, deaths)
+
+    if deaths > 8:
+        tips.append("⚠️ You die too much. Try safer positioning.")
+
+    if cs_min < 6:
+        tips.append("💰 Your CS per minute is low. Focus more on farming.")
+
+    if vision < 20:
+        tips.append("👁️ Your vision score is low. Place more wards.")
+
+    if kda > 4:
+        tips.append("🔥 Excellent fight performance.")
 
     if gold > 15000:
-        return "💎 Strong economy"
+        tips.append("💎 Strong gold income.")
 
-    return "👍 Solid game"
+    if not tips:
+        tips.append("👍 Solid game overall.")
+
+    return tips
 
 
 @app.route("/")
@@ -111,6 +145,7 @@ def search():
         games = []
 
         wins = 0
+
         total_k = total_d = total_a = total_cs = 0
 
         for match_id in match_ids:
@@ -150,6 +185,8 @@ def search():
 
             analysis = ai_analysis(player_data)
 
+            coach = ai_coach(player_data, match)
+
             games.append({
 
                 "champion": champion,
@@ -166,7 +203,9 @@ def search():
 
                 "result": "Victory" if player_data["win"] else "Defeat",
 
-                "analysis": analysis
+                "analysis": analysis,
+
+                "coach": coach
             })
 
         count = len(games)
@@ -194,7 +233,6 @@ def search():
     except Exception as e:
 
         print("ERROR:", e)
-
         return redirect("/")
 
 
