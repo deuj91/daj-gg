@@ -1,59 +1,102 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
+<title>{{ player }}</title>
+
 <link rel="stylesheet" href="/static/style.css">
+
+<script>
+
+function toggleGame(id){
+
+const el = document.getElementById(id)
+
+if(el.style.display === "none"){
+el.style.display = "block"
+}else{
+el.style.display = "none"
+}
+
+}
+
+</script>
 
 </head>
 
 <body>
 
-<div class="profile">
+<div class="container">
 
-<h2>{{player}}</h2>
+<h1>{{ player }}</h1>
 
-<p>Level {{level}}</p>
+<div class="rank">
 
-<img src="{{rank_icon}}" width="90">
+{% if rank_icon %}
+<img src="{{ rank_icon }}" class="rank-icon">
+{% endif %}
 
-<p>{{rank}}</p>
-
-<p>Winrate: {{winrate}}%</p>
-
-<p>Average KDA: {{avg_kda}}</p>
-
-<p>Average CS: {{avg_cs}}</p>
+<span>{{ rank }}</span>
 
 </div>
 
-<div class="games">
+<h2>Recent Games</h2>
 
 {% for game in games %}
 
-<div class="game {{game.result}}">
+<div class="game">
 
-<img src="{{game.champion_img}}" class="champion">
+<div class="game-header" onclick="toggleGame('game{{ loop.index }}')">
 
-<p>KDA {{game.kda}}</p>
+<img src="{{ game.champion_img }}" class="champ">
 
-<p>CS {{game.cs}}</p>
+<div>
 
-<p>Vision {{game.vision}}</p>
+<h3>{{ game.champion }}</h3>
 
-<p>Kill participation {{game.kp}}%</p>
+<p>KDA: {{ game.kda }}</p>
 
-<p>MVP: {{game.mvp}}</p>
+<p>CS: {{ game.cs }} | Vision: {{ game.vision }}</p>
 
-<p>Worst player: {{game.feeder}}</p>
+<p class="{{ game.result|lower }}">{{ game.result }}</p>
+
+</div>
+
+</div>
+
+<div class="game-details" id="game{{ loop.index }}" style="display:none">
+
+<h4>AI Coach</h4>
 
 <ul>
 
 {% for tip in game.coach %}
-<li>{{tip}}</li>
+<li>{{ tip }}</li>
 {% endfor %}
 
 </ul>
+
+<h4>Players</h4>
+
+<div class="players">
+
+{% for p in game.players %}
+
+<div class="player">
+
+<img src="{{ p.champion_img }}" width="30">
+
+<span class="name">{{ p.summoner }}</span>
+
+<span>{{ p.kda }}</span>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
 
 </div>
 
