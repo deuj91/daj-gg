@@ -1,134 +1,99 @@
 body{
-
 margin:0;
 font-family:Arial;
 background:#0f172a;
 color:white;
-
 }
 
-.hero{
-
+.home{
 height:100vh;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
 text-align:center;
-
 }
 
-.hero h1{
-
+.home h1{
 font-size:60px;
 margin-bottom:10px;
-
 }
 
-.hero input{
-
+.home input{
 padding:12px;
-width:300px;
-border-radius:5px;
+width:260px;
 border:none;
-
+border-radius:6px;
 }
 
-.hero button{
-
+.home button{
 padding:12px 20px;
-margin-left:5px;
 background:#2563eb;
 border:none;
 color:white;
-border-radius:5px;
+border-radius:6px;
 cursor:pointer;
-
 }
 
 .container{
-
 width:900px;
 margin:auto;
-padding-top:40px;
-
+padding:40px;
 }
 
 .match{
-
 background:#1e293b;
 margin-bottom:10px;
 border-radius:8px;
-
 }
 
 .summary{
-
 padding:10px;
 display:flex;
 align-items:center;
 cursor:pointer;
-
 }
 
 .summary:hover{
-
 background:#334155;
-
 }
 
 .champ{
-
-width:48px;
+width:45px;
 margin-right:10px;
-
 }
 
 .champ-small{
-
 width:28px;
-
 }
 
 .details{
-
 display:none;
 padding:10px;
-
 }
 
 .player{
-
 display:flex;
 align-items:center;
 gap:8px;
 margin-bottom:6px;
-
 }
 
 .items img{
-
 width:22px;
-
 }
 
 .win{
-
 color:#22c55e;
-
 }
 
 .lose{
-
 color:#ef4444;
-
 }
 
 .coach{
-
 background:#020617;
 padding:15px;
 border-radius:8px;
 margin-bottom:20px;
-
 }
