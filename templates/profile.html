@@ -12,10 +12,10 @@ function toggleGame(id){
 
 const el = document.getElementById(id)
 
-if(el.style.display === "none"){
-el.style.display = "block"
+if(el.classList.contains("open")){
+el.classList.remove("open")
 }else{
-el.style.display = "none"
+el.classList.add("open")
 }
 
 }
@@ -27,6 +27,8 @@ el.style.display = "none"
 <body>
 
 <div class="container">
+
+<div class="profile-header">
 
 <h1>{{ player }}</h1>
 
@@ -40,35 +42,41 @@ el.style.display = "none"
 
 </div>
 
+</div>
+
 <h2>Recent Games</h2>
 
 {% for game in games %}
 
 <div class="game">
 
-<div class="game-header" onclick="toggleGame('game{{ loop.index }}')">
+<div class="game-summary" onclick="toggleGame('game{{ loop.index }}')">
 
 <img src="{{ game.champion_img }}" class="champ">
 
-<div>
+<div class="summary-stats">
 
-<h3>{{ game.champion }}</h3>
+<div class="champ-name">{{ game.champion }}</div>
 
-<p>KDA: {{ game.kda }}</p>
+<div class="kda">{{ game.kda }}</div>
 
-<p>CS: {{ game.cs }} | Vision: {{ game.vision }}</p>
-
-<p class="{{ game.result|lower }}">{{ game.result }}</p>
-
+<div class="extra">
+CS {{ game.cs }} • Vision {{ game.vision }} • Gold {{ game.gold }}
 </div>
 
 </div>
 
-<div class="game-details" id="game{{ loop.index }}" style="display:none">
+<div class="result {{ game.result|lower }}">
+{{ game.result }}
+</div>
 
-<h4>AI Coach</h4>
+</div>
 
-<ul>
+<div class="game-details" id="game{{ loop.index }}">
+
+<h3>AI Coach</h3>
+
+<ul class="coach">
 
 {% for tip in game.coach %}
 <li>{{ tip }}</li>
@@ -76,7 +84,7 @@ el.style.display = "none"
 
 </ul>
 
-<h4>Players</h4>
+<h3>Players</h3>
 
 <div class="players">
 
@@ -84,11 +92,27 @@ el.style.display = "none"
 
 <div class="player">
 
-<img src="{{ p.champion_img }}" width="30">
+<img src="{{ p.champion_img }}" class="champ-small">
 
-<span class="name">{{ p.summoner }}</span>
+<div class="player-name">
+{{ p.summoner }}
+</div>
 
-<span>{{ p.kda }}</span>
+<div class="player-kda">
+{{ p.kda }}
+</div>
+
+<div class="items">
+
+{% for item in p.items %}
+
+{% if item != 0 %}
+<img src="https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/{{ item }}.png" class="item">
+{% endif %}
+
+{% endfor %}
+
+</div>
 
 </div>
 
