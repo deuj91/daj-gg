@@ -1,57 +1,45 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request
 import requests
+import time
 import os
 
 app = Flask(__name__)
 
 API_KEY = os.environ.get("RIOT_API_KEY")
 
-REGION = "europe"
-PLATFORM = "euw1"
-DD_VERSION = "14.1.1"
+REGION = "euw1"
+MATCH_REGION = "europe"
+
+session = requests.Session()
+
+CACHE = {}
+CACHE_TIME = 300
 
 
-def riot_get(url):
-    try:
-        r = requests.get(url, timeout=10)
-
-        if r.status_code != 200:
-            print("API ERROR:", r.text)
-            return None
-
-        return r.json()
-
-    except Exception as e:
-        print("REQUEST ERROR:", e)
-        return None
-
-
-def ai_coach(player):
+def ai_coach(games):
 
     tips = []
 
-    kills = player.get("kills", 0)
-    deaths = player.get("deaths", 0)
-    assists = player.get("assists", 0)
-    cs = player.get("totalMinionsKilled", 0)
-    vision = player.get("visionScore", 0)
+    kills = sum(g["kills"] for g in games)
+    deaths = sum(g["deaths"] for g in games)
+    assists = sum(g["assists"] for g in games)
+
+    avg_kills = kills / len(games)
+    avg_deaths = deaths / len(games)
 
     kda = (kills + assists) / max(1, deaths)
 
-    if deaths > 8:
-        tips.append("Too many deaths, play safer.")
+    if avg_deaths > 7:
+        tips.append("You die too much. Try safer positioning.")
 
-    if cs < 120:
-        tips.append("Your farm is low, focus on CS.")
-
-    if vision < 15:
-        tips.append("Place more wards.")
+    if avg_kills < 4:
+        tips.append("Your impact is low. Try roaming more.")
 
     if kda > 4:
-        tips.append("Great teamfight impact.")
+        tips.append("Great KDA. You are performing well.")
 
     if not tips:
-        tips.append("Solid performance.")
+        tips.append("Balanced performance. Improve map awareness.")
 
     return tips
 
@@ -67,120 +55,95 @@ def search():
     player = request.args.get("player")
 
     if not player:
-        return redirect("/")
+        return "Player missing"
+
+    if player in CACHE:
+
+        data, t = CACHE[player]
+
+        if time.time() - t < CACHE_TIME:
+            return render_template(
+                "profile.html",
+                name=player,
+                games=data["games"],
+                tips=data["tips"]
+            )
 
     if "#" not in player:
-        return render_template("error.html", message="Use format: pseudo#tag")
+        return "Use RiotID format Name#TAG"
 
-    name, tag = player.split("#", 1)
+    name, tag = player.split("#")
 
-    print("SEARCH:", player)
-    print("API KEY:", API_KEY)
+    url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
-    if not API_KEY:
-        return render_template("error.html", message="API key missing")
+    acc = session.get(url, headers={"X-Riot-Token": API_KEY}).json()
 
-    # ACCOUNT
-    account_url = f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
-    account = riot_get(account_url)
+    puuid = acc["puuid"]
 
-    if not account or "puuid" not in account:
-        print("ACCOUNT ERROR:", account)
-        return render_template("error.html", message="Player not found")
+    matches_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=10"
 
-    puuid = account["puuid"]
-
-    # SUMMONER
-    summoner_url = f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}?api_key={API_KEY}"
-    summoner = riot_get(summoner_url)
-
-    if not summoner:
-        print("SUMMONER ERROR:", summoner)
-        return render_template("error.html", message="Summoner not found")
-
-    level = summoner.get("summonerLevel", 0)
-
-    summoner_id = summoner.get("id")
-
-    ranks = []
-    rank = "Unranked"
-    rank_icon = ""
-
-    if summoner_id:
-
-        rank_url = f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}?api_key={API_KEY}"
-        ranks = riot_get(rank_url)
-
-        if ranks and len(ranks) > 0:
-            tier = ranks[0]["tier"]
-            div = ranks[0]["rank"]
-
-            rank = f"{tier} {div}"
-
-            rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier.lower()}.png"
-
-    # MATCHES
-    matches_url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={API_KEY}"
-    match_ids = riot_get(matches_url)
-
-    if not match_ids:
-        return render_template("error.html", message="No matches found")
+    match_ids = session.get(matches_url, headers={"X-Riot-Token": API_KEY}).json()
 
     games = []
 
     for match_id in match_ids:
 
-        match_url = f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={API_KEY}"
-        match = riot_get(match_url)
+        murl = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
 
-        if not match:
-            continue
+        match = session.get(murl, headers={"X-Riot-Token": API_KEY}).json()
 
-        participants = match["info"]["participants"]
+        participants = match["metadata"]["participants"]
+        info = match["info"]["participants"]
 
-        player_data = None
+        players = []
 
-        for p in participants:
-            if p["puuid"] == puuid:
-                player_data = p
-                break
+        for p in info:
 
-        if not player_data:
-            continue
+            players.append({
 
-        coach = ai_coach(player_data)
+                "name": p["riotIdGameName"],
+                "champion": p["championName"],
+                "items": [
+                    p["item0"],
+                    p["item1"],
+                    p["item2"],
+                    p["item3"],
+                    p["item4"],
+                    p["item5"]
+                ]
 
-        champion = player_data.get("championName", "Unknown")
+            })
+
+        me = next(p for p in info if p["puuid"] == puuid)
 
         games.append({
 
-            "champion": champion,
-
-            "champion_img": f"https://ddragon.leagueoflegends.com/cdn/{DD_VERSION}/img/champion/{champion}.png",
-
-            "kda": f"{player_data.get('kills',0)}/{player_data.get('deaths',0)}/{player_data.get('assists',0)}",
-
-            "cs": player_data.get("totalMinionsKilled", 0),
-
-            "vision": player_data.get("visionScore", 0),
-
-            "gold": player_data.get("goldEarned", 0),
-
-            "result": "Victory" if player_data.get("win") else "Defeat",
-
-            "coach": coach
+            "champion": me["championName"],
+            "kills": me["kills"],
+            "deaths": me["deaths"],
+            "assists": me["assists"],
+            "win": me["win"],
+            "players": players
 
         })
 
+    tips = ai_coach(games)
+
+    CACHE[player] = (
+        {
+            "games": games,
+            "tips": tips
+        },
+        time.time()
+    )
+
     return render_template(
         "profile.html",
-        player=player,
-        level=level,
-        rank=rank,
-        rank_icon=rank_icon,
-        games=games
+        name=player,
+        games=games,
+        tips=tips
     )
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
