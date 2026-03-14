@@ -12,7 +12,7 @@ cache = Cache(config={
 
 cache.init_app(app)
 
-API_KEY = os.environ.get("RIOT_API_KEY")
+API_KEY = os.environ.get("RGAPI-17629850-7fb2-4282-ad49-3607656edeb0")
 
 REGION = "europe"
 PLATFORM = "euw1"
