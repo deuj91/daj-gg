@@ -2,74 +2,112 @@
 <html>
 <head>
 
-<title>daj.gg — LoL Match Analyzer</title>
+<title>DAJ.GG - LoL Match Analyzer</title>
 
 <style>
 
 body{
+margin:0;
 background:#0f172a;
 color:#e5e7eb;
 font-family:Arial;
+}
+
+/* HERO */
+
+.hero{
+height:420px;
+background-image:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg");
+background-size:cover;
+background-position:center;
 display:flex;
+flex-direction:column;
+align-items:center;
 justify-content:center;
-margin:0;
-}
-
-.container{
-width:1100px;
-padding:40px;
-}
-
-h1{
 text-align:center;
-color:#60a5fa;
-margin-bottom:30px;
+}
+
+.hero h1{
+font-size:48px;
+margin:0;
+color:white;
+text-shadow:0 0 10px black;
+}
+
+.hero p{
+font-size:20px;
+margin-top:10px;
+color:#e5e7eb;
+text-shadow:0 0 10px black;
 }
 
 .search{
-text-align:center;
-margin-bottom:35px;
+margin-top:25px;
 }
 
 .search input{
-padding:10px;
+padding:12px;
 width:260px;
 border:none;
 border-radius:6px;
-margin-right:6px;
 }
 
 .search button{
-padding:10px 16px;
+padding:12px 18px;
 background:#3b82f6;
 border:none;
 color:white;
 border-radius:6px;
 cursor:pointer;
+font-weight:bold;
 }
+
+.container{
+width:1100px;
+margin:auto;
+padding:40px;
+}
+
+/* FEATURES */
+
+.features{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+margin-bottom:40px;
+}
+
+.feature{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+text-align:center;
+}
+
+.feature h3{
+margin-top:10px;
+color:#60a5fa;
+}
+
+/* MATCH */
 
 .match{
 background:#1e293b;
-padding:16px;
+padding:15px;
 border-radius:8px;
-margin-bottom:14px;
+margin-bottom:12px;
 cursor:pointer;
-transition:0.2s;
-}
-
-.match:hover{
-background:#26344b;
 }
 
 .row{
 display:grid;
-grid-template-columns:60px 110px 120px 100px 120px 120px 160px 1fr;
+grid-template-columns:60px 100px 120px 100px 120px 120px 120px 100px 1fr;
 align-items:center;
-gap:14px;
+gap:15px;
 }
 
 .champion img{
-width:42px;
+width:40px;
 border-radius:6px;
 }
 
@@ -78,34 +116,30 @@ width:32px;
 margin-right:4px;
 }
 
-.victory{
-color:#22c55e;
-font-weight:bold;
+.victory{color:#22c55e;}
+.defeat{color:#ef4444;}
+
+.score{
+color:#60a5fa;
 }
 
-.defeat{
-color:#ef4444;
-font-weight:bold;
-}
-
-.ai{
+.win{
 color:#fbbf24;
-font-size:13px;
 }
 
 .allies{
 display:none;
-margin-top:14px;
+margin-top:12px;
 border-top:1px solid #334155;
-padding-top:14px;
+padding-top:12px;
 }
 
 .player{
 display:grid;
-grid-template-columns:50px 260px 120px 1fr;
+grid-template-columns:50px 250px 120px 1fr;
 align-items:center;
 padding:8px 0;
-gap:20px;
+gap:25px;
 }
 
 .player img{
@@ -122,13 +156,9 @@ gap:4px;
 .rank{
 display:flex;
 align-items:center;
-gap:10px;
 justify-content:center;
-margin-bottom:25px;
-}
-
-.rank img{
-width:60px;
+gap:10px;
+margin-bottom:30px;
 }
 
 </style>
@@ -136,8 +166,7 @@ width:60px;
 <script>
 
 function toggle(id){
-
-let el = document.getElementById(id)
+let el=document.getElementById(id)
 
 if(el.style.display=="block"){
 el.style.display="none"
@@ -153,23 +182,54 @@ el.style.display="block"
 
 <body>
 
-<div class="container">
+<!-- HERO -->
 
-<h1>daj.gg — LoL Match Analyzer</h1>
+<div class="hero">
 
-<form class="search" action="/search" method="GET">
+<h1>DAJ.GG</h1>
 
-<input name="player" placeholder="pseudo#tag" required>
+<p>Analyse intelligente de tes parties League of Legends</p>
 
-<button type="submit">Search</button>
+<form class="search" action="/search">
+
+<input name="player" placeholder="pseudo#tag">
+
+<button>Analyser</button>
 
 </form>
+
+</div>
+
+
+<div class="container">
+
+<!-- FEATURES -->
+
+<div class="features">
+
+<div class="feature">
+<h3>📊 Performance Score</h3>
+<p>Un score automatique sur 100 analyse ta performance dans chaque game.</p>
+</div>
+
+<div class="feature">
+<h3>🎯 Win Probability</h3>
+<p>Estimation des chances de victoire selon ton impact.</p>
+</div>
+
+<div class="feature">
+<h3>⚠️ Feeder Detector</h3>
+<p>Détection automatique du joueur qui a ruiné la game.</p>
+</div>
+
+</div>
+
 
 {% if rank %}
 
 <div class="rank">
 
-<img src="{{rank_icon}}">
+<img src="{{rank_icon}}" width="60">
 
 <h2>{{player}} — {{rank}}</h2>
 
@@ -200,29 +260,31 @@ el.style.display="block"
 
 <div>Vision {{g.vision}}</div>
 
-<div class="ai">
-{{g.analysis}}
+<div class="score">
+Score {{g.score}}/100
+</div>
+
+<div class="win">
+Win {{g.probability}}%
 </div>
 
 <div class="items">
+
 {% for item in g.items_list %}
 <img src="{{item}}">
 {% endfor %}
-</div>
 
 </div>
 
+</div>
+
+{% if g.feeder %}
+<div style="margin-top:8px;color:#f87171;">
+{{g.feeder}}
+</div>
+{% endif %}
 
 <div id="m{{loop.index}}" class="allies">
-
-<div class="ai">
-
-{% for a in g.analysis_details %}
-<div>{{a}}</div>
-{% endfor %}
-
-</div>
-
 
 {% for ally in g.allies %}
 
