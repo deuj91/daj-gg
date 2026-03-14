@@ -9,16 +9,16 @@ API_KEY = os.environ.get("RIOT_API_KEY")
 
 MATCH_REGION = "europe"
 
-session = requests.Session()
-
 CACHE = {}
 CACHE_TIME = 300
+
+session = requests.Session()
 
 
 def ai_coach(games):
 
     if not games:
-        return ["No match data yet."]
+        return ["No matches found."]
 
     kills = sum(g["kills"] for g in games)
     deaths = sum(g["deaths"] for g in games)
@@ -28,17 +28,17 @@ def ai_coach(games):
 
     tips = []
 
-    if deaths / len(games) > 7:
-        tips.append("You die a lot. Try safer positioning.")
+    if deaths/len(games) > 7:
+        tips.append("You die too much. Try safer positioning.")
 
-    if kills / len(games) < 4:
-        tips.append("Your damage impact seems low.")
+    if kills/len(games) < 4:
+        tips.append("Your damage seems low. Try more aggressive plays.")
 
     if kda > 4:
-        tips.append("Excellent KDA. Keep playing like that.")
+        tips.append("Excellent KDA. Keep it up.")
 
     if not tips:
-        tips.append("Solid overall performance.")
+        tips.append("Solid performance overall.")
 
     return tips
 
@@ -54,11 +54,14 @@ def search():
     player = request.args.get("player")
 
     if not player:
-        return "Player missing"
+        return "Enter a Riot ID (Name#Tag)"
 
     if player in CACHE:
+
         data, t = CACHE[player]
+
         if time.time() - t < CACHE_TIME:
+
             return render_template(
                 "profile.html",
                 name=player,
@@ -70,18 +73,24 @@ def search():
 
         name, tag = player.split("#")
 
-        url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+        acc_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
-        acc = session.get(url, headers={"X-Riot-Token": API_KEY}).json()
+        acc = session.get(
+            acc_url,
+            headers={"X-Riot-Token": API_KEY}
+        ).json()
 
         if "puuid" not in acc:
-            return "Player not found"
+            return "Summoner not found"
 
         puuid = acc["puuid"]
 
         matches_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=10"
 
-        match_ids = session.get(matches_url, headers={"X-Riot-Token": API_KEY}).json()
+        match_ids = session.get(
+            matches_url,
+            headers={"X-Riot-Token": API_KEY}
+        ).json()
 
         games = []
 
@@ -89,7 +98,10 @@ def search():
 
             murl = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
 
-            match = session.get(murl, headers={"X-Riot-Token": API_KEY}).json()
+            match = session.get(
+                murl,
+                headers={"X-Riot-Token": API_KEY}
+            ).json()
 
             info = match["info"]["participants"]
 
@@ -98,9 +110,10 @@ def search():
             for p in info:
 
                 players.append({
-                    "name": p.get("riotIdGameName", "Unknown"),
-                    "champion": p.get("championName", "Unknown"),
-                    "items": [
+
+                    "name": p.get("riotIdGameName","Unknown"),
+                    "champion": p.get("championName","Unknown"),
+                    "items":[
                         p.get("item0",0),
                         p.get("item1",0),
                         p.get("item2",0),
@@ -108,6 +121,7 @@ def search():
                         p.get("item4",0),
                         p.get("item5",0)
                     ]
+
                 })
 
             me = next((p for p in info if p["puuid"] == puuid), None)
@@ -116,21 +130,20 @@ def search():
                 continue
 
             games.append({
-                "champion": me.get("championName","Unknown"),
-                "kills": me.get("kills",0),
-                "deaths": me.get("deaths",0),
-                "assists": me.get("assists",0),
-                "win": me.get("win",False),
+
+                "champion": me["championName"],
+                "kills": me["kills"],
+                "deaths": me["deaths"],
+                "assists": me["assists"],
+                "win": me["win"],
                 "players": players
+
             })
 
         tips = ai_coach(games)
 
         CACHE[player] = (
-            {
-                "games": games,
-                "tips": tips
-            },
+            {"games": games, "tips": tips},
             time.time()
         )
 
@@ -145,7 +158,7 @@ def search():
 
         print("ERROR:", e)
 
-        return "Internal error (check server logs)"
+        return "Server error (check logs)"
 
 
 if __name__ == "__main__":
