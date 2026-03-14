@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 
-<title>LoL Match Analyzer</title>
+<title>daj.gg — LoL Match Analyzer</title>
 
 <style>
 
@@ -13,6 +12,7 @@ color:#e5e7eb;
 font-family:Arial;
 display:flex;
 justify-content:center;
+margin:0;
 }
 
 .container{
@@ -23,21 +23,23 @@ padding:40px;
 h1{
 text-align:center;
 color:#60a5fa;
+margin-bottom:30px;
 }
 
 .search{
 text-align:center;
-margin-bottom:30px;
+margin-bottom:35px;
 }
 
-input{
+.search input{
 padding:10px;
 width:260px;
 border:none;
 border-radius:6px;
+margin-right:6px;
 }
 
-button{
+.search button{
 padding:10px 16px;
 background:#3b82f6;
 border:none;
@@ -48,21 +50,26 @@ cursor:pointer;
 
 .match{
 background:#1e293b;
-padding:15px;
+padding:16px;
 border-radius:8px;
-margin-bottom:12px;
+margin-bottom:14px;
 cursor:pointer;
+transition:0.2s;
+}
+
+.match:hover{
+background:#26344b;
 }
 
 .row{
 display:grid;
-grid-template-columns:60px 100px 120px 100px 120px 120px 140px 1fr;
+grid-template-columns:60px 110px 120px 100px 120px 120px 160px 1fr;
 align-items:center;
-gap:15px;
+gap:14px;
 }
 
 .champion img{
-width:40px;
+width:42px;
 border-radius:6px;
 }
 
@@ -71,8 +78,15 @@ width:32px;
 margin-right:4px;
 }
 
-.victory{color:#22c55e;}
-.defeat{color:#ef4444;}
+.victory{
+color:#22c55e;
+font-weight:bold;
+}
+
+.defeat{
+color:#ef4444;
+font-weight:bold;
+}
 
 .ai{
 color:#fbbf24;
@@ -81,17 +95,17 @@ font-size:13px;
 
 .allies{
 display:none;
-margin-top:12px;
+margin-top:14px;
 border-top:1px solid #334155;
-padding-top:12px;
+padding-top:14px;
 }
 
 .player{
 display:grid;
-grid-template-columns:50px 260px 140px 1fr;
+grid-template-columns:50px 260px 120px 1fr;
 align-items:center;
 padding:8px 0;
-gap:25px;
+gap:20px;
 }
 
 .player img{
@@ -105,13 +119,25 @@ justify-content:flex-end;
 gap:4px;
 }
 
+.rank{
+display:flex;
+align-items:center;
+gap:10px;
+justify-content:center;
+margin-bottom:25px;
+}
+
+.rank img{
+width:60px;
+}
+
 </style>
 
 <script>
 
 function toggle(id){
 
-let el=document.getElementById(id)
+let el = document.getElementById(id)
 
 if(el.style.display=="block"){
 el.style.display="none"
@@ -129,27 +155,28 @@ el.style.display="block"
 
 <div class="container">
 
-<h1>LoL Match Analyzer</h1>
+<h1>daj.gg — LoL Match Analyzer</h1>
 
-<form class="search" action="/search">
+<form class="search" action="/search" method="GET">
 
-<input name="player" placeholder="pseudo#tag">
+<input name="player" placeholder="pseudo#tag" required>
 
-<button>Search</button>
+<button type="submit">Search</button>
 
 </form>
 
 {% if rank %}
 
-<div style="display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:25px;">
+<div class="rank">
 
-<img src="{{rank_icon}}" width="60">
+<img src="{{rank_icon}}">
 
 <h2>{{player}} — {{rank}}</h2>
 
 </div>
 
 {% endif %}
+
 
 {% for g in games %}
 
@@ -178,11 +205,9 @@ el.style.display="block"
 </div>
 
 <div class="items">
-
 {% for item in g.items_list %}
 <img src="{{item}}">
 {% endfor %}
-
 </div>
 
 </div>
@@ -197,6 +222,7 @@ el.style.display="block"
 {% endfor %}
 
 </div>
+
 
 {% for ally in g.allies %}
 
@@ -233,5 +259,4 @@ KDA {{ally.kda}}
 </div>
 
 </body>
-
 </html>
