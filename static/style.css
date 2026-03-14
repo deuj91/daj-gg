@@ -1,132 +1,200 @@
-<!DOCTYPE html>
-<html>
-<head>
+body{
 
-<title>{{ player }}</title>
-
-<link rel="stylesheet" href="/static/style.css">
-
-<script>
-
-function toggleGame(id){
-
-const el = document.getElementById(id)
-
-if(el.classList.contains("open")){
-el.classList.remove("open")
-}else{
-el.classList.add("open")
-}
+background:#0b1220;
+color:white;
+font-family:Arial, Helvetica, sans-serif;
+margin:0;
+padding:40px;
 
 }
 
-</script>
+.container{
 
-</head>
+max-width:1100px;
+margin:auto;
 
-<body>
+}
 
-<div class="container">
+.profile-header{
 
-<div class="profile-header">
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
 
-<h1>{{ player }}</h1>
+}
 
-<div class="rank">
+.rank{
 
-{% if rank_icon %}
-<img src="{{ rank_icon }}" class="rank-icon">
-{% endif %}
+display:flex;
+align-items:center;
+gap:10px;
 
-<span>{{ rank }}</span>
+}
 
-</div>
+.rank-icon{
 
-</div>
+width:40px;
 
-<h2>Recent Games</h2>
+}
 
-{% for game in games %}
+.game{
 
-<div class="game">
+background:#111827;
+border-radius:10px;
+margin-bottom:15px;
+overflow:hidden;
 
-<div class="game-summary" onclick="toggleGame('game{{ loop.index }}')">
+}
 
-<img src="{{ game.champion_img }}" class="champ">
+.game-summary{
 
-<div class="summary-stats">
+display:flex;
+align-items:center;
+gap:15px;
+padding:15px;
+cursor:pointer;
+transition:0.2s;
 
-<div class="champ-name">{{ game.champion }}</div>
+}
 
-<div class="kda">{{ game.kda }}</div>
+.game-summary:hover{
 
-<div class="extra">
-CS {{ game.cs }} • Vision {{ game.vision }} • Gold {{ game.gold }}
-</div>
+background:#1f2937;
 
-</div>
+}
 
-<div class="result {{ game.result|lower }}">
-{{ game.result }}
-</div>
+.champ{
 
-</div>
+width:60px;
+border-radius:8px;
 
-<div class="game-details" id="game{{ loop.index }}">
+}
 
-<h3>AI Coach</h3>
+.summary-stats{
 
-<ul class="coach">
+flex:1;
 
-{% for tip in game.coach %}
-<li>{{ tip }}</li>
-{% endfor %}
+}
 
-</ul>
+.champ-name{
 
-<h3>Players</h3>
+font-size:18px;
+font-weight:bold;
 
-<div class="players">
+}
 
-{% for p in game.players %}
+.kda{
 
-<div class="player">
+font-size:16px;
+margin-top:4px;
 
-<img src="{{ p.champion_img }}" class="champ-small">
+}
 
-<div class="player-name">
-{{ p.summoner }}
-</div>
+.extra{
 
-<div class="player-kda">
-{{ p.kda }}
-</div>
+font-size:13px;
+color:#9ca3af;
+margin-top:3px;
 
-<div class="items">
+}
 
-{% for item in p.items %}
+.result{
 
-{% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/14.1.1/img/item/{{ item }}.png" class="item">
-{% endif %}
+font-weight:bold;
+padding:6px 12px;
+border-radius:6px;
 
-{% endfor %}
+}
 
-</div>
+.victory{
 
-</div>
+background:#065f46;
+color:#10b981;
 
-{% endfor %}
+}
 
-</div>
+.defeat{
 
-</div>
+background:#7f1d1d;
+color:#ef4444;
 
-</div>
+}
 
-{% endfor %}
+.game-details{
 
-</div>
+display:none;
+padding:20px;
+border-top:1px solid #1f2937;
 
-</body>
-</html>
+}
+
+.game-details.open{
+
+display:block;
+
+}
+
+.players{
+
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:15px;
+
+}
+
+.player{
+
+display:flex;
+align-items:center;
+gap:10px;
+background:#0b1220;
+padding:8px;
+border-radius:6px;
+
+}
+
+.champ-small{
+
+width:35px;
+border-radius:6px;
+
+}
+
+.player-name{
+
+flex:1;
+font-size:14px;
+
+}
+
+.player-kda{
+
+width:70px;
+font-size:13px;
+color:#9ca3af;
+
+}
+
+.items{
+
+display:flex;
+gap:3px;
+
+}
+
+.item{
+
+width:22px;
+border-radius:3px;
+
+}
+
+.coach{
+
+margin-top:10px;
+margin-bottom:20px;
+color:#cbd5f5;
+
+}
