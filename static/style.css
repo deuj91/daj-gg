@@ -1,104 +1,156 @@
 body{
-
 margin:0;
-font-family:Arial;
-background:#0f172a;
+font-family:Arial, Helvetica, sans-serif;
+background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg");
+background-size:cover;
+background-attachment:fixed;
 color:white;
-
 }
+
+/* overlay sombre */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.75);
+z-index:-1;
+}
+
+/* header */
 
 header{
-
-background:#020617;
-padding:15px 30px;
-
-}
-
-.logo{
-
-font-weight:bold;
-font-size:20px;
-
-}
-
-.hero{
-
-text-align:center;
-padding:120px 20px;
-
-}
-
-.search input{
-
-padding:12px;
-width:240px;
-border:none;
-border-radius:6px;
-
-}
-
-.search button{
-
-padding:12px 20px;
-background:#2563eb;
-border:none;
-color:white;
-border-radius:6px;
-cursor:pointer;
-
-}
-
-.container{
-
-max-width:900px;
-margin:auto;
-padding:30px;
-
-}
-
-.match{
-
-background:#1e293b;
-margin-bottom:15px;
-border-radius:10px;
-padding:15px;
-
-}
-
-.match-main{
-
 display:flex;
 justify-content:space-between;
 align-items:center;
-
+padding:20px 40px;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(6px);
 }
 
-.players{
+header a{
+text-decoration:none;
+color:white;
+font-weight:bold;
+font-size:22px;
+}
 
-display:none;
-margin-top:10px;
-padding:10px;
-background:#0f172a;
+/* hero */
+
+.hero{
+text-align:center;
+margin-top:120px;
+}
+
+.hero h1{
+font-size:50px;
+margin-bottom:10px;
+}
+
+.hero p{
+color:#cbd5f5;
+}
+
+/* search bar */
+
+.search{
+margin-top:25px;
+}
+
+.search input{
+padding:14px;
+width:260px;
+border:none;
+border-radius:8px;
+font-size:16px;
+}
+
+.search button{
+padding:14px 24px;
+border:none;
+border-radius:8px;
+background:#2563eb;
+color:white;
+font-weight:bold;
+cursor:pointer;
+margin-left:10px;
+}
+
+.search button:hover{
+background:#1d4ed8;
+}
+
+/* container */
+
+.container{
+max-width:900px;
+margin:auto;
+padding:30px;
+}
+
+/* match card */
+
+.match{
+background:rgba(30,41,59,0.85);
+border-radius:12px;
+margin-bottom:20px;
+padding:16px;
+box-shadow:0 4px 15px rgba(0,0,0,0.4);
+}
+
+.match-main{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.champion{
+font-weight:bold;
+font-size:18px;
+}
+
+.kda{
+font-size:16px;
+}
+
+button{
+background:#334155;
+border:none;
+padding:8px 12px;
 border-radius:6px;
+color:white;
+cursor:pointer;
+}
 
+button:hover{
+background:#475569;
+}
+
+/* players dropdown */
+
+.players{
+display:none;
+margin-top:12px;
+padding:10px;
+background:rgba(15,23,42,0.9);
+border-radius:8px;
 }
 
 .player{
-
-padding:4px 0;
-
+padding:5px 0;
+font-size:14px;
 }
 
-.win{
+/* result colors */
 
+.win{
 color:#22c55e;
 font-weight:bold;
-
 }
 
 .lose{
-
 color:#ef4444;
 font-weight:bold;
-
 }
