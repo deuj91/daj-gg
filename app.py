@@ -16,6 +16,7 @@ def home():
 @app.route("/search")
 def search():
     try:
+
         player = request.args.get("player")
 
         if not player or "#" not in player:
@@ -26,16 +27,12 @@ def search():
         name = quote(name)
         tag = quote(tag)
 
-        # ACCOUNT
         account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
         account_res = requests.get(
             account_url,
             headers={"X-Riot-Token": API_KEY}
         )
-
-        if account_res.status_code != 200:
-            return f"Riot API error {account_res.status_code}"
 
         account = account_res.json()
 
@@ -44,7 +41,6 @@ def search():
 
         puuid = account["puuid"]
 
-        # MATCH LIST
         matchlist_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
 
         matchlist_res = requests.get(
@@ -109,7 +105,7 @@ def search():
                     "kills": p["kills"],
                     "deaths": p["deaths"],
                     "assists": p["assists"],
-                    "items": [
+                    "build": [
                         p["item0"],
                         p["item1"],
                         p["item2"],
