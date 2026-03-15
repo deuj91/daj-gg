@@ -9,34 +9,100 @@
 
 <body>
 
+<div class="topbar">
+
+<div class="logo">DAJ.GG</div>
+
+<div class="menu">
+<button onclick="toggleMenu()">☰ Menu</button>
+
+<div id="dropdown" class="dropdown">
+
+<a href="/">Search</a>
+<a href="#">Champions</a>
+<a href="#">Meta</a>
+
+</div>
+</div>
+
+</div>
+
+
+<div class="profile">
+
 <h1>{{name}}</h1>
 
 <div class="stats">
 
-KDA: {{avg_k}} / {{avg_d}} / {{avg_a}}  
-Winrate: {{winrate}}%  
-Rank: {{rank}}
+<div>KDA<br>{{avg_k}} / {{avg_d}} / {{avg_a}}</div>
+
+<div>Winrate<br>{{winrate}}%</div>
+
+<div>Rank<br>{{rank}}</div>
 
 </div>
+
+</div>
+
 
 {% for game in games %}
 
 <div class="match {% if game.win %}win{% else %}lose{% endif %}">
 
-<h3>{{game.champion}} — {{game.kills}} / {{game.deaths}} / {{game.assists}}</h3>
+<div class="match-header">
+
+<div class="champion">
+
+<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{game.champion}}.png">
+
+</div>
+
+<div class="score">
+
+{{game.kills}} / {{game.deaths}} / {{game.assists}}
+
+</div>
+
+<div class="result">
+
+{% if game.win %}
+WIN
+{% else %}
+LOSE
+{% endif %}
+
+</div>
+
+</div>
+
 
 <div class="teams">
 
 <div class="team">
 
-<h4>Allies</h4>
-
 {% for p in game.allies %}
 
 <div class="player">
 
-{{p.champion}}  
-{{p.kills}}/{{p.deaths}}/{{p.assists}}
+<img class="champicon"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{p.champion}}.png">
+
+<div class="name">{{p.name}}</div>
+
+<div class="kda">{{p.kills}}/{{p.deaths}}/{{p.assists}}</div>
+
+<div class="items">
+
+{% for item in p.items %}
+{% if item != 0 %}
+
+<img class="item"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{item}}.png">
+
+{% endif %}
+{% endfor %}
+
+</div>
 
 </div>
 
@@ -44,18 +110,35 @@ Rank: {{rank}}
 
 </div>
 
+
 <div class="vs">VS</div>
 
-<div class="team">
 
-<h4>Enemies</h4>
+<div class="team">
 
 {% for p in game.enemies %}
 
 <div class="player">
 
-{{p.champion}}  
-{{p.kills}}/{{p.deaths}}/{{p.assists}}
+<img class="champicon"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{p.champion}}.png">
+
+<div class="name">{{p.name}}</div>
+
+<div class="kda">{{p.kills}}/{{p.deaths}}/{{p.assists}}</div>
+
+<div class="items">
+
+{% for item in p.items %}
+{% if item != 0 %}
+
+<img class="item"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{item}}.png">
+
+{% endif %}
+{% endfor %}
+
+</div>
 
 </div>
 
@@ -68,6 +151,23 @@ Rank: {{rank}}
 </div>
 
 {% endfor %}
+
+<script>
+
+function toggleMenu(){
+
+var menu = document.getElementById("dropdown");
+
+if(menu.style.display === "block"){
+menu.style.display = "none";
+}
+else{
+menu.style.display = "block";
+}
+
+}
+
+</script>
 
 </body>
 </html>
