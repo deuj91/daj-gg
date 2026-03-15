@@ -3,7 +3,7 @@
 
 <head>
 
-<title>{{name}} - DAJ.GG</title>
+<title>{{name}}</title>
 
 <link rel="stylesheet" href="/static/style.css">
 
@@ -11,27 +11,19 @@
 
 <body>
 
-<header>
-
-<a href="/" class="logo">DAJ.GG</a>
-
-</header>
-
 <div class="container">
 
 <h1>{{name}}</h1>
 
-<div class="coach">
-
-<h2>AI Coach</h2>
+<h2>AI Tips</h2>
 
 <ul>
+
 {% for tip in tips %}
 <li>{{tip}}</li>
 {% endfor %}
-</ul>
 
-</div>
+</ul>
 
 <h2>Recent Matches</h2>
 
@@ -39,22 +31,22 @@
 
 <div class="match">
 
-<div class="match-top">
+<div class="top">
 
 <img
-class="champion"
+class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{game.champion}}.png">
 
-<div class="kda">
+<div>
 
 {{game.kills}} / {{game.deaths}} / {{game.assists}}
 
 </div>
 
 {% if game.win %}
-<div class="win">WIN</div>
+<span class="win">WIN</span>
 {% else %}
-<div class="lose">LOSE</div>
+<span class="lose">LOSE</span>
 {% endif %}
 
 </div>
@@ -62,7 +54,6 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{game.champion
 <div class="items">
 
 {% for item in game.items %}
-
 {% if item != 0 %}
 
 <img
@@ -70,29 +61,6 @@ class="item"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{item}}.png">
 
 {% endif %}
-
-{% endfor %}
-
-</div>
-
-<button onclick="togglePlayers({{loop.index}})">
-Show Players
-</button>
-
-<div id="players{{loop.index}}" class="players">
-
-{% for p in game.players %}
-
-<div class="player">
-
-<img
-class="champ-small"
-src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champion}}.png">
-
-{{p.name}}
-
-</div>
-
 {% endfor %}
 
 </div>
@@ -102,26 +70,6 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champion}}.
 {% endfor %}
 
 </div>
-
-<script>
-
-function togglePlayers(id){
-
-let el = document.getElementById("players"+id)
-
-if(el.style.display==="block"){
-
-el.style.display="none"
-
-}else{
-
-el.style.display="block"
-
-}
-
-}
-
-</script>
 
 </body>
 
