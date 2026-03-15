@@ -4,7 +4,7 @@ font-family:Arial;
 color:white;
 }
 
-/* background pages */
+/* backgrounds */
 
 .home{
 background:url("https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt9a6b09fce5d8e2f0/5e2e2c9c5f8c6a4d6d8a8c6b/LoL_Splash.jpg") center/cover no-repeat;
@@ -14,6 +14,7 @@ height:100vh;
 .profile-page{
 background:#0f172a;
 }
+
 
 /* home */
 
@@ -42,19 +43,38 @@ color:white;
 cursor:pointer;
 }
 
-/* profile */
+
+/* profile header */
 
 .top{
 text-align:center;
 margin-top:30px;
 }
 
+.profile-header{
+display:flex;
+align-items:center;
+gap:20px;
+justify-content:center;
+}
+
+.profile-icon{
+width:80px;
+border-radius:10px;
+}
+
+.level{
+opacity:0.7;
+margin-top:5px;
+}
+
 .stats{
 display:flex;
 justify-content:center;
 gap:40px;
-margin-top:15px;
+margin-top:20px;
 }
+
 
 /* match */
 
@@ -82,6 +102,12 @@ width:60px;
 font-size:20px;
 }
 
+.duration{
+margin-left:auto;
+font-size:14px;
+opacity:0.8;
+}
+
 .win{
 color:#22c55e;
 font-weight:bold;
@@ -91,6 +117,7 @@ font-weight:bold;
 color:#ef4444;
 font-weight:bold;
 }
+
 
 /* teams */
 
@@ -108,6 +135,7 @@ width:45%;
 font-size:30px;
 font-weight:bold;
 }
+
 
 /* players */
 
