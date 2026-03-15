@@ -1,8 +1,26 @@
 body{
-background:linear-gradient(#0f172a,#020617);
 color:white;
 font-family:Arial;
 margin:0;
+}
+
+/* backgrounds */
+
+.home-bg{
+background:
+linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.8)),
+url("https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt8a4fdd71b24d9022/5f8fbd1f88a6d347c5e5e92d/league-of-legends-key-art.jpg");
+background-size:cover;
+background-position:center;
+height:100vh;
+}
+
+.profile-bg{
+background:
+linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.9)),
+url("https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt8a4fdd71b24d9022/5f8fbd1f88a6d347c5e5e92d/league-of-legends-key-art.jpg");
+background-size:cover;
+background-attachment:fixed;
 }
 
 /* home */
@@ -15,19 +33,24 @@ justify-content:center;
 align-items:center;
 }
 
+h1{
+font-size:48px;
+margin-bottom:20px;
+}
+
 input{
-padding:10px;
+padding:12px;
 font-size:16px;
-border-radius:5px;
+border-radius:6px;
 border:none;
 }
 
 button{
-padding:10px 15px;
+padding:12px 16px;
 background:#2563eb;
 border:none;
 color:white;
-border-radius:5px;
+border-radius:6px;
 cursor:pointer;
 }
 
@@ -48,12 +71,12 @@ margin-top:20px;
 /* match */
 
 .match{
-background:#111827;
+background:rgba(17,24,39,0.9);
 margin:40px auto;
 padding:20px;
 width:900px;
 border-radius:10px;
-box-shadow:0 5px 20px rgba(0,0,0,0.5);
+box-shadow:0 10px 25px rgba(0,0,0,0.6);
 }
 
 .match-header{
@@ -73,10 +96,12 @@ font-size:20px;
 
 .win{
 color:#22c55e;
+font-weight:bold;
 }
 
 .lose{
 color:#ef4444;
+font-weight:bold;
 }
 
 /* teams */
@@ -92,7 +117,7 @@ width:45%;
 }
 
 .vs{
-font-size:30px;
+font-size:32px;
 font-weight:bold;
 }
 
@@ -102,10 +127,10 @@ font-weight:bold;
 display:flex;
 align-items:center;
 gap:10px;
-margin:5px 0;
+margin:6px 0;
 background:#1e293b;
-padding:5px 8px;
-border-radius:5px;
+padding:6px 10px;
+border-radius:6px;
 }
 
 .champicon{
