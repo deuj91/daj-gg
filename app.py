@@ -15,9 +15,7 @@ def home():
 
 @app.route("/search")
 def search():
-
     try:
-
         player = request.args.get("player")
 
         if not player or "#" not in player:
@@ -28,7 +26,7 @@ def search():
         name = quote(name)
         tag = quote(tag)
 
-        # GET ACCOUNT (PUUID)
+        # ACCOUNT
         account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
         account_res = requests.get(
@@ -37,7 +35,7 @@ def search():
         )
 
         if account_res.status_code != 200:
-            return f"Riot API error: {account_res.status_code}"
+            return f"Riot API error {account_res.status_code}"
 
         account = account_res.json()
 
@@ -145,6 +143,8 @@ def search():
             avg_a = round(total_a / len(games), 1)
             winrate = round((wins / len(games)) * 100)
 
+        rank = "Unranked"
+
         return render_template(
             "profile.html",
             name=player,
@@ -152,7 +152,8 @@ def search():
             avg_k=avg_k,
             avg_d=avg_d,
             avg_a=avg_a,
-            winrate=winrate
+            winrate=winrate,
+            rank=rank
         )
 
     except Exception as e:
