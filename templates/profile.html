@@ -8,92 +8,47 @@
 
 <body>
 
-<div class="topbar">
-
-<div class="logo">DAJ.GG</div>
-
-<div class="menu">
-
-<button onclick="toggleMenu()">☰</button>
-
-<div id="dropdown" class="dropdown">
-<a href="/">Search</a>
-</div>
-
-</div>
-
-</div>
-
-
-<div class="profile">
-
 <h1>{{ name }}</h1>
 
-<div class="stats">
-
 <div>
-KDA<br>
-{{ avg_k }} / {{ avg_d }} / {{ avg_a }}
-</div>
 
-<div>
-Winrate<br>
-{{ winrate }}%
-</div>
-
-<div>
-Rank<br>
-{{ rank }}
-</div>
+KDA : {{ avg_k }} / {{ avg_d }} / {{ avg_a }}
+<br>
+Winrate : {{ winrate }}%
+<br>
+Rank : {{ rank }}
 
 </div>
-
-</div>
-
 
 {% for game in games %}
 
-<div class="match {% if game.win %}win{% else %}lose{% endif %}">
+<div>
 
-<div class="match-header">
+<h3>{{ game.champion }} — {{ game.kills }}/{{ game.deaths }}/{{ game.assists }}</h3>
 
-<img class="champ-main"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champion }}.png">
+<div style="display:flex;justify-content:space-between">
 
-<div class="score">
-{{ game.kills }} / {{ game.deaths }} / {{ game.assists }}
-</div>
+<div>
 
-<div class="result">
-{% if game.win %}WIN{% else %}LOSE{% endif %}
-</div>
-
-</div>
-
-
-<div class="teams">
-
-<div class="team">
+<h4>Allies</h4>
 
 {% for p in game.allies %}
 
-<div class="player">
+<div>
 
-<img class="champicon"
+<img width="32"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
 
-<div class="pname">{{ p.name }}</div>
+{{ p.name }}
 
-<div class="pkda">
 {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
-</div>
 
-<div class="items">
+<div>
 
-{% for item in p["items"] %}
+{% for item in p.build %}
 {% if item != 0 %}
 
-<img class="item"
+<img width="22"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 
 {% endif %}
@@ -107,31 +62,29 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 
 </div>
 
+<div style="font-size:30px">VS</div>
 
-<div class="vs">VS</div>
+<div>
 
-
-<div class="team">
+<h4>Enemies</h4>
 
 {% for p in game.enemies %}
 
-<div class="player">
+<div>
 
-<img class="champicon"
+<img width="32"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
 
-<div class="pname">{{ p.name }}</div>
+{{ p.name }}
 
-<div class="pkda">
 {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
-</div>
 
-<div class="items">
+<div>
 
-{% for item in p["items"] %}
+{% for item in p.build %}
 {% if item != 0 %}
 
-<img class="item"
+<img width="22"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 
 {% endif %}
@@ -150,23 +103,6 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 </div>
 
 {% endfor %}
-
-
-<script>
-
-function toggleMenu() {
-
-var menu = document.getElementById("dropdown");
-
-if (menu.style.display === "block") {
-menu.style.display = "none";
-} else {
-menu.style.display = "block";
-}
-
-}
-
-</script>
 
 </body>
 </html>
