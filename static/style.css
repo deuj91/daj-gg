@@ -5,11 +5,12 @@ font-family:Arial;
 margin:0;
 }
 
-/* top bar */
+/* topbar */
 
 .topbar{
 display:flex;
 justify-content:space-between;
+align-items:center;
 padding:15px;
 background:#020617;
 }
@@ -21,8 +22,8 @@ font-weight:bold;
 
 .menu button{
 background:#1e293b;
-color:white;
 border:none;
+color:white;
 padding:8px 12px;
 cursor:pointer;
 }
@@ -45,21 +46,20 @@ text-decoration:none;
 
 .profile{
 text-align:center;
-margin:40px;
+margin:30px;
 }
 
 .stats{
 display:flex;
 justify-content:center;
 gap:40px;
-font-size:18px;
 }
 
-/* match card */
+/* match */
 
 .match{
-margin:40px auto;
 width:80%;
+margin:40px auto;
 padding:20px;
 border-radius:10px;
 }
@@ -72,21 +72,19 @@ background:#064e3b;
 background:#7f1d1d;
 }
 
-/* match header */
-
 .match-header{
 display:flex;
 align-items:center;
 gap:20px;
-margin-bottom:20px;
+margin-bottom:15px;
 }
 
-.champion img{
+.champ-main{
 width:60px;
 }
 
 .score{
-font-size:22px;
+font-size:20px;
 }
 
 .result{
@@ -116,7 +114,7 @@ font-weight:bold;
 display:flex;
 align-items:center;
 gap:10px;
-margin:8px 0;
+margin:6px 0;
 }
 
 .champicon{
@@ -130,4 +128,13 @@ gap:3px;
 
 .item{
 width:22px;
+}
+
+.pname{
+width:110px;
+font-size:14px;
+}
+
+.pkda{
+font-size:13px;
 }
