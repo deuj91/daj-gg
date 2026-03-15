@@ -8,47 +8,68 @@
 
 <body>
 
+<div class="top">
+
 <h1>{{ name }}</h1>
 
-<div>
+<div class="stats">
 
-KDA : {{ avg_k }} / {{ avg_d }} / {{ avg_a }}
-<br>
-Winrate : {{ winrate }}%
-<br>
-Rank : {{ rank }}
+<div>KDA<br>{{ avg_k }}/{{ avg_d }}/{{ avg_a }}</div>
+
+<div>Winrate<br>{{ winrate }}%</div>
+
+<div>Rank<br>{{ rank }}</div>
+
+</div>
 
 </div>
 
 {% for game in games %}
 
-<div>
+<div class="match">
 
-<h3>{{ game.champion }} — {{ game.kills }}/{{ game.deaths }}/{{ game.assists }}</h3>
+<div class="match-header">
 
-<div style="display:flex;justify-content:space-between">
+<img class="champ"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champion }}.png">
 
-<div>
+<div class="kda">
+{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
+</div>
 
-<h4>Allies</h4>
+<div class="result">
+
+{% if game.win %}
+<span class="win">WIN</span>
+{% else %}
+<span class="lose">LOSE</span>
+{% endif %}
+
+</div>
+
+</div>
+
+<div class="teams">
+
+<div class="team">
 
 {% for p in game.allies %}
 
-<div>
+<div class="player">
 
-<img width="32"
+<img class="champicon"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
 
-{{ p.name }}
+<span>{{ p.name }}</span>
 
-{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
+<span class="pkda">{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
 
-<div>
+<div class="items">
 
 {% for item in p.build %}
 {% if item != 0 %}
 
-<img width="22"
+<img class="item"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 
 {% endif %}
@@ -62,29 +83,27 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 
 </div>
 
-<div style="font-size:30px">VS</div>
+<div class="vs">VS</div>
 
-<div>
-
-<h4>Enemies</h4>
+<div class="team">
 
 {% for p in game.enemies %}
 
-<div>
+<div class="player">
 
-<img width="32"
+<img class="champicon"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
 
-{{ p.name }}
+<span>{{ p.name }}</span>
 
-{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
+<span class="pkda">{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
 
-<div>
+<div class="items">
 
 {% for item in p.build %}
 {% if item != 0 %}
 
-<img width="22"
+<img class="item"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 
 {% endif %}
