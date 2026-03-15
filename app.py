@@ -5,43 +5,20 @@ import time
 
 app = Flask(__name__)
 
-API_KEY = os.environ.get("RIOT_API_KEY")
+API_KEY = os.getenv("RIOT_API_KEY")
 
-REGION_ACCOUNT = "https://europe.api.riotgames.com"
-REGION_MATCH = "https://europe.api.riotgames.com"
+# simple cache pour éviter trop d'appels API
+cache = {}
 
-session = requests.Session()
+def get_cache(key):
+    if key in cache:
+        data, timestamp = cache[key]
+        if time.time() - timestamp < 120:
+            return data
+    return None
 
-CACHE = {}
-CACHE_TIME = 300
-
-
-def ai_coach(games):
-
-    if not games:
-        return ["No matches found."]
-
-    kills = sum(g["kills"] for g in games)
-    deaths = sum(g["deaths"] for g in games)
-    assists = sum(g["assists"] for g in games)
-
-    kda = (kills + assists) / max(1, deaths)
-
-    tips = []
-
-    if deaths / len(games) > 7:
-        tips.append("Try dying less and improve positioning.")
-
-    if kills / len(games) < 4:
-        tips.append("Try increasing your kill participation.")
-
-    if kda > 4:
-        tips.append("Excellent KDA, keep it up!")
-
-    if not tips:
-        tips.append("Balanced performance overall.")
-
-    return tips
+def set_cache(key, data):
+    cache[key] = (data, time.time())
 
 
 @app.route("/")
@@ -52,117 +29,107 @@ def index():
 @app.route("/search")
 def search():
 
-    player = request.args.get("player")
-
-    if not player:
-        return render_template("error.html", message="Enter Riot ID (example: Caps#EUW)")
-
-    if "#" not in player:
-        return render_template("error.html", message="Format must be Name#TAG")
-
-    # cache
-    if player in CACHE:
-
-        data, timestamp = CACHE[player]
-
-        if time.time() - timestamp < CACHE_TIME:
-            return render_template(
-                "profile.html",
-                name=player,
-                games=data["games"],
-                tips=data["tips"]
-            )
-
     try:
+
+        player = request.args.get("player")
+
+        if not player or "#" not in player:
+            return "Invalid format. Use name#tag"
 
         name, tag = player.split("#")
 
-        # account
-        account_url = f"{REGION_ACCOUNT}/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+        cache_key = f"{name}-{tag}"
 
-        acc_response = session.get(
-            account_url,
-            headers={"X-Riot-Token": API_KEY}
-        )
+        cached = get_cache(cache_key)
 
-        if acc_response.status_code != 200:
-            return render_template("error.html", message="Player not found")
+        if cached:
+            return render_template(
+                "profile.html",
+                name=cached["name"],
+                games=cached["games"],
+                tips=cached["tips"]
+            )
 
-        account = acc_response.json()
+        # STEP 1 : get PUUID
+        account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
+        account = requests.get(account_url).json()
 
-        puuid = account.get("puuid")
+        if "puuid" not in account:
+            return "Summoner not found"
 
-        if not puuid:
-            return render_template("error.html", message="PUUID not found")
+        puuid = account["puuid"]
 
-        # match list
-        matches_url = f"{REGION_MATCH}/lol/match/v5/matches/by-puuid/{puuid}/ids?count=10"
-
-        matches_response = session.get(
-            matches_url,
-            headers={"X-Riot-Token": API_KEY}
-        )
-
-        if matches_response.status_code != 200:
-            return render_template("error.html", message="Unable to fetch matches")
-
-        match_ids = matches_response.json()
+        # STEP 2 : match list
+        matches_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={API_KEY}"
+        match_ids = requests.get(matches_url).json()
 
         games = []
 
+        kills_total = 0
+        deaths_total = 0
+
         for match_id in match_ids:
 
-            match_url = f"{REGION_MATCH}/lol/match/v5/matches/{match_id}"
+            match_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={API_KEY}"
+            match = requests.get(match_url).json()
 
-            match_response = session.get(
-                match_url,
-                headers={"X-Riot-Token": API_KEY}
-            )
+            participants = match["metadata"]["participants"]
+            info = match["info"]["participants"]
 
-            if match_response.status_code != 200:
-                continue
+            player_index = participants.index(puuid)
+            p = info[player_index]
 
-            match_data = match_response.json()
+            kills_total += p["kills"]
+            deaths_total += p["deaths"]
 
-            info = match_data["info"]["participants"]
+            items = [
+                p["item0"],
+                p["item1"],
+                p["item2"],
+                p["item3"],
+                p["item4"],
+                p["item5"]
+            ]
 
             players = []
 
-            for p in info:
-
+            for pl in info:
                 players.append({
-                    "name": p.get("riotIdGameName", "Unknown"),
-                    "champion": p.get("championName", "Unknown"),
-                    "items": [
-                        p.get("item0", 0),
-                        p.get("item1", 0),
-                        p.get("item2", 0),
-                        p.get("item3", 0),
-                        p.get("item4", 0),
-                        p.get("item5", 0)
-                    ]
+                    "name": pl["summonerName"],
+                    "champion": pl["championName"]
                 })
 
-            me = next((p for p in info if p["puuid"] == puuid), None)
-
-            if not me:
-                continue
-
             games.append({
-                "champion": me.get("championName", "Unknown"),
-                "kills": me.get("kills", 0),
-                "deaths": me.get("deaths", 0),
-                "assists": me.get("assists", 0),
-                "win": me.get("win", False),
+
+                "champion": p["championName"],
+                "kills": p["kills"],
+                "deaths": p["deaths"],
+                "assists": p["assists"],
+                "win": p["win"],
+                "items": items,
                 "players": players
+
             })
 
-        tips = ai_coach(games)
+        # AI COACH simple
+        tips = []
 
-        CACHE[player] = (
-            {"games": games, "tips": tips},
-            time.time()
-        )
+        if deaths_total > kills_total:
+            tips.append("You die too much. Play safer.")
+
+        if kills_total < 10:
+            tips.append("Try to be more aggressive in fights.")
+
+        if not tips:
+            tips.append("Good performance. Keep it up!")
+
+        result = {
+            "name": player,
+            "games": games,
+            "tips": tips
+        }
+
+        set_cache(cache_key, result)
 
         return render_template(
             "profile.html",
@@ -174,12 +141,8 @@ def search():
     except Exception as e:
 
         print("SERVER ERROR:", e)
-
-        return render_template(
-            "error.html",
-            message="Server error. Check logs."
-        )
+        return "Server error. Check API key or logs."
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
