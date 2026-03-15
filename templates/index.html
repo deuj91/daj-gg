@@ -2,25 +2,41 @@
 <html>
 
 <head>
-<title>DAJ.GG</title>
+<title>{{ name }}</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 
-<body class="home">
+<body class="profile">
 
-<div class="center">
+<h1>{{ name }}</h1>
 
-<h1>DAJ.GG</h1>
+<p>Level {{ level }}</p>
 
-<form action="/search">
+<img
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.png"
+width="80">
 
-<input type="text" name="player" placeholder="Summoner#TAG">
+<h2>Last games</h2>
 
-<button type="submit">Search</button>
+{% for game in games %}
 
-</form>
+<div class="game">
+
+<img
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champion }}.png"
+width="40">
+
+{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
+
+{% if game.win %}
+<span class="win">WIN</span>
+{% else %}
+<span class="lose">LOSE</span>
+{% endif %}
 
 </div>
+
+{% endfor %}
 
 </body>
 
