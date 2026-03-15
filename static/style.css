@@ -4,13 +4,10 @@ font-family:Arial;
 color:white;
 }
 
-/* HOME */
-
 .home{
 background:
 linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.9)),
 url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg");
-
 background-size:cover;
 background-position:center;
 height:100vh;
@@ -24,18 +21,13 @@ justify-content:center;
 height:100vh;
 }
 
-/* PROFILE PAGE */
-
 .profile-page{
 background:
 linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.95)),
 url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg");
-
 background-size:cover;
 background-attachment:fixed;
 }
-
-/* INPUT */
 
 input{
 padding:12px;
@@ -53,100 +45,13 @@ color:white;
 cursor:pointer;
 }
 
-/* HEADER */
-
-.top{
-text-align:center;
-margin-top:30px;
-}
-
-.profile-header{
-display:flex;
-align-items:center;
-gap:20px;
-justify-content:center;
-}
-
-.profile-icon{
-width:80px;
-border-radius:10px;
-}
-
-.level{
-opacity:0.8;
-}
-
-.rank{
-font-weight:bold;
-}
-
-.stats{
-display:flex;
-justify-content:center;
-gap:40px;
-margin-top:20px;
-}
-
-/* MATCH */
-
 .match{
 background:rgba(17,24,39,0.92);
 margin:40px auto;
 padding:20px;
 width:900px;
 border-radius:10px;
-box-shadow:0 10px 25px rgba(0,0,0,0.6);
 }
-
-.match-header{
-display:flex;
-align-items:center;
-gap:20px;
-margin-bottom:20px;
-}
-
-.champ{
-width:60px;
-}
-
-.kda{
-font-size:20px;
-}
-
-.duration{
-margin-left:auto;
-font-size:14px;
-opacity:0.8;
-}
-
-.win{
-color:#22c55e;
-font-weight:bold;
-}
-
-.lose{
-color:#ef4444;
-font-weight:bold;
-}
-
-/* TEAMS */
-
-.teams{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.team{
-width:45%;
-}
-
-.vs{
-font-size:30px;
-font-weight:bold;
-}
-
-/* PLAYERS */
 
 .player{
 display:flex;
@@ -156,23 +61,6 @@ margin:5px 0;
 background:#1e293b;
 padding:6px 8px;
 border-radius:6px;
-}
-
-.champicon{
-width:28px;
-}
-
-.pname{
-width:120px;
-}
-
-.pkda{
-font-size:13px;
-}
-
-.items{
-display:flex;
-gap:3px;
 }
 
 .item{
