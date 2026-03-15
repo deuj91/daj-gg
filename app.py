@@ -27,10 +27,12 @@ def search():
         # ACCOUNT REQUEST
         account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
-        account = requests.get(
+        account_res = requests.get(
             account_url,
             headers={"X-Riot-Token": API_KEY}
-        ).json()
+        )
+
+        account = account_res.json()
 
         if "puuid" not in account:
             return "Summoner not found"
@@ -40,10 +42,12 @@ def search():
         # MATCH LIST
         matchlist_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
 
-        match_ids = requests.get(
+        matchlist_res = requests.get(
             matchlist_url,
             headers={"X-Riot-Token": API_KEY}
-        ).json()
+        )
+
+        match_ids = matchlist_res.json()
 
         games = []
 
@@ -51,52 +55,60 @@ def search():
 
             match_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"
 
-            match = requests.get(
+            match_res = requests.get(
                 match_url,
                 headers={"X-Riot-Token": API_KEY}
-            ).json()
+            )
 
-            participants = match["info"]["participants"]
+            match = match_res.json()
+
+            info = match.get("info")
+
+            if not info:
+                continue
+
+            participants = info.get("participants", [])
 
             player_data = None
 
             for p in participants:
                 if p["puuid"] == puuid:
                     player_data = p
+                    break
 
             if not player_data:
                 continue
 
             items = [
-                player_data["item0"],
-                player_data["item1"],
-                player_data["item2"],
-                player_data["item3"],
-                player_data["item4"],
-                player_data["item5"]
+                player_data.get("item0", 0),
+                player_data.get("item1", 0),
+                player_data.get("item2", 0),
+                player_data.get("item3", 0),
+                player_data.get("item4", 0),
+                player_data.get("item5", 0)
             ]
 
             players = []
 
             for p in participants:
                 players.append({
-                    "name": p["summonerName"],
-                    "champion": p["championName"]
+                    "name": p.get("summonerName"),
+                    "champion": p.get("championName")
                 })
 
             games.append({
-                "champion": player_data["championName"],
-                "kills": player_data["kills"],
-                "deaths": player_data["deaths"],
-                "assists": player_data["assists"],
-                "win": player_data["win"],
+                "champion": player_data.get("championName"),
+                "kills": player_data.get("kills"),
+                "deaths": player_data.get("deaths"),
+                "assists": player_data.get("assists"),
+                "win": player_data.get("win"),
                 "items": items,
                 "players": players
             })
 
         tips = [
-            "Reduce deaths to improve consistency",
-            "Track enemy jungler more often"
+            "Try to reduce early deaths",
+            "Improve vision control with more wards"
         ]
 
         return render_template(
