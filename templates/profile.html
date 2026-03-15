@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="/static/style.css">
 </head>
 
-<body>
+<body class="profile-bg">
 
 <div class="top">
 
@@ -67,10 +67,11 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }
 <div class="items">
 
 {% for item in p.build %}
-{% if item != 0 %}
+{% if item > 0 %}
 
 <img class="item"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
+onerror="this.style.display='none'">
 
 {% endif %}
 {% endfor %}
@@ -101,10 +102,11 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }
 <div class="items">
 
 {% for item in p.build %}
-{% if item != 0 %}
+{% if item > 0 %}
 
 <img class="item"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
+onerror="this.style.display='none'">
 
 {% endif %}
 {% endfor %}
