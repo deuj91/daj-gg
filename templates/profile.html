@@ -4,6 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
+
 <title>{{ name }}</title>
 
 <style>
@@ -18,11 +19,11 @@ margin:0;
 /* HEADER */
 
 .header{
+background:#020617;
+padding:20px 40px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px;
-background:#020617;
 }
 
 .logo{
@@ -31,38 +32,81 @@ font-weight:bold;
 }
 
 .menu-btn{
-font-size:28px;
+background:#1e293b;
+border:none;
+color:white;
+padding:10px 14px;
+border-radius:6px;
 cursor:pointer;
 }
 
-.menu{
+.dropdown{
 display:none;
-background:#020617;
-padding:20px;
+position:absolute;
+top:70px;
+right:40px;
+background:#1e293b;
+padding:10px;
+border-radius:8px;
 }
 
-.menu a{
+.dropdown a{
 display:block;
 color:white;
 text-decoration:none;
-margin:10px 0;
+padding:8px;
 }
 
 /* CONTAINER */
 
 .container{
-max-width:1200px;
+max-width:1100px;
 margin:auto;
 padding:30px;
 }
 
-/* MATCH CARD */
+/* PLAYER STATS */
+
+.stats{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+margin-bottom:30px;
+display:flex;
+justify-content:space-between;
+}
+
+.stat{
+text-align:center;
+}
+
+/* MATCH */
 
 .match{
 background:#1e293b;
-padding:25px;
-margin-top:30px;
 border-radius:12px;
+padding:20px;
+margin-bottom:25px;
+}
+
+.win{
+border-left:6px solid #22c55e;
+}
+
+.lose{
+border-left:6px solid #ef4444;
+}
+
+.match-header{
+display:flex;
+align-items:center;
+gap:15px;
+margin-bottom:15px;
+}
+
+.champion{
+width:48px;
+border-radius:50%;
 }
 
 /* TEAMS */
@@ -70,60 +114,46 @@ border-radius:12px;
 .teams{
 display:flex;
 justify-content:space-between;
-align-items:center;
-margin-top:20px;
 }
 
 .team{
-width:42%;
+width:45%;
 }
 
-/* VS */
-
 .vs{
-font-size:40px;
+font-size:32px;
 font-weight:bold;
 color:#38bdf8;
 }
 
-/* PLAYER ROW */
+/* PLAYER */
 
 .player{
 display:flex;
 align-items:center;
 justify-content:space-between;
-background:#0f172a;
-padding:10px;
-margin:8px 0;
+background:#020617;
+padding:8px;
+margin:6px 0;
 border-radius:8px;
 }
 
-/* PLAYER NAME */
-
-.name{
-flex:1;
+.player img{
+width:28px;
 }
 
-/* KDA */
+.name{
+width:120px;
+}
 
 .kda{
 width:90px;
 text-align:center;
 }
 
-/* RANK */
-
-.rank{
-width:90px;
-text-align:center;
-color:#facc15;
-}
-
-/* ITEMS */
-
 .items img{
-width:30px;
-margin-left:3px;
+width:26px;
+margin-left:2px;
 }
 
 </style>
@@ -131,13 +161,10 @@ margin-left:3px;
 <script>
 
 function toggleMenu(){
-let menu = document.getElementById("menu")
 
-if(menu.style.display === "block"){
-menu.style.display = "none"
-}else{
-menu.style.display = "block"
-}
+let menu=document.getElementById("menu")
+
+menu.style.display = menu.style.display==="block" ? "none":"block"
 
 }
 
@@ -149,20 +176,15 @@ menu.style.display = "block"
 
 <div class="header">
 
-<div class="logo">
-LOLGPT
+<div class="logo">LoL Stats</div>
+
+<button class="menu-btn" onclick="toggleMenu()">Menu</button>
+
+<div id="menu" class="dropdown">
+
+<a href="/">Home</a>
+
 </div>
-
-<div class="menu-btn" onclick="toggleMenu()">
-☰
-</div>
-
-</div>
-
-<div id="menu" class="menu">
-
-<a href="/">Accueil</a>
-<a href="/">Recherche</a>
 
 </div>
 
@@ -170,15 +192,40 @@ LOLGPT
 
 <h1>{{ name }}</h1>
 
+<div class="stats">
+
+<div class="stat">
+<h2>{{ avg_k }}/{{ avg_d }}/{{ avg_a }}</h2>
+<p>KDA moyen</p>
+</div>
+
+<div class="stat">
+<h2>{{ winrate }}%</h2>
+<p>Winrate</p>
+</div>
+
+</div>
+
 {% for game in games %}
 
-<div class="match">
+<div class="match {% if game.win %}win{% else %}lose{% endif %}">
 
-<h3>{{ game.champion }} — {{ game.kills }}/{{ game.deaths }}/{{ game.assists }}</h3>
+<div class="match-header">
+
+<img class="champion"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{ game.champion }}.png">
+
+<div>
+
+<strong>{{ game.champion }}</strong>
+
+{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
+
+</div>
+
+</div>
 
 <div class="teams">
-
-<!-- TEAM ALLIEE -->
 
 <div class="team">
 
@@ -186,20 +233,26 @@ LOLGPT
 
 <div class="player">
 
-<div class="name">
-{{ p.name }}
-</div>
-
-<div class="rank">
-Unranked
-</div>
+<div class="name">{{ p.summonerName }}</div>
 
 <div class="kda">
--
+
+{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
+
 </div>
 
 <div class="items">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/1001.png">
+
+{% for i in range(6) %}
+
+{% if p["item"+i|string] != 0 %}
+
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ p["item"+i|string] }}.png">
+
+{% endif %}
+
+{% endfor %}
+
 </div>
 
 </div>
@@ -208,11 +261,7 @@ Unranked
 
 </div>
 
-<div class="vs">
-VS
-</div>
-
-<!-- TEAM ENNEMIE -->
+<div class="vs">VS</div>
 
 <div class="team">
 
@@ -220,20 +269,26 @@ VS
 
 <div class="player">
 
-<div class="name">
-{{ p.name }}
-</div>
-
-<div class="rank">
-Unranked
-</div>
+<div class="name">{{ p.summonerName }}</div>
 
 <div class="kda">
--
+
+{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
+
 </div>
 
 <div class="items">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/1001.png">
+
+{% for i in range(6) %}
+
+{% if p["item"+i|string] != 0 %}
+
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ p["item"+i|string] }}.png">
+
+{% endif %}
+
+{% endfor %}
+
 </div>
 
 </div>
