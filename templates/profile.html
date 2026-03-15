@@ -4,7 +4,6 @@
 <head>
 
 <meta charset="UTF-8">
-
 <title>{{ name }}</title>
 
 <style>
@@ -60,20 +59,40 @@ padding:8px;
 /* CONTAINER */
 
 .container{
-max-width:1100px;
+max-width:1200px;
 margin:auto;
-padding:30px;
+padding:40px;
 }
 
-/* PLAYER STATS */
+/* PLAYER HEADER */
+
+.player-header{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:30px;
+}
+
+.rank{
+display:flex;
+align-items:center;
+gap:10px;
+font-size:18px;
+}
+
+.rank img{
+width:40px;
+}
+
+/* STATS */
 
 .stats{
+display:flex;
+gap:30px;
 background:#1e293b;
 padding:20px;
-border-radius:10px;
+border-radius:12px;
 margin-bottom:30px;
-display:flex;
-justify-content:space-between;
 }
 
 .stat{
@@ -105,7 +124,7 @@ margin-bottom:15px;
 }
 
 .champion{
-width:48px;
+width:50px;
 border-radius:50%;
 }
 
@@ -114,6 +133,7 @@ border-radius:50%;
 .teams{
 display:flex;
 justify-content:space-between;
+align-items:center;
 }
 
 .team{
@@ -121,7 +141,7 @@ width:45%;
 }
 
 .vs{
-font-size:32px;
+font-size:30px;
 font-weight:bold;
 color:#38bdf8;
 }
@@ -138,16 +158,12 @@ margin:6px 0;
 border-radius:8px;
 }
 
-.player img{
-width:28px;
-}
-
 .name{
-width:120px;
+width:140px;
 }
 
 .kda{
-width:90px;
+width:80px;
 text-align:center;
 }
 
@@ -161,11 +177,8 @@ margin-left:2px;
 <script>
 
 function toggleMenu(){
-
 let menu=document.getElementById("menu")
-
 menu.style.display = menu.style.display==="block" ? "none":"block"
-
 }
 
 </script>
@@ -181,16 +194,26 @@ menu.style.display = menu.style.display==="block" ? "none":"block"
 <button class="menu-btn" onclick="toggleMenu()">Menu</button>
 
 <div id="menu" class="dropdown">
-
 <a href="/">Home</a>
-
 </div>
 
 </div>
 
 <div class="container">
 
+<div class="player-header">
+
 <h1>{{ name }}</h1>
+
+<div class="rank">
+
+<img src="/static/ranks/{{ rank.split()[0]|lower }}.png">
+
+{{ rank }}
+
+</div>
+
+</div>
 
 <div class="stats">
 
@@ -229,25 +252,23 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{ game.champio
 
 <div class="team">
 
-{% for p in game.players[:5] %}
+{% for p in game.teams.allies %}
 
 <div class="player">
 
-<div class="name">{{ p.summonerName }}</div>
+<div class="name">{{ p.name }}</div>
 
 <div class="kda">
-
 {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
-
 </div>
 
 <div class="items">
 
-{% for i in range(6) %}
+{% for item in p.items %}
 
-{% if p["item"+i|string] != 0 %}
+{% if item != 0 %}
 
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ p["item"+i|string] }}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png">
 
 {% endif %}
 
@@ -265,25 +286,23 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{ game.champio
 
 <div class="team">
 
-{% for p in game.players[5:] %}
+{% for p in game.teams.enemies %}
 
 <div class="player">
 
-<div class="name">{{ p.summonerName }}</div>
+<div class="name">{{ p.name }}</div>
 
 <div class="kda">
-
 {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
-
 </div>
 
 <div class="items">
 
-{% for i in range(6) %}
+{% for item in p.items %}
 
-{% if p["item"+i|string] != 0 %}
+{% if item != 0 %}
 
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ p["item"+i|string] }}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png">
 
 {% endif %}
 
