@@ -26,13 +26,9 @@
 <h2>AI Coach</h2>
 
 <ul>
-
 {% for tip in tips %}
-
 <li>{{tip}}</li>
-
 {% endfor %}
-
 </ul>
 
 </div>
@@ -56,22 +52,32 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{game.champion
 </div>
 
 {% if game.win %}
-
 <div class="win">WIN</div>
-
 {% else %}
-
 <div class="lose">LOSE</div>
+{% endif %}
+
+</div>
+
+<div class="items">
+
+{% for item in game.items %}
+
+{% if item != 0 %}
+
+<img
+class="item"
+src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{item}}.png">
 
 {% endif %}
 
-<button onclick="togglePlayers({{loop.index}})">
-
-Players
-
-</button>
+{% endfor %}
 
 </div>
+
+<button onclick="togglePlayers({{loop.index}})">
+Show Players
+</button>
 
 <div id="players{{loop.index}}" class="players">
 
@@ -103,13 +109,13 @@ function togglePlayers(id){
 
 let el = document.getElementById("players"+id)
 
-if(el.style.display === "block"){
+if(el.style.display==="block"){
 
-el.style.display = "none"
+el.style.display="none"
 
 }else{
 
-el.style.display = "block"
+el.style.display="block"
 
 }
 
