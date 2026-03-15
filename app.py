@@ -7,6 +7,8 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
+DDRAGON = "https://ddragon.leagueoflegends.com/cdn/14.6.1"
+
 
 @app.route("/")
 def home():
@@ -30,26 +32,30 @@ def search():
 
         account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
-        account_res = requests.get(
+        account = requests.get(
             account_url,
             headers={"X-Riot-Token": API_KEY}
-        )
-
-        account = account_res.json()
-
-        if "puuid" not in account:
-            return "Player not found"
+        ).json()
 
         puuid = account["puuid"]
 
+        # summoner info
+        summoner_url = f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
+
+        summoner = requests.get(
+            summoner_url,
+            headers={"X-Riot-Token": API_KEY}
+        ).json()
+
+        icon = summoner["profileIconId"]
+        level = summoner["summonerLevel"]
+
         matchlist_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
 
-        matchlist_res = requests.get(
+        match_ids = requests.get(
             matchlist_url,
             headers={"X-Riot-Token": API_KEY}
-        )
-
-        match_ids = matchlist_res.json()
+        ).json()
 
         games = []
 
@@ -57,31 +63,18 @@ def search():
 
         for match_id in match_ids:
 
-            match_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"
-
-            match_res = requests.get(
-                match_url,
+            match = requests.get(
+                f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
                 headers={"X-Riot-Token": API_KEY}
-            )
+            ).json()
 
-            match = match_res.json()
+            info = match["info"]
 
-            info = match.get("info")
-
-            if not info:
-                continue
+            duration = int(info["gameDuration"] / 60)
 
             participants = info["participants"]
 
-            player_data = None
-
-            for p in participants:
-                if p["puuid"] == puuid:
-                    player_data = p
-                    break
-
-            if not player_data:
-                continue
+            player_data = next(p for p in participants if p["puuid"] == puuid)
 
             if player_data["win"]:
                 wins += 1
@@ -90,7 +83,7 @@ def search():
             total_d += player_data["deaths"]
             total_a += player_data["assists"]
 
-            player_team = player_data["teamId"]
+            team_id = player_data["teamId"]
 
             allies = []
             enemies = []
@@ -117,7 +110,7 @@ def search():
                     "build": build
                 }
 
-                if p["teamId"] == player_team:
+                if p["teamId"] == team_id:
                     allies.append(pdata)
                 else:
                     enemies.append(pdata)
@@ -128,23 +121,24 @@ def search():
                 "deaths": player_data["deaths"],
                 "assists": player_data["assists"],
                 "win": player_data["win"],
+                "duration": duration,
                 "allies": allies,
                 "enemies": enemies
             })
 
-        if len(games) == 0:
-            avg_k = avg_d = avg_a = winrate = 0
-        else:
-            avg_k = round(total_k / len(games), 1)
-            avg_d = round(total_d / len(games), 1)
-            avg_a = round(total_a / len(games), 1)
-            winrate = round((wins / len(games)) * 100)
+        avg_k = round(total_k / len(games), 1)
+        avg_d = round(total_d / len(games), 1)
+        avg_a = round(total_a / len(games), 1)
+
+        winrate = round((wins / len(games)) * 100)
 
         rank = "Unranked"
 
         return render_template(
             "profile.html",
             name=player,
+            icon=icon,
+            level=level,
             games=games,
             avg_k=avg_k,
             avg_d=avg_d,
@@ -154,7 +148,9 @@ def search():
         )
 
     except Exception as e:
+
         print("SERVER ERROR:", e)
+
         return f"Server error: {e}"
 
 
