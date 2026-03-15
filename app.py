@@ -88,9 +88,9 @@ def search():
         )
 
     except Exception as e:
-
-        print("ERROR:", e)
-        return "Server error"
+    import traceback
+    traceback.print_exc()
+    return f"SERVER ERROR: {e}"
 
 
 if __name__ == "__main__":
