@@ -13,7 +13,7 @@
 
 <header>
 
-<a href="/">DAJ.GG</a>
+<a class="logo" href="/">DAJ.GG</a>
 
 </header>
 
@@ -21,15 +21,17 @@
 
 <h1>{{name}}</h1>
 
+<div class="coach">
+
 <h2>AI Coach</h2>
 
 <ul>
-
 {% for tip in tips %}
 <li>{{tip}}</li>
 {% endfor %}
-
 </ul>
+
+</div>
 
 <h2>Recent Matches</h2>
 
@@ -39,15 +41,17 @@
 
 <div class="match-main">
 
-<div class="champion">
-{{game.champion}}
-</div>
+<img
+class="champion-img"
+src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{game.champion}}.png">
 
 <div class="kda">
+
 {{game.kills}} / {{game.deaths}} / {{game.assists}}
+
 </div>
 
-<div class="result">
+<div>
 
 {% if game.win %}
 <span class="win">WIN</span>
@@ -69,7 +73,11 @@ Players
 
 <div class="player">
 
-{{p.name}} — {{p.champion}}
+<img
+class="champion-small"
+src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champion}}.png">
+
+{{p.name}}
 
 </div>
 
@@ -89,10 +97,11 @@ function toggle(id){
 
 let el = document.getElementById("players"+id)
 
-if(el.style.display=="block")
+if(el.style.display=="block"){
 el.style.display="none"
-else
+}else{
 el.style.display="block"
+}
 
 }
 
