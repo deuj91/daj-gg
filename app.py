@@ -7,6 +7,8 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
+DDRAGON = "https://ddragon.leagueoflegends.com/cdn/14.6.1"
+
 
 @app.route("/")
 def home():
@@ -45,25 +47,23 @@ def search():
             headers={"X-Riot-Token": API_KEY}
         ).json()
 
-        if "id" not in summoner:
-            return f"Summoner data error: {summoner}"
-
         icon = summoner.get("profileIconId", 29)
         level = summoner.get("summonerLevel", 0)
-        summoner_id = summoner["id"]
 
         # RANK
-        rank_data = requests.get(
-            f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}",
-            headers={"X-Riot-Token": API_KEY}
-        ).json()
-
         rank = "Unranked"
 
-        if isinstance(rank_data, list):
+        rank_req = requests.get(
+            f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}",
+            headers={"X-Riot-Token": API_KEY}
+        )
+
+        if rank_req.status_code == 200:
+            rank_data = rank_req.json()
+
             for q in rank_data:
-                if q["queueType"] == "RANKED_SOLO_5x5":
-                    rank = f'{q["tier"]} {q["rank"]}'
+                if q.get("queueType") == "RANKED_SOLO_5x5":
+                    rank = f'{q.get("tier")} {q.get("rank")}'
                     break
 
         # MATCHLIST
@@ -84,10 +84,9 @@ def search():
             ).json()
 
             info = match.get("info", {})
+            participants = info.get("participants", [])
 
             duration = int(info.get("gameDuration", 0) / 60)
-
-            participants = info.get("participants", [])
 
             player_data = next((p for p in participants if p["puuid"] == puuid), None)
 
@@ -169,7 +168,6 @@ def search():
     except Exception as e:
 
         print("SERVER ERROR:", e)
-
         return f"Server error: {e}"
 
 
