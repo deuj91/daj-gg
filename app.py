@@ -15,6 +15,7 @@ def home():
 
 @app.route("/search")
 def search():
+
     try:
 
         player = request.args.get("player")
@@ -52,10 +53,7 @@ def search():
 
         games = []
 
-        total_k = 0
-        total_d = 0
-        total_a = 0
-        wins = 0
+        total_k = total_d = total_a = wins = 0
 
         for match_id in match_ids:
 
@@ -73,7 +71,7 @@ def search():
             if not info:
                 continue
 
-            participants = info.get("participants", [])
+            participants = info["participants"]
 
             player_data = None
 
@@ -99,20 +97,24 @@ def search():
 
             for p in participants:
 
+                build = [
+                    p["item0"],
+                    p["item1"],
+                    p["item2"],
+                    p["item3"],
+                    p["item4"],
+                    p["item5"]
+                ]
+
+                build = [i for i in build if i != 0]
+
                 pdata = {
                     "name": p["summonerName"],
                     "champion": p["championName"],
                     "kills": p["kills"],
                     "deaths": p["deaths"],
                     "assists": p["assists"],
-                    "build": [
-                        p["item0"],
-                        p["item1"],
-                        p["item2"],
-                        p["item3"],
-                        p["item4"],
-                        p["item5"]
-                    ]
+                    "build": build
                 }
 
                 if p["teamId"] == player_team:
@@ -131,8 +133,7 @@ def search():
             })
 
         if len(games) == 0:
-            avg_k = avg_d = avg_a = 0
-            winrate = 0
+            avg_k = avg_d = avg_a = winrate = 0
         else:
             avg_k = round(total_k / len(games), 1)
             avg_d = round(total_d / len(games), 1)
