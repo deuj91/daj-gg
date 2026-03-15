@@ -2,14 +2,14 @@ body{
 
 margin:0;
 font-family:Arial, Helvetica, sans-serif;
-background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg");
+background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg");
 background-size:cover;
 background-attachment:fixed;
 color:white;
 
 }
 
-/* overlay */
+/* dark overlay */
 
 body::before{
 
@@ -28,46 +28,36 @@ z-index:-1;
 
 header{
 
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px 40px;
+padding:20px;
 background:rgba(0,0,0,0.6);
 
 }
 
 .logo{
 
-font-size:24px;
+font-size:26px;
 font-weight:bold;
 
 }
 
-header a{
+/* home */
 
-color:white;
-text-decoration:none;
-
-}
-
-/* hero */
-
-.hero{
+.home{
 
 text-align:center;
 margin-top:150px;
 
 }
 
-.hero h1{
+.home h1{
 
-font-size:60px;
+font-size:70px;
 
 }
 
-.hero p{
+.home p{
 
-color:#cbd5f5;
+color:#94a3b8;
 
 }
 
@@ -82,16 +72,15 @@ margin-top:30px;
 .search input{
 
 padding:14px;
-width:260px;
-border:none;
+width:250px;
 border-radius:8px;
-font-size:16px;
+border:none;
 
 }
 
 .search button{
 
-padding:14px 24px;
+padding:14px 22px;
 border:none;
 border-radius:8px;
 background:#2563eb;
@@ -116,10 +105,10 @@ padding:30px;
 
 .coach{
 
-background:rgba(30,41,59,0.9);
+background:#1e293b;
 padding:20px;
-border-radius:12px;
-margin-bottom:30px;
+border-radius:10px;
+margin-bottom:25px;
 
 }
 
@@ -127,34 +116,33 @@ margin-bottom:30px;
 
 .match{
 
-background:rgba(30,41,59,0.9);
-border-radius:12px;
-margin-bottom:20px;
+background:#1e293b;
+border-radius:10px;
+margin-bottom:15px;
 padding:15px;
 
 }
 
-.match-main{
+.match-top{
 
 display:flex;
 align-items:center;
 gap:20px;
-justify-content:space-between;
 
 }
 
 /* champion */
 
-.champion-img{
+.champion{
 
-width:60px;
+width:55px;
 border-radius:8px;
 
 }
 
-.champion-small{
+.champ-small{
 
-width:25px;
+width:22px;
 margin-right:8px;
 
 }
@@ -166,7 +154,7 @@ margin-right:8px;
 display:none;
 margin-top:10px;
 padding:10px;
-background:rgba(15,23,42,0.9);
+background:#0f172a;
 border-radius:8px;
 
 }
@@ -199,7 +187,7 @@ button{
 
 background:#334155;
 border:none;
-padding:8px 12px;
+padding:6px 12px;
 border-radius:6px;
 color:white;
 cursor:pointer;
