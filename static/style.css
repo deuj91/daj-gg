@@ -1,14 +1,18 @@
 body{
+
 margin:0;
 font-family:Arial, Helvetica, sans-serif;
-background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg");
+background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg");
 background-size:cover;
 background-attachment:fixed;
 color:white;
+
 }
 
-/* overlay sombre */
+/* overlay */
+
 body::before{
+
 content:"";
 position:fixed;
 top:0;
@@ -17,57 +21,76 @@ width:100%;
 height:100%;
 background:rgba(0,0,0,0.75);
 z-index:-1;
+
 }
 
 /* header */
 
 header{
+
 display:flex;
 justify-content:space-between;
 align-items:center;
 padding:20px 40px;
 background:rgba(0,0,0,0.6);
-backdrop-filter:blur(6px);
+
+}
+
+.logo{
+
+font-size:24px;
+font-weight:bold;
+
 }
 
 header a{
-text-decoration:none;
+
 color:white;
-font-weight:bold;
-font-size:22px;
+text-decoration:none;
+
 }
 
 /* hero */
 
 .hero{
+
 text-align:center;
-margin-top:120px;
+margin-top:150px;
+
 }
 
 .hero h1{
-font-size:50px;
-margin-bottom:10px;
+
+font-size:60px;
+
 }
 
 .hero p{
+
 color:#cbd5f5;
+
 }
 
-/* search bar */
+/* search */
 
 .search{
-margin-top:25px;
+
+margin-top:30px;
+
 }
 
 .search input{
+
 padding:14px;
 width:260px;
 border:none;
 border-radius:8px;
 font-size:16px;
+
 }
 
 .search button{
+
 padding:14px 24px;
 border:none;
 border-radius:8px;
@@ -76,81 +99,109 @@ color:white;
 font-weight:bold;
 cursor:pointer;
 margin-left:10px;
-}
 
-.search button:hover{
-background:#1d4ed8;
 }
 
 /* container */
 
 .container{
+
 max-width:900px;
 margin:auto;
 padding:30px;
+
 }
 
-/* match card */
+/* coach */
+
+.coach{
+
+background:rgba(30,41,59,0.9);
+padding:20px;
+border-radius:12px;
+margin-bottom:30px;
+
+}
+
+/* match */
 
 .match{
-background:rgba(30,41,59,0.85);
+
+background:rgba(30,41,59,0.9);
 border-radius:12px;
 margin-bottom:20px;
-padding:16px;
-box-shadow:0 4px 15px rgba(0,0,0,0.4);
+padding:15px;
+
 }
 
 .match-main{
+
 display:flex;
-justify-content:space-between;
 align-items:center;
+gap:20px;
+justify-content:space-between;
+
 }
 
-.champion{
+/* champion */
+
+.champion-img{
+
+width:60px;
+border-radius:8px;
+
+}
+
+.champion-small{
+
+width:25px;
+margin-right:8px;
+
+}
+
+/* players */
+
+.players{
+
+display:none;
+margin-top:10px;
+padding:10px;
+background:rgba(15,23,42,0.9);
+border-radius:8px;
+
+}
+
+.player{
+
+display:flex;
+align-items:center;
+padding:5px 0;
+
+}
+
+/* result */
+
+.win{
+
+color:#22c55e;
 font-weight:bold;
-font-size:18px;
+
 }
 
-.kda{
-font-size:16px;
+.lose{
+
+color:#ef4444;
+font-weight:bold;
+
 }
 
 button{
+
 background:#334155;
 border:none;
 padding:8px 12px;
 border-radius:6px;
 color:white;
 cursor:pointer;
-}
 
-button:hover{
-background:#475569;
-}
-
-/* players dropdown */
-
-.players{
-display:none;
-margin-top:12px;
-padding:10px;
-background:rgba(15,23,42,0.9);
-border-radius:8px;
-}
-
-.player{
-padding:5px 0;
-font-size:14px;
-}
-
-/* result colors */
-
-.win{
-color:#22c55e;
-font-weight:bold;
-}
-
-.lose{
-color:#ef4444;
-font-weight:bold;
 }
