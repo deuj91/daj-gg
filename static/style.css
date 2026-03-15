@@ -4,19 +4,17 @@ font-family:Arial;
 color:white;
 }
 
-/* backgrounds */
+/* HOME */
 
 .home{
-background:url("https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt9a6b09fce5d8e2f0/5e2e2c9c5f8c6a4d6d8a8c6b/LoL_Splash.jpg") center/cover no-repeat;
+background:
+linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.9)),
+url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg");
+
+background-size:cover;
+background-position:center;
 height:100vh;
 }
-
-.profile-page{
-background:#0f172a;
-}
-
-
-/* home */
 
 .home-container{
 display:flex;
@@ -24,8 +22,20 @@ flex-direction:column;
 align-items:center;
 justify-content:center;
 height:100vh;
-background:rgba(0,0,0,0.6);
 }
+
+/* PROFILE PAGE */
+
+.profile-page{
+background:
+linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.95)),
+url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg");
+
+background-size:cover;
+background-attachment:fixed;
+}
+
+/* INPUT */
 
 input{
 padding:12px;
@@ -43,8 +53,7 @@ color:white;
 cursor:pointer;
 }
 
-
-/* profile header */
+/* HEADER */
 
 .top{
 text-align:center;
@@ -64,8 +73,11 @@ border-radius:10px;
 }
 
 .level{
-opacity:0.7;
-margin-top:5px;
+opacity:0.8;
+}
+
+.rank{
+font-weight:bold;
 }
 
 .stats{
@@ -75,16 +87,15 @@ gap:40px;
 margin-top:20px;
 }
 
-
-/* match */
+/* MATCH */
 
 .match{
-background:#111827;
+background:rgba(17,24,39,0.92);
 margin:40px auto;
 padding:20px;
 width:900px;
 border-radius:10px;
-box-shadow:0 5px 20px rgba(0,0,0,0.6);
+box-shadow:0 10px 25px rgba(0,0,0,0.6);
 }
 
 .match-header{
@@ -118,8 +129,7 @@ color:#ef4444;
 font-weight:bold;
 }
 
-
-/* teams */
+/* TEAMS */
 
 .teams{
 display:flex;
@@ -136,8 +146,7 @@ font-size:30px;
 font-weight:bold;
 }
 
-
-/* players */
+/* PLAYERS */
 
 .player{
 display:flex;
