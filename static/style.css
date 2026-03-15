@@ -4,11 +4,6 @@ margin:0;
 font-family:Arial;
 background:#0f172a;
 color:white;
-height:100vh;
-
-display:flex;
-justify-content:center;
-align-items:center;
 
 }
 
@@ -16,6 +11,11 @@ align-items:center;
 
 .home{
 
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
 text-align:center;
 
 }
@@ -23,34 +23,86 @@ text-align:center;
 .home h1{
 
 font-size:70px;
-margin-bottom:10px;
-
-}
-
-.home p{
-
-color:#94a3b8;
-margin-bottom:30px;
 
 }
 
 input{
 
-padding:15px;
-width:250px;
+padding:14px;
 border-radius:8px;
 border:none;
+width:250px;
 
 }
 
 button{
 
-padding:15px 20px;
+padding:14px;
+margin-left:10px;
 border:none;
 background:#2563eb;
 color:white;
 border-radius:8px;
-margin-left:10px;
 cursor:pointer;
+
+}
+
+/* PROFILE */
+
+.container{
+
+max-width:900px;
+margin:auto;
+padding:30px;
+
+}
+
+.match{
+
+background:#1e293b;
+padding:15px;
+border-radius:10px;
+margin-bottom:15px;
+
+}
+
+.top{
+
+display:flex;
+align-items:center;
+gap:20px;
+
+}
+
+.champ{
+
+width:50px;
+
+}
+
+.items{
+
+margin-top:10px;
+
+}
+
+.item{
+
+width:30px;
+margin-right:5px;
+
+}
+
+.win{
+
+color:#22c55e;
+font-weight:bold;
+
+}
+
+.lose{
+
+color:#ef4444;
+font-weight:bold;
 
 }
