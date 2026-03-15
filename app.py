@@ -7,8 +7,6 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
-DDRAGON = "https://ddragon.leagueoflegends.com/cdn/14.6.1"
-
 
 @app.route("/")
 def home():
@@ -37,7 +35,7 @@ def search():
         ).json()
 
         if "puuid" not in account:
-            return "Player not found"
+            return f"Player not found: {account}"
 
         puuid = account["puuid"]
 
@@ -47,8 +45,11 @@ def search():
             headers={"X-Riot-Token": API_KEY}
         ).json()
 
-        icon = summoner["profileIconId"]
-        level = summoner["summonerLevel"]
+        if "id" not in summoner:
+            return f"Summoner data error: {summoner}"
+
+        icon = summoner.get("profileIconId", 29)
+        level = summoner.get("summonerLevel", 0)
         summoner_id = summoner["id"]
 
         # RANK
@@ -59,10 +60,11 @@ def search():
 
         rank = "Unranked"
 
-        for q in rank_data:
-            if q["queueType"] == "RANKED_SOLO_5x5":
-                rank = f'{q["tier"]} {q["rank"]}'
-                break
+        if isinstance(rank_data, list):
+            for q in rank_data:
+                if q["queueType"] == "RANKED_SOLO_5x5":
+                    rank = f'{q["tier"]} {q["rank"]}'
+                    break
 
         # MATCHLIST
         match_ids = requests.get(
@@ -81,13 +83,16 @@ def search():
                 headers={"X-Riot-Token": API_KEY}
             ).json()
 
-            info = match["info"]
+            info = match.get("info", {})
 
-            duration = int(info["gameDuration"] / 60)
+            duration = int(info.get("gameDuration", 0) / 60)
 
-            participants = info["participants"]
+            participants = info.get("participants", [])
 
-            player_data = next(p for p in participants if p["puuid"] == puuid)
+            player_data = next((p for p in participants if p["puuid"] == puuid), None)
+
+            if not player_data:
+                continue
 
             if player_data["win"]:
                 wins += 1
@@ -138,6 +143,9 @@ def search():
                 "allies": allies,
                 "enemies": enemies
             })
+
+        if len(games) == 0:
+            return "No matches found"
 
         avg_k = round(total_k / len(games), 1)
         avg_d = round(total_d / len(games), 1)
