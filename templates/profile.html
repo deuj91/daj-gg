@@ -23,6 +23,7 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.p
 <h1>{{ name }}</h1>
 
 <div class="level">Level {{ level }}</div>
+<div class="rank">{{ rank }}</div>
 
 </div>
 
@@ -33,8 +34,6 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.p
 <div>KDA<br>{{ avg_k }}/{{ avg_d }}/{{ avg_a }}</div>
 
 <div>Winrate<br>{{ winrate }}%</div>
-
-<div>Rank<br>{{ rank }}</div>
 
 </div>
 
@@ -87,7 +86,8 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }
 {% for item in p.build %}
 
 <img class="item"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
+onerror="this.style.display='none'">
 
 {% endfor %}
 
@@ -121,7 +121,8 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }
 {% for item in p.build %}
 
 <img class="item"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
+onerror="this.style.display='none'">
 
 {% endfor %}
 
