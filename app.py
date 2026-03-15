@@ -20,45 +20,65 @@ def search():
         player = request.args.get("player")
 
         if not player or "#" not in player:
-            return "Use format name#tag"
+            return "Use format: name#tag"
 
         name, tag = player.split("#")
 
-        # ACCOUNT
-        account = requests.get(
-            f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
+        # RIOT ACCOUNT
+        account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+
+        account_res = requests.get(
+            account_url,
             headers={"X-Riot-Token": API_KEY}
-        ).json()
+        )
+
+        account = account_res.json()
+
+        if "puuid" not in account:
+            return "Player not found"
 
         puuid = account["puuid"]
 
-        # SUMMONER
-        summoner = requests.get(
-            f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
+        # SUMMONER INFO
+        summoner_url = f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
+
+        summoner_res = requests.get(
+            summoner_url,
             headers={"X-Riot-Token": API_KEY}
-        ).json()
+        )
+
+        summoner = summoner_res.json()
+
+        if "id" not in summoner:
+            return "Summoner data error"
 
         summoner_id = summoner["id"]
 
         # RANK
-        rank_data = requests.get(
-            f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}",
+        rank_url = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}"
+
+        rank_res = requests.get(
+            rank_url,
             headers={"X-Riot-Token": API_KEY}
-        ).json()
+        )
+
+        rank_data = rank_res.json()
 
         rank = "Unranked"
 
         if len(rank_data) > 0:
-
             r = rank_data[0]
-
             rank = f"{r['tier']} {r['rank']}"
 
         # MATCH LIST
-        match_ids = requests.get(
-            f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10",
+        matchlist_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
+
+        matchlist_res = requests.get(
+            matchlist_url,
             headers={"X-Riot-Token": API_KEY}
-        ).json()
+        )
+
+        match_ids = matchlist_res.json()
 
         games = []
 
@@ -69,14 +89,21 @@ def search():
 
         for match_id in match_ids:
 
-            match = requests.get(
-                f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
+            match_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"
+
+            match_res = requests.get(
+                match_url,
                 headers={"X-Riot-Token": API_KEY}
-            ).json()
+            )
 
-            info = match["info"]
+            match = match_res.json()
 
-            participants = info["participants"]
+            info = match.get("info")
+
+            if not info:
+                continue
+
+            participants = info.get("participants", [])
 
             player_data = None
 
@@ -95,7 +122,10 @@ def search():
             total_d += player_data["deaths"]
             total_a += player_data["assists"]
 
-            teams = {"allies": [], "enemies": []}
+            teams = {
+                "allies": [],
+                "enemies": []
+            }
 
             player_team = player_data["teamId"]
 
@@ -131,31 +161,30 @@ def search():
                 "teams": teams
             })
 
-        games_count = len(games)
-
-        avg_k = round(total_k/games_count,1)
-        avg_d = round(total_d/games_count,1)
-        avg_a = round(total_a/games_count,1)
-
-        winrate = round((wins/games_count)*100)
+        if len(games) == 0:
+            avg_k = avg_d = avg_a = 0
+            winrate = 0
+        else:
+            avg_k = round(total_k / len(games), 1)
+            avg_d = round(total_d / len(games), 1)
+            avg_a = round(total_a / len(games), 1)
+            winrate = round((wins / len(games)) * 100)
 
         return render_template(
             "profile.html",
             name=player,
             games=games,
+            rank=rank,
             avg_k=avg_k,
             avg_d=avg_d,
             avg_a=avg_a,
-            winrate=winrate,
-            rank=rank
+            winrate=winrate
         )
 
     except Exception as e:
-
         print("SERVER ERROR:", e)
-
         return f"Server error: {e}"
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", port=10000)
