@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import requests
 import os
+from urllib.parse import quote
 
 app = Flask(__name__)
 
@@ -24,7 +25,11 @@ def search():
 
         name, tag = player.split("#")
 
-        # RIOT ACCOUNT
+        # FIX espaces dans pseudo
+        name = quote(name)
+        tag = quote(tag)
+
+        # ACCOUNT REQUEST
         account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
         account_res = requests.get(
@@ -32,10 +37,13 @@ def search():
             headers={"X-Riot-Token": API_KEY}
         )
 
+        if account_res.status_code != 200:
+            return f"Riot API error (account): {account_res.status_code}"
+
         account = account_res.json()
 
         if "puuid" not in account:
-            return "Player not found"
+            return f"Player not found: {account}"
 
         puuid = account["puuid"]
 
@@ -47,10 +55,13 @@ def search():
             headers={"X-Riot-Token": API_KEY}
         )
 
+        if summoner_res.status_code != 200:
+            return f"Riot API error (summoner): {summoner_res.status_code}"
+
         summoner = summoner_res.json()
 
         if "id" not in summoner:
-            return "Summoner data error"
+            return f"Summoner data error: {summoner}"
 
         summoner_id = summoner["id"]
 
@@ -122,12 +133,12 @@ def search():
             total_d += player_data["deaths"]
             total_a += player_data["assists"]
 
+            player_team = player_data["teamId"]
+
             teams = {
                 "allies": [],
                 "enemies": []
             }
-
-            player_team = player_data["teamId"]
 
             for p in participants:
 
