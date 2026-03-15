@@ -36,6 +36,9 @@ def search():
             headers={"X-Riot-Token": API_KEY}
         ).json()
 
+        if "puuid" not in account:
+            return "Player not found"
+
         puuid = account["puuid"]
 
         # SUMMONER
@@ -163,4 +166,5 @@ def search():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
