@@ -1,15 +1,13 @@
 body{
 
 margin:0;
-font-family:Arial, Helvetica, sans-serif;
-background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg");
+font-family:Arial;
+background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg");
 background-size:cover;
 background-attachment:fixed;
 color:white;
 
 }
-
-/* dark overlay */
 
 body::before{
 
@@ -37,57 +35,8 @@ background:rgba(0,0,0,0.6);
 
 font-size:26px;
 font-weight:bold;
-
-}
-
-/* home */
-
-.home{
-
-text-align:center;
-margin-top:150px;
-
-}
-
-.home h1{
-
-font-size:70px;
-
-}
-
-.home p{
-
-color:#94a3b8;
-
-}
-
-/* search */
-
-.search{
-
-margin-top:30px;
-
-}
-
-.search input{
-
-padding:14px;
-width:250px;
-border-radius:8px;
-border:none;
-
-}
-
-.search button{
-
-padding:14px 22px;
-border:none;
-border-radius:8px;
-background:#2563eb;
 color:white;
-font-weight:bold;
-cursor:pointer;
-margin-left:10px;
+text-decoration:none;
 
 }
 
@@ -117,9 +66,9 @@ margin-bottom:25px;
 .match{
 
 background:#1e293b;
+padding:15px;
 border-radius:10px;
 margin-bottom:15px;
-padding:15px;
 
 }
 
@@ -147,6 +96,22 @@ margin-right:8px;
 
 }
 
+/* items */
+
+.items{
+
+margin-top:10px;
+
+}
+
+.item{
+
+width:30px;
+margin-right:4px;
+border-radius:4px;
+
+}
+
 /* players */
 
 .players{
@@ -163,7 +128,7 @@ border-radius:8px;
 
 display:flex;
 align-items:center;
-padding:5px 0;
+padding:4px 0;
 
 }
 
@@ -185,11 +150,12 @@ font-weight:bold;
 
 button{
 
-background:#334155;
-border:none;
+margin-top:10px;
 padding:6px 12px;
-border-radius:6px;
+border:none;
+background:#334155;
 color:white;
+border-radius:6px;
 cursor:pointer;
 
 }
