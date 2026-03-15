@@ -14,7 +14,9 @@ def home():
 
 @app.route("/search")
 def search():
+
     try:
+
         player = request.args.get("player")
 
         if not player or "#" not in player:
@@ -22,9 +24,14 @@ def search():
 
         name, tag = player.split("#", 1)
 
-        # ACCOUNT
+        # ACCOUNT REQUEST
         account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
-        account_res = requests.get(account_url, headers={"X-Riot-Token": API_KEY})
+
+        account_res = requests.get(
+            account_url,
+            headers={"X-Riot-Token": API_KEY}
+        )
+
         account = account_res.json()
 
         if "puuid" not in account:
@@ -34,7 +41,12 @@ def search():
 
         # MATCH LIST
         matchlist_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
-        matchlist_res = requests.get(matchlist_url, headers={"X-Riot-Token": API_KEY})
+
+        matchlist_res = requests.get(
+            matchlist_url,
+            headers={"X-Riot-Token": API_KEY}
+        )
+
         match_ids = matchlist_res.json()
 
         games = []
@@ -42,7 +54,12 @@ def search():
         for match_id in match_ids:
 
             match_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"
-            match_res = requests.get(match_url, headers={"X-Riot-Token": API_KEY})
+
+            match_res = requests.get(
+                match_url,
+                headers={"X-Riot-Token": API_KEY}
+            )
+
             match = match_res.json()
 
             info = match.get("info", {})
@@ -64,7 +81,7 @@ def search():
                 player_data.get("item2", 0),
                 player_data.get("item3", 0),
                 player_data.get("item4", 0),
-                player_data.get("item5", 0),
+                player_data.get("item5", 0)
             ]
 
             players = []
@@ -100,8 +117,3 @@ def search():
     except Exception as e:
         print("SERVER ERROR:", e)
         return f"Server error: {e}"
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
