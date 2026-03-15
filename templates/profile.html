@@ -1,69 +1,61 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
-<title>{{name}}</title>
-
+<title>{{ name }} - DAJ.GG</title>
 <link rel="stylesheet" href="/static/style.css">
-
 </head>
 
 <body>
 
 <div class="container">
 
-<h1>{{name}}</h1>
-
-<h2>AI Tips</h2>
-
-<ul>
-
-{% for tip in tips %}
-<li>{{tip}}</li>
-{% endfor %}
-
-</ul>
-
-<h2>Recent Matches</h2>
+<h1>{{ name }}</h1>
 
 {% for game in games %}
 
-<div class="match">
+<div class="match {% if game.win %}win{% else %}lose{% endif %}">
 
-<div class="top">
-
-<img
-class="champ"
-src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{game.champion}}.png">
-
-<div>
-
-{{game.kills}} / {{game.deaths}} / {{game.assists}}
-
+<div class="champion">
+<b>{{ game.champion }}</b>
 </div>
 
-{% if game.win %}
-<span class="win">WIN</span>
-{% else %}
-<span class="lose">LOSE</span>
-{% endif %}
-
+<div class="kda">
+{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
 </div>
 
 <div class="items">
 
 {% for item in game.items %}
+
 {% if item != 0 %}
 
-<img
-class="item"
-src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{item}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
 
 {% endif %}
+
 {% endfor %}
 
 </div>
+
+<details>
+
+<summary>Players</summary>
+
+<div class="players">
+
+{% for p in game.players %}
+
+<div class="player">
+
+{{ p.name }} — {{ p.champion }}
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</details>
 
 </div>
 
@@ -72,5 +64,4 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{item}}.png">
 </div>
 
 </body>
-
 </html>
