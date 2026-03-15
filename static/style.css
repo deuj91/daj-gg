@@ -1,108 +1,78 @@
-body{
-
+body {
 margin:0;
 font-family:Arial;
-background:#0f172a;
+background:#0b0f19;
 color:white;
-
 }
-
-/* HOME */
 
 .home{
-
+background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg");
+background-size:cover;
 height:100vh;
 display:flex;
-flex-direction:column;
 justify-content:center;
 align-items:center;
-text-align:center;
-
 }
 
-.home h1{
-
-font-size:70px;
-
+.center-box{
+background:rgba(0,0,0,0.75);
+padding:40px;
+border-radius:10px;
+text-align:center;
 }
 
 input{
-
-padding:14px;
-border-radius:8px;
-border:none;
+padding:10px;
+font-size:16px;
 width:250px;
-
+border:none;
+border-radius:5px;
 }
 
 button{
-
-padding:14px;
-margin-left:10px;
+padding:10px 20px;
+font-size:16px;
 border:none;
-background:#2563eb;
+border-radius:5px;
+background:#3b82f6;
 color:white;
-border-radius:8px;
 cursor:pointer;
-
 }
 
-/* PROFILE */
-
 .container{
-
-max-width:900px;
+width:900px;
 margin:auto;
-padding:30px;
-
+margin-top:40px;
 }
 
 .match{
-
-background:#1e293b;
 padding:15px;
-border-radius:10px;
-margin-bottom:15px;
-
-}
-
-.top{
-
+margin-bottom:10px;
+border-radius:8px;
 display:flex;
 align-items:center;
 gap:20px;
-
-}
-
-.champ{
-
-width:50px;
-
-}
-
-.items{
-
-margin-top:10px;
-
-}
-
-.item{
-
-width:30px;
-margin-right:5px;
-
 }
 
 .win{
-
-color:#22c55e;
-font-weight:bold;
-
+background:#1f3d2b;
 }
 
 .lose{
+background:#3d1f1f;
+}
 
-color:#ef4444;
-font-weight:bold;
+.items img{
+width:32px;
+height:32px;
+margin-right:4px;
+}
 
+.players{
+margin-top:10px;
+}
+
+.player{
+font-size:14px;
+padding:2px;
 }
