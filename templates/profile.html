@@ -2,11 +2,14 @@
 <html>
 
 <head>
+
 <title>{{ name }}</title>
+
 <link rel="stylesheet" href="/static/style.css">
+
 </head>
 
-<body class="profile-bg">
+<body class="profile-page">
 
 <div class="top">
 
@@ -37,15 +40,11 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champio
 {{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
 </div>
 
-<div class="result">
-
 {% if game.win %}
-<span class="win">WIN</span>
+<div class="win">WIN</div>
 {% else %}
-<span class="lose">LOSE</span>
+<div class="lose">LOSE</div>
 {% endif %}
-
-</div>
 
 </div>
 
@@ -60,20 +59,17 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champio
 <img class="champicon"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
 
-<span>{{ p.name }}</span>
+<span class="pname">{{ p.name }}</span>
 
 <span class="pkda">{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
 
 <div class="items">
 
 {% for item in p.build %}
-{% if item > 0 %}
 
 <img class="item"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
-onerror="this.style.display='none'">
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 
-{% endif %}
 {% endfor %}
 
 </div>
@@ -95,20 +91,17 @@ onerror="this.style.display='none'">
 <img class="champicon"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
 
-<span>{{ p.name }}</span>
+<span class="pname">{{ p.name }}</span>
 
 <span class="pkda">{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
 
 <div class="items">
 
 {% for item in p.build %}
-{% if item > 0 %}
 
 <img class="item"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
-onerror="this.style.display='none'">
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 
-{% endif %}
 {% endfor %}
 
 </div>
@@ -126,4 +119,5 @@ onerror="this.style.display='none'">
 {% endfor %}
 
 </body>
+
 </html>
