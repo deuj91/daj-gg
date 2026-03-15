@@ -1,56 +1,44 @@
 body{
-color:white;
-font-family:Arial;
 margin:0;
+font-family:Arial;
+color:white;
 }
 
-/* backgrounds */
+/* background pages */
 
-.home-bg{
-background:
-linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.8)),
-url("https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt8a4fdd71b24d9022/5f8fbd1f88a6d347c5e5e92d/league-of-legends-key-art.jpg");
-background-size:cover;
-background-position:center;
+.home{
+background:url("https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt9a6b09fce5d8e2f0/5e2e2c9c5f8c6a4d6d8a8c6b/LoL_Splash.jpg") center/cover no-repeat;
 height:100vh;
 }
 
-.profile-bg{
-background:
-linear-gradient(rgba(0,0,0,0.7),rgba(0,0,0,0.9)),
-url("https://images.contentstack.io/v3/assets/blt731acb42bb3d1659/blt8a4fdd71b24d9022/5f8fbd1f88a6d347c5e5e92d/league-of-legends-key-art.jpg");
-background-size:cover;
-background-attachment:fixed;
+.profile-page{
+background:#0f172a;
 }
 
 /* home */
 
-.header{
-height:100vh;
+.home-container{
 display:flex;
 flex-direction:column;
-justify-content:center;
 align-items:center;
-}
-
-h1{
-font-size:48px;
-margin-bottom:20px;
+justify-content:center;
+height:100vh;
+background:rgba(0,0,0,0.6);
 }
 
 input{
 padding:12px;
 font-size:16px;
-border-radius:6px;
 border:none;
+border-radius:6px;
 }
 
 button{
-padding:12px 16px;
+padding:12px 18px;
 background:#2563eb;
 border:none;
-color:white;
 border-radius:6px;
+color:white;
 cursor:pointer;
 }
 
@@ -65,18 +53,18 @@ margin-top:30px;
 display:flex;
 justify-content:center;
 gap:40px;
-margin-top:20px;
+margin-top:15px;
 }
 
 /* match */
 
 .match{
-background:rgba(17,24,39,0.9);
+background:#111827;
 margin:40px auto;
 padding:20px;
 width:900px;
 border-radius:10px;
-box-shadow:0 10px 25px rgba(0,0,0,0.6);
+box-shadow:0 5px 20px rgba(0,0,0,0.6);
 }
 
 .match-header{
@@ -117,7 +105,7 @@ width:45%;
 }
 
 .vs{
-font-size:32px;
+font-size:30px;
 font-weight:bold;
 }
 
@@ -127,14 +115,18 @@ font-weight:bold;
 display:flex;
 align-items:center;
 gap:10px;
-margin:6px 0;
+margin:5px 0;
 background:#1e293b;
-padding:6px 10px;
+padding:6px 8px;
 border-radius:6px;
 }
 
 .champicon{
 width:28px;
+}
+
+.pname{
+width:120px;
 }
 
 .pkda{
