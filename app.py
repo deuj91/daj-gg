@@ -7,7 +7,8 @@ app = Flask(__name__)
 
 API_KEY = os.environ.get("RIOT_API_KEY")
 
-MATCH_REGION = "europe"
+REGION_ACCOUNT = "https://europe.api.riotgames.com"
+REGION_MATCH = "https://europe.api.riotgames.com"
 
 session = requests.Session()
 
@@ -32,10 +33,10 @@ def ai_coach(games):
         tips.append("Try dying less and improve positioning.")
 
     if kills / len(games) < 4:
-        tips.append("Your damage impact seems low. Try playing more aggressively.")
+        tips.append("Try increasing your kill participation.")
 
     if kda > 4:
-        tips.append("Excellent KDA. Keep it up.")
+        tips.append("Excellent KDA, keep it up!")
 
     if not tips:
         tips.append("Balanced performance overall.")
@@ -54,11 +55,12 @@ def search():
     player = request.args.get("player")
 
     if not player:
-        return render_template("error.html", message="Enter Riot ID like Caps#EUW")
+        return render_template("error.html", message="Enter Riot ID (example: Caps#EUW)")
 
     if "#" not in player:
-        return render_template("error.html", message="Use Riot ID format Name#TAG")
+        return render_template("error.html", message="Format must be Name#TAG")
 
+    # cache
     if player in CACHE:
 
         data, timestamp = CACHE[player]
@@ -75,7 +77,8 @@ def search():
 
         name, tag = player.split("#")
 
-        account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+        # account
+        account_url = f"{REGION_ACCOUNT}/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
         acc_response = session.get(
             account_url,
@@ -92,7 +95,8 @@ def search():
         if not puuid:
             return render_template("error.html", message="PUUID not found")
 
-        matches_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=10"
+        # match list
+        matches_url = f"{REGION_MATCH}/lol/match/v5/matches/by-puuid/{puuid}/ids?count=10"
 
         matches_response = session.get(
             matches_url,
@@ -100,7 +104,7 @@ def search():
         )
 
         if matches_response.status_code != 200:
-            return render_template("error.html", message="Match history unavailable")
+            return render_template("error.html", message="Unable to fetch matches")
 
         match_ids = matches_response.json()
 
@@ -108,7 +112,7 @@ def search():
 
         for match_id in match_ids:
 
-            match_url = f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
+            match_url = f"{REGION_MATCH}/lol/match/v5/matches/{match_id}"
 
             match_response = session.get(
                 match_url,
@@ -118,16 +122,15 @@ def search():
             if match_response.status_code != 200:
                 continue
 
-            match = match_response.json()
+            match_data = match_response.json()
 
-            info = match["info"]["participants"]
+            info = match_data["info"]["participants"]
 
             players = []
 
             for p in info:
 
                 players.append({
-
                     "name": p.get("riotIdGameName", "Unknown"),
                     "champion": p.get("championName", "Unknown"),
                     "items": [
@@ -138,7 +141,6 @@ def search():
                         p.get("item4", 0),
                         p.get("item5", 0)
                     ]
-
                 })
 
             me = next((p for p in info if p["puuid"] == puuid), None)
@@ -147,14 +149,12 @@ def search():
                 continue
 
             games.append({
-
                 "champion": me.get("championName", "Unknown"),
                 "kills": me.get("kills", 0),
                 "deaths": me.get("deaths", 0),
                 "assists": me.get("assists", 0),
                 "win": me.get("win", False),
                 "players": players
-
             })
 
         tips = ai_coach(games)
@@ -177,7 +177,7 @@ def search():
 
         return render_template(
             "error.html",
-            message="Server error. Check API key or logs."
+            message="Server error. Check logs."
         )
 
 
