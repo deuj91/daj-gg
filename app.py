@@ -25,11 +25,10 @@ def search():
 
         name, tag = player.split("#")
 
-        # FIX espaces dans pseudo
         name = quote(name)
         tag = quote(tag)
 
-        # ACCOUNT REQUEST
+        # GET ACCOUNT (PUUID)
         account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
 
         account_res = requests.get(
@@ -38,48 +37,14 @@ def search():
         )
 
         if account_res.status_code != 200:
-            return f"Riot API error (account): {account_res.status_code}"
+            return f"Riot API error: {account_res.status_code}"
 
         account = account_res.json()
 
         if "puuid" not in account:
-            return f"Player not found: {account}"
+            return "Player not found"
 
         puuid = account["puuid"]
-
-        # SUMMONER INFO
-        summoner_url = f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
-
-        summoner_res = requests.get(
-            summoner_url,
-            headers={"X-Riot-Token": API_KEY}
-        )
-
-        if summoner_res.status_code != 200:
-            return f"Riot API error (summoner): {summoner_res.status_code}"
-
-        summoner = summoner_res.json()
-
-        if "id" not in summoner:
-            return f"Summoner data error: {summoner}"
-
-        summoner_id = summoner["id"]
-
-        # RANK
-        rank_url = f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}"
-
-        rank_res = requests.get(
-            rank_url,
-            headers={"X-Riot-Token": API_KEY}
-        )
-
-        rank_data = rank_res.json()
-
-        rank = "Unranked"
-
-        if len(rank_data) > 0:
-            r = rank_data[0]
-            rank = f"{r['tier']} {r['rank']}"
 
         # MATCH LIST
         matchlist_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
@@ -135,10 +100,8 @@ def search():
 
             player_team = player_data["teamId"]
 
-            teams = {
-                "allies": [],
-                "enemies": []
-            }
+            allies = []
+            enemies = []
 
             for p in participants:
 
@@ -159,9 +122,9 @@ def search():
                 }
 
                 if p["teamId"] == player_team:
-                    teams["allies"].append(pdata)
+                    allies.append(pdata)
                 else:
-                    teams["enemies"].append(pdata)
+                    enemies.append(pdata)
 
             games.append({
                 "champion": player_data["championName"],
@@ -169,7 +132,8 @@ def search():
                 "deaths": player_data["deaths"],
                 "assists": player_data["assists"],
                 "win": player_data["win"],
-                "teams": teams
+                "allies": allies,
+                "enemies": enemies
             })
 
         if len(games) == 0:
@@ -185,7 +149,6 @@ def search():
             "profile.html",
             name=player,
             games=games,
-            rank=rank,
             avg_k=avg_k,
             avg_d=avg_d,
             avg_a=avg_a,
