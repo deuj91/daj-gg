@@ -6,8 +6,9 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
+
 @app.route("/")
-def index():
+def home():
     return render_template("index.html")
 
 
@@ -23,9 +24,13 @@ def search():
 
         name, tag = player.split("#")
 
-        # GET ACCOUNT
-        url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}?api_key={API_KEY}"
-        account = requests.get(url).json()
+        # ACCOUNT REQUEST
+        account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+
+        account = requests.get(
+            account_url,
+            headers={"X-Riot-Token": API_KEY}
+        ).json()
 
         if "puuid" not in account:
             return "Summoner not found"
@@ -33,52 +38,66 @@ def search():
         puuid = account["puuid"]
 
         # MATCH LIST
-        matches_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5&api_key={API_KEY}"
-        match_ids = requests.get(matches_url).json()
+        matchlist_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
+
+        match_ids = requests.get(
+            matchlist_url,
+            headers={"X-Riot-Token": API_KEY}
+        ).json()
 
         games = []
 
         for match_id in match_ids:
 
-            match_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}?api_key={API_KEY}"
-            match = requests.get(match_url).json()
+            match_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}"
 
-            info = match["info"]["participants"]
-            metadata = match["metadata"]["participants"]
+            match = requests.get(
+                match_url,
+                headers={"X-Riot-Token": API_KEY}
+            ).json()
 
-            player_index = metadata.index(puuid)
-            p = info[player_index]
+            participants = match["info"]["participants"]
+
+            player_data = None
+
+            for p in participants:
+                if p["puuid"] == puuid:
+                    player_data = p
+
+            if not player_data:
+                continue
 
             items = [
-                p["item0"],
-                p["item1"],
-                p["item2"],
-                p["item3"],
-                p["item4"],
-                p["item5"]
+                player_data["item0"],
+                player_data["item1"],
+                player_data["item2"],
+                player_data["item3"],
+                player_data["item4"],
+                player_data["item5"]
             ]
 
             players = []
 
-            for pl in info:
+            for p in participants:
                 players.append({
-                    "name": pl["summonerName"],
-                    "champion": pl["championName"]
+                    "name": p["summonerName"],
+                    "champion": p["championName"]
                 })
 
             games.append({
-
-                "champion": p["championName"],
-                "kills": p["kills"],
-                "deaths": p["deaths"],
-                "assists": p["assists"],
-                "win": p["win"],
+                "champion": player_data["championName"],
+                "kills": player_data["kills"],
+                "deaths": player_data["deaths"],
+                "assists": player_data["assists"],
+                "win": player_data["win"],
                 "items": items,
                 "players": players
-
             })
 
-        tips = ["Focus on map awareness", "Try to reduce deaths"]
+        tips = [
+            "Reduce deaths to improve consistency",
+            "Track enemy jungler more often"
+        ]
 
         return render_template(
             "profile.html",
@@ -88,9 +107,9 @@ def search():
         )
 
     except Exception as e:
-    import traceback
-    traceback.print_exc()
-    return f"SERVER ERROR: {e}"
+
+        print("SERVER ERROR:", e)
+        return f"Server error: {e}"
 
 
 if __name__ == "__main__":
