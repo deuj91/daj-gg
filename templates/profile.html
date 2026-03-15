@@ -13,7 +13,7 @@
 
 <header>
 
-<a class="logo" href="/">DAJ.GG</a>
+<a href="/" class="logo">DAJ.GG</a>
 
 </header>
 
@@ -26,9 +26,13 @@
 <h2>AI Coach</h2>
 
 <ul>
+
 {% for tip in tips %}
+
 <li>{{tip}}</li>
+
 {% endfor %}
+
 </ul>
 
 </div>
@@ -39,10 +43,10 @@
 
 <div class="match">
 
-<div class="match-main">
+<div class="match-top">
 
 <img
-class="champion-img"
+class="champion"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{game.champion}}.png">
 
 <div class="kda">
@@ -51,18 +55,20 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{game.champion
 
 </div>
 
-<div>
-
 {% if game.win %}
-<span class="win">WIN</span>
+
+<div class="win">WIN</div>
+
 {% else %}
-<span class="lose">LOSE</span>
+
+<div class="lose">LOSE</div>
+
 {% endif %}
 
-</div>
+<button onclick="togglePlayers({{loop.index}})">
 
-<button onclick="toggle({{loop.index}})">
 Players
+
 </button>
 
 </div>
@@ -74,7 +80,7 @@ Players
 <div class="player">
 
 <img
-class="champion-small"
+class="champ-small"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champion}}.png">
 
 {{p.name}}
@@ -93,14 +99,18 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champion}}.
 
 <script>
 
-function toggle(id){
+function togglePlayers(id){
 
 let el = document.getElementById("players"+id)
 
-if(el.style.display=="block"){
-el.style.display="none"
+if(el.style.display === "block"){
+
+el.style.display = "none"
+
 }else{
-el.style.display="block"
+
+el.style.display = "block"
+
 }
 
 }
