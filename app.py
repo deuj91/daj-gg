@@ -30,30 +30,40 @@ def search():
         name = quote(name)
         tag = quote(tag)
 
-        account_url = f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
-
+        # ACCOUNT
         account = requests.get(
-            account_url,
+            f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
             headers={"X-Riot-Token": API_KEY}
         ).json()
 
         puuid = account["puuid"]
 
-        # summoner info
-        summoner_url = f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
-
+        # SUMMONER
         summoner = requests.get(
-            summoner_url,
+            f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
             headers={"X-Riot-Token": API_KEY}
         ).json()
 
         icon = summoner["profileIconId"]
         level = summoner["summonerLevel"]
+        summoner_id = summoner["id"]
 
-        matchlist_url = f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
+        # RANK
+        rank_data = requests.get(
+            f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}",
+            headers={"X-Riot-Token": API_KEY}
+        ).json()
 
+        rank = "Unranked"
+
+        for q in rank_data:
+            if q["queueType"] == "RANKED_SOLO_5x5":
+                rank = f'{q["tier"]} {q["rank"]}'
+                break
+
+        # MATCHLIST
         match_ids = requests.get(
-            matchlist_url,
+            f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5",
             headers={"X-Riot-Token": API_KEY}
         ).json()
 
@@ -132,19 +142,17 @@ def search():
 
         winrate = round((wins / len(games)) * 100)
 
-        rank = "Unranked"
-
         return render_template(
             "profile.html",
             name=player,
             icon=icon,
             level=level,
+            rank=rank,
             games=games,
             avg_k=avg_k,
             avg_d=avg_d,
             avg_a=avg_a,
-            winrate=winrate,
-            rank=rank
+            winrate=winrate
         )
 
     except Exception as e:
