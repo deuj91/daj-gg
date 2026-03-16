@@ -15,7 +15,7 @@ background-image:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splas
 }
 
 .home-container{
-background:rgba(0,0,0,0.75);
+background:rgba(0,0,0,0.8);
 padding:60px;
 border-radius:12px;
 text-align:center;
@@ -23,6 +23,7 @@ text-align:center;
 
 .logo{
 font-size:60px;
+margin-bottom:30px;
 }
 
 .search input{
@@ -117,7 +118,7 @@ font-weight:bold;
 display:flex;
 justify-content:center;
 align-items:center;
-font-size:48px;
+font-size:50px;
 font-weight:bold;
 color:#FFD700;
 animation:vsPulse 1.5s infinite;
@@ -132,6 +133,7 @@ animation:vsPulse 1.5s infinite;
 .top-champs{
 display:flex;
 gap:20px;
+margin-bottom:30px;
 }
 
 .champ-card{
