@@ -2,109 +2,124 @@ body{
 background:#0f172a;
 color:white;
 font-family:Arial;
+margin:0;
 }
 
-.home{
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg");
-background-size:cover;
+.search{
+text-align:center;
+margin-top:150px;
 }
 
-.search-box{
-background:rgba(0,0,0,0.7);
-padding:30px;
-border-radius:10px;
+input{
+padding:12px;
+width:250px;
+border-radius:6px;
+border:none;
+}
+
+button{
+padding:12px 20px;
+border:none;
+background:#6366f1;
+color:white;
+border-radius:6px;
+cursor:pointer;
 }
 
 .profile{
-padding:20px;
-background:#020617;
+text-align:center;
+margin:40px;
 }
 
-.match{
+.rank img{
+height:60px;
+}
+
+.game{
 background:#1e293b;
-margin:20px;
-padding:15px;
-border-radius:10px;
-position:relative;
+margin:30px auto;
+width:1200px;
+border-radius:12px;
+padding:20px;
 }
 
-.match.win{
-border-left:6px solid #3b82f6;
+.win{
+border-left:6px solid #22c55e;
 }
 
-.match.lose{
+.lose{
 border-left:6px solid #ef4444;
 }
 
-.mvp{
-position:absolute;
-top:10px;
-right:10px;
-background:#facc15;
-color:black;
-padding:4px 8px;
-border-radius:6px;
-font-size:12px;
+.game-header{
+display:flex;
+align-items:center;
+gap:20px;
+margin-bottom:20px;
+}
+
+.champion{
+height:60px;
+}
+
+.kda{
+font-size:20px;
+}
+
+.duration{
+margin-left:auto;
 }
 
 .teams{
-display:flex;
-justify-content:space-between;
+display:grid;
+grid-template-columns:1fr 80px 1fr;
 align-items:center;
 }
 
 .team{
-width:45%;
-}
-
-.vs{
-width:10%;
-text-align:center;
-font-size:22px;
+display:flex;
+flex-direction:column;
+gap:8px;
 }
 
 .player{
 display:flex;
 align-items:center;
-background:#020617;
+background:#111827;
 padding:6px;
-margin:5px 0;
 border-radius:6px;
+gap:10px;
 }
 
 .champ{
-width:40px;
-margin-right:8px;
+height:30px;
 }
 
-.player-info{
-width:150px;
+.name{
+flex:1;
+font-size:13px;
+}
+
+.gold{
+color:#facc15;
+font-size:12px;
 }
 
 .items img{
-width:22px;
-margin-left:2px;
+height:22px;
+margin-right:3px;
 }
 
-.winrate-bar{
-height:12px;
-background:#1e293b;
-margin-top:10px;
-border-radius:10px;
+.vs{
+text-align:center;
+font-weight:bold;
+font-size:22px;
 }
 
-.winrate{
-height:100%;
-background:#3b82f6;
-}
-
-.ai-box{
-background:#020617;
-margin:20px;
-padding:15px;
-border-radius:10px;
+.analysis{
+margin-top:15px;
+background:#0f172a;
+padding:10px;
+border-radius:8px;
+font-size:13px;
 }
