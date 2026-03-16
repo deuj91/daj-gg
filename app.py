@@ -11,7 +11,6 @@ CACHE = {}
 CACHE_TIME = 120
 
 VERSION = "14.6.1"
-DDRAGON = f"https://ddragon.leagueoflegends.com/cdn/{VERSION}"
 
 headers = {"X-Riot-Token": API_KEY}
 
@@ -41,7 +40,7 @@ def search():
         player = request.args.get("player")
 
         if not player or "#" not in player:
-            return "Use format: name#tag"
+            return "Format: Summoner#TAG"
 
         cached = get_cache(player)
         if cached:
@@ -49,43 +48,35 @@ def search():
 
         name, tag = player.split("#")
 
-        # ACCOUNT
         account = requests.get(
             f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
-            headers=headers,
-            timeout=10
+            headers=headers
         ).json()
 
         puuid = account["puuid"]
 
-        # SUMMONER
         summoner = requests.get(
             f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
-            headers=headers,
-            timeout=10
+            headers=headers
         ).json()
 
         icon = summoner["profileIconId"]
         level = summoner["summonerLevel"]
 
-        # RANK
         rank = "Unranked"
 
         leagues = requests.get(
             f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}",
-            headers=headers,
-            timeout=10
+            headers=headers
         ).json()
 
         for r in leagues:
             if r["queueType"] == "RANKED_SOLO_5x5":
-                rank = f'{r["tier"]} {r["rank"]} {r["leaguePoints"]}LP'
+                rank = f'{r["tier"]} {r["rank"]} {r["leaguePoints"]} LP'
 
-        # MATCHES
         match_ids = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
-            headers=headers,
-            timeout=10
+            headers=headers
         ).json()
 
         matches = []
@@ -98,14 +89,14 @@ def search():
 
             match = requests.get(
                 f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
-                headers=headers,
-                timeout=10
+                headers=headers
             ).json()
 
             info = match["info"]
-            participants = info["participants"]
 
-            player_data = next(p for p in participants if p["puuid"] == puuid)
+            player_data = next(
+                p for p in info["participants"] if p["puuid"] == puuid
+            )
 
             if player_data["win"]:
                 wins += 1
@@ -133,11 +124,10 @@ def search():
                 "cs": player_data["totalMinionsKilled"],
                 "damage": player_data["totalDamageDealtToChampions"],
                 "gold": player_data["goldEarned"],
-                "win": player_data["win"],
-                "duration": int(info["gameDuration"]/60)
+                "win": player_data["win"]
             })
 
-        games = len(match_ids)
+        games = len(matches)
 
         kda = f"{total_k/games:.1f}/{total_d/games:.1f}/{total_a/games:.1f}"
         winrate = int((wins/games)*100)
@@ -163,7 +153,6 @@ def search():
         return html
 
     except Exception as e:
-
         return f"Server error: {str(e)}"
 
 
