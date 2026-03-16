@@ -1,54 +1,33 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
+<title>Results</title>
 <link rel="stylesheet" href="/static/style.css">
-
 </head>
 
 <body>
-
-<div class="profile">
 
 <h1>{{ summoner.name }}</h1>
 
 {% if rank %}
 <div class="rank">
-
-<img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/{{ rank.tier | lower }}.png">
-
-<span>{{ rank.tier }} {{ rank.rank }}</span>
-
+{{ rank.tier }} {{ rank.rank }} - {{ rank.leaguePoints }} LP
 </div>
 {% endif %}
 
-</div>
-
-
 {% for game in games %}
 
-<div class="game {{ 'win' if game.win else 'lose' }}">
+<div class="match">
 
-<div class="header">
-
-<img class="champ"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champion }}.png">
-
-<div class="kda">
-
-{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
-
-</div>
-
-<div class="time">
-
+<div class="player">
+{{ game.champion }} |
+{{ game.kills }}/{{ game.deaths }}/{{ game.assists }} |
 {{ game.duration }} min
-
 </div>
 
+<div class="analysis">
+{{ game.analysis }}
 </div>
-
 
 <div class="teams">
 
@@ -56,20 +35,19 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champio
 
 {% for p in game.team1 %}
 
-<div class="player">
+<div class="p">
 
-<img class="champ-small"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
+<div>{{ p.name }}</div>
 
-<span>{{ p.name }}</span>
+<div>{{ p.champion }}</div>
 
-<span class="gold">{{ p.gold }}g</span>
+<div>{{ p.gold }}g</div>
 
 <div class="items">
 
 {% for item in p.items %}
 {% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/{{item}}.png">
 {% endif %}
 {% endfor %}
 
@@ -81,28 +59,25 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }
 
 </div>
 
-
 <div class="vs">VS</div>
-
 
 <div class="team">
 
 {% for p in game.team2 %}
 
-<div class="player">
+<div class="p">
 
-<img class="champ-small"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
+<div>{{ p.name }}</div>
 
-<span>{{ p.name }}</span>
+<div>{{ p.champion }}</div>
 
-<span class="gold">{{ p.gold }}g</span>
+<div>{{ p.gold }}g</div>
 
 <div class="items">
 
 {% for item in p.items %}
 {% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/{{item}}.png">
 {% endif %}
 {% endfor %}
 
@@ -113,13 +88,6 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }
 {% endfor %}
 
 </div>
-
-</div>
-
-
-<div class="analysis">
-
-🤖 {{ game.analysis }}
 
 </div>
 
