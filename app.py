@@ -1,24 +1,21 @@
 from flask import Flask, render_template, request
 import requests
-import os
 import time
+from collections import Counter
 
 app = Flask(__name__)
 
-API_KEY = os.getenv("RIOT_API_KEY")
-headers = {"X-Riot-Token": API_KEY}
+RIOT_API_KEY = "YOUR_RIOT_API_KEY"
 
 CACHE = {}
-CACHE_TIME = 120
-
-VERSION = "14.6.1"
+CACHE_TIME = 300
 
 
 def get_cache(key):
     if key in CACHE:
-        data, timestamp = CACHE[key]
+        value, timestamp = CACHE[key]
         if time.time() - timestamp < CACHE_TIME:
-            return data
+            return value
     return None
 
 
@@ -27,69 +24,77 @@ def set_cache(key, value):
 
 
 @app.route("/")
-def home():
+def index():
     return render_template("index.html")
 
 
 @app.route("/search")
 def search():
 
-    player_input = request.args.get("player")
+    player = request.args.get("player")
 
-    if not player_input or "#" not in player_input:
-        return "Format: Name#TAG"
-
-    name, tag = player_input.split("#")
-
-    cache_key = f"{name}#{tag}"
-
-    cached = get_cache(cache_key)
+    cached = get_cache(player)
     if cached:
         return cached
 
-    account = requests.get(
+    name, tag = player.split("#")
+
+    acc = requests.get(
         f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
-        headers=headers
+        headers={"X-Riot-Token": RIOT_API_KEY}
     ).json()
 
-    puuid = account["puuid"]
+    puuid = acc["puuid"]
 
     summoner = requests.get(
         f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
-        headers=headers
+        headers={"X-Riot-Token": RIOT_API_KEY}
     ).json()
 
-    icon = summoner["profileIconId"]
     level = summoner["summonerLevel"]
+    icon = summoner["profileIconId"]
+
+    league = requests.get(
+        f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner['id']}",
+        headers={"X-Riot-Token": RIOT_API_KEY}
+    ).json()
 
     rank = "Unranked"
+    if league:
+        tier = league[0]["tier"]
+        div = league[0]["rank"]
+        rank = f"{tier} {div}"
 
-    leagues = requests.get(
-        f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}",
-        headers=headers
-    ).json()
+    rank_icon = "https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-unranked.png"
 
-    for r in leagues:
-        if r["queueType"] == "RANKED_SOLO_5x5":
-            rank = f'{r["tier"]} {r["rank"]} {r["leaguePoints"]} LP'
+    if rank != "Unranked":
+        tier = rank.split()[0].lower()
+        rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier}.png"
 
-    match_ids = requests.get(
+    matches_id = requests.get(
         f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
-        headers=headers
+        headers={"X-Riot-Token": RIOT_API_KEY}
     ).json()
 
     matches = []
+    champions = []
 
-    for match_id in match_ids:
+    for match_id in matches_id:
 
         data = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
-            headers=headers
+            headers={"X-Riot-Token": RIOT_API_KEY}
         ).json()
 
         info = data["info"]
 
-        teams = {"blue": [], "red": []}
+        mode = info["gameMode"]
+
+        blue = []
+        red = []
+
+        mvp_score = -999
+        mvp = "Unknown"
 
         for p in info["participants"]:
 
@@ -108,18 +113,34 @@ def search():
                 "kills": p["kills"],
                 "deaths": p["deaths"],
                 "assists": p["assists"],
-                "build": build,
-                "team": p["teamId"]
+                "gold": p["goldEarned"],
+                "build": build
             }
 
+            score = p["kills"] + p["assists"] - p["deaths"]
+
+            if score > mvp_score:
+                mvp_score = score
+                mvp = player_data["name"]
+
+            if p["puuid"] == puuid:
+                champions.append(p["championName"])
+
             if p["teamId"] == 100:
-                teams["blue"].append(player_data)
+                blue.append(player_data)
             else:
-                teams["red"].append(player_data)
+                red.append(player_data)
 
-        matches.append({"teams": teams})
+        matches.append({
+            "blue": blue,
+            "red": red,
+            "mode": mode,
+            "mvp": mvp
+        })
 
-    bg = matches[0]["teams"]["blue"][0]["champion"]
+    top_champs = Counter(champions).most_common(5)
+
+    bg = champions[0] if champions else "Ahri"
 
     html = render_template(
         "profile.html",
@@ -128,15 +149,16 @@ def search():
         level=level,
         icon=icon,
         rank=rank,
+        rank_icon=rank_icon,
         matches=matches,
+        top_champs=top_champs,
         bg=bg
     )
 
-    set_cache(cache_key, html)
+    set_cache(player, html)
 
     return html
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run()
