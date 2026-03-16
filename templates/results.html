@@ -2,27 +2,41 @@
 <html>
 
 <head>
-<title>Match History</title>
+<title>Results</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body class="results">
 
-<h2 class="summoner">
-Level {{ summoner.summonerLevel }}
-</h2>
+<div class="profile">
+
+<h2>Level {{ summoner.summonerLevel }}</h2>
+
+{% if rank %}
+<div class="rank">
+
+<img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{{rank.tier|lower}}.png">
+
+{{rank.tier}} {{rank.rank}} - {{rank.leaguePoints}} LP
+
+</div>
+{% endif %}
+
+</div>
 
 {% for game in games %}
 
 <div class="match">
 
-<div class="mode">
-{{ game.mode }} • {{ game.duration }} min
+<div class="match-header">
+
+{{game.mode}} • {{game.duration}} min
+
 </div>
 
 <div class="teams">
 
-<div class="team">
+<div class="team blue">
 
 {% for p in game.blue %}
 
@@ -31,36 +45,37 @@ Level {{ summoner.summonerLevel }}
 <img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champ}}.png">
 
-<div class="stats">
+<div class="kda">
+{{p.kills}}/{{p.deaths}}/{{p.assists}}
+</div>
 
-<div>{{p.kills}} / {{p.deaths}} / {{p.assists}}</div>
-<div class="gold">{{p.gold}}g</div>
-
+<div class="gold">
+{{p.gold}}g
 </div>
 
 <div class="items">
 
-{% for i in p.items %}
+{% for i in p.items_list %}
+
 {% if i != 0 %}
+
 <img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{i}}.png">
+
 {% endif %}
-{% endfor %}
-
-</div>
-
-</div>
 
 {% endfor %}
 
 </div>
 
-<div class="vs">
+</div>
 
-VS
+{% endfor %}
 
 </div>
 
-<div class="team">
+<div class="vs">VS</div>
+
+<div class="team red">
 
 {% for p in game.red %}
 
@@ -69,19 +84,24 @@ VS
 <img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champ}}.png">
 
-<div class="stats">
+<div class="kda">
+{{p.kills}}/{{p.deaths}}/{{p.assists}}
+</div>
 
-<div>{{p.kills}} / {{p.deaths}} / {{p.assists}}</div>
-<div class="gold">{{p.gold}}g</div>
-
+<div class="gold">
+{{p.gold}}g
 </div>
 
 <div class="items">
 
-{% for i in p.items %}
+{% for i in p.items_list %}
+
 {% if i != 0 %}
+
 <img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{i}}.png">
+
 {% endif %}
+
 {% endfor %}
 
 </div>
