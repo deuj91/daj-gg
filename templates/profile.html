@@ -2,77 +2,51 @@
 <html>
 
 <head>
-<title>{{ name }}</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 
-<body class="profile"
-style="background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{{ bg }}_0.jpg');">
+<body style="background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{{ bg }}_0.jpg')">
 
-<div class="overlay">
+<div class="profile">
 
-<div class="header">
+<h2>{{ name }}</h2>
 
-<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.png">
-
-<div>
-
-<h1>{{ name }}</h1>
 <p>Level {{ level }}</p>
+<p>{{ rank }}</p>
 
 <div class="stats">
-
-<span>KDA {{ kda }}</span>
-<span>Winrate {{ winrate }}%</span>
-<span>CS {{ cs_avg }}</span>
-<span>{{ rank }}</span>
-
-</div>
-
-</div>
-
+Winrate {{ winrate }}% | KDA {{ kda }} | CS {{ cs_avg }}
 </div>
 
 {% for match in matches %}
 
-<div class="match {% if match.win %}win{% else %}lose{% endif %}">
+<div class="match {{ 'win' if match['win'] else 'lose' }}">
 
-<div class="match-header">
-
-<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ match.champion }}.png">
-
-<div>
+<img class="champion"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ match['champion'] }}.png">
 
 <div class="kda">
-
-{{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
-
-</div>
-
-<div>
-
-CS {{ match.cs }}  
-Damage {{ match.damage }}  
-Gold {{ match.gold }}
-
-</div>
-
+{{ match["kills"] }}/{{ match["deaths"] }}/{{ match["assists"] }}
 </div>
 
 <div class="items">
 
-{% for item in match.items %}
+{% for item in match["build"] %}
+
+{% if item != 0 %}
+
 <img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+
+{% endif %}
+
 {% endfor %}
 
 </div>
 
-<div class="duration">
-
-{{ match.duration }} min
-
-</div>
-
+<div class="extra">
+CS {{ match["cs"] }} |
+DMG {{ match["damage"] }} |
+Gold {{ match["gold"] }}
 </div>
 
 </div>
@@ -82,5 +56,4 @@ Gold {{ match.gold }}
 </div>
 
 </body>
-
 </html>
