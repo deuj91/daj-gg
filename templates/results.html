@@ -2,46 +2,48 @@
 <html>
 
 <head>
-<title>Results</title>
+<title>Match History</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 
-<body>
+<body class="results">
 
-<div class="profile">
-
-<h2>Level {{ summoner.summonerLevel }}</h2>
-
-</div>
-
-<div class="games">
+<h2 class="summoner">
+Level {{ summoner.summonerLevel }}
+</h2>
 
 {% for game in games %}
 
-<div class="game {% if game.win %}win{% else %}lose{% endif %}">
+<div class="match">
 
-<div class="champ">
-{{ game.champ }}
+<div class="mode">
+{{ game.mode }} • {{ game.duration }} min
 </div>
 
-<div class="kda">
-{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
-</div>
+<div class="teams">
 
-<div class="duration">
-{{ game.duration }} min
+<div class="team">
+
+{% for p in game.blue %}
+
+<div class="player">
+
+<img class="champ"
+src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champ}}.png">
+
+<div class="stats">
+
+<div>{{p.kills}} / {{p.deaths}} / {{p.assists}}</div>
+<div class="gold">{{p.gold}}g</div>
+
 </div>
 
 <div class="items">
 
-{% for item in game.items_list %}
-
-{% if item != 0 %}
-
-<img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{ item }}.png">
-
+{% for i in p.items %}
+{% if i != 0 %}
+<img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{i}}.png">
 {% endif %}
-
 {% endfor %}
 
 </div>
@@ -51,6 +53,50 @@
 {% endfor %}
 
 </div>
+
+<div class="vs">
+
+VS
+
+</div>
+
+<div class="team">
+
+{% for p in game.red %}
+
+<div class="player">
+
+<img class="champ"
+src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champ}}.png">
+
+<div class="stats">
+
+<div>{{p.kills}} / {{p.deaths}} / {{p.assists}}</div>
+<div class="gold">{{p.gold}}g</div>
+
+</div>
+
+<div class="items">
+
+{% for i in p.items %}
+{% if i != 0 %}
+<img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{i}}.png">
+{% endif %}
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
 
 </body>
 </html>
