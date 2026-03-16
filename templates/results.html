@@ -10,12 +10,12 @@
 
 <div class="profile">
 
-<h2>Level {{ summoner.summonerLevel }}</h2>
+<h2>Level {{summoner.summonerLevel}}</h2>
 
 {% if rank %}
 <div class="rank">
 
-<img class="rank-icon"
+<img
 src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{{rank.tier|lower}}.png">
 
 <span>
@@ -27,15 +27,13 @@ src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/glo
 
 </div>
 
-
 {% for game in games %}
 
-<div class="match-card">
+<div class="match">
 
 <div class="teams">
 
-<!-- TEAM BLUE -->
-<div class="team blue">
+<div class="team">
 
 {% for p in game.blue %}
 
@@ -44,19 +42,15 @@ src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/glo
 <img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champ}}.png">
 
-<div class="player-info">
-
-<div class="name">{{p.name}}</div>
-
 <div class="kda">
-{{p.kills}} / {{p.deaths}} / {{p.assists}}
-</div>
+
+{{p.kills}}/{{p.deaths}}/{{p.assists}}
 
 </div>
 
 <div class="items">
 
-{% for item in p.items_list %}
+{% for item in p.items %}
 {% if item != 0 %}
 <img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{item}}.png">
 {% endif %}
@@ -70,17 +64,13 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champ}}.png
 
 </div>
 
-
-<!-- VS -->
 <div class="vs">
 
 VS
 
 </div>
 
-
-<!-- TEAM RED -->
-<div class="team red">
+<div class="team">
 
 {% for p in game.red %}
 
@@ -89,19 +79,15 @@ VS
 <img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{p.champ}}.png">
 
-<div class="player-info">
-
-<div class="name">{{p.name}}</div>
-
 <div class="kda">
-{{p.kills}} / {{p.deaths}} / {{p.assists}}
-</div>
+
+{{p.kills}}/{{p.deaths}}/{{p.assists}}
 
 </div>
 
 <div class="items">
 
-{% for item in p.items_list %}
+{% for item in p.items %}
 {% if item != 0 %}
 <img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{item}}.png">
 {% endif %}
