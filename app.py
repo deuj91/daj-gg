@@ -31,11 +31,10 @@ def search():
     player = request.args.get("player")
 
     if not player or "#" not in player:
-        return "Use format: name#tag"
+        return "Use format name#tag"
 
     name, tag = player.split("#")
 
-    # account
     account = riot(
         f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
     )
@@ -45,19 +44,16 @@ def search():
 
     puuid = account["puuid"]
 
-    # summoner
     summoner = riot(
         f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
     )
 
-    # ranked
     ranked = riot(
         f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}"
     )
 
     rank = ranked[0] if ranked else None
 
-    # match ids (LIMIT 5 to avoid Render timeout)
     matches = riot(
         f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5"
     )
@@ -88,6 +84,7 @@ def search():
                     "kills": p["kills"],
                     "deaths": p["deaths"],
                     "assists": p["assists"],
+                    "gold": p["goldEarned"],
                     "items": [
                         p["item0"],
                         p["item1"],
