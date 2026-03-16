@@ -1,48 +1,65 @@
+/* GLOBAL */
+
 body{
 margin:0;
-font-family:Arial;
+font-family:Arial, Helvetica, sans-serif;
+background:#0f172a;
 color:white;
 }
+
+
+/* PAGE 1 */
 
 .home{
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg");
+background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ahri_0.jpg");
 background-size:cover;
+background-position:center;
 }
 
 .search-box{
-background:rgba(0,0,0,0.6);
+background:rgba(0,0,0,0.7);
 padding:40px;
 border-radius:12px;
 text-align:center;
 }
 
-input{
+.search-box h1{
+margin-bottom:20px;
+font-size:28px;
+}
+
+.search-box input{
 padding:12px;
-width:260px;
+width:250px;
 border-radius:6px;
 border:none;
+margin-right:10px;
 }
 
-button{
-padding:12px 20px;
-border:none;
+.search-box button{
+padding:12px 18px;
 background:#2563eb;
-color:white;
+border:none;
 border-radius:6px;
+color:white;
+cursor:pointer;
 }
 
-.results{
-background:#020617;
-padding:30px;
+.search-box button:hover{
+background:#1d4ed8;
 }
+
+
+
+/* PROFILE */
 
 .profile{
 text-align:center;
-margin-bottom:30px;
+padding:20px;
 }
 
 .rank{
@@ -50,65 +67,151 @@ display:flex;
 justify-content:center;
 align-items:center;
 gap:10px;
+margin-top:10px;
 }
 
 .rank img{
-width:60px;
+width:70px;
 }
+
+.rank span{
+font-size:16px;
+font-weight:bold;
+}
+
+
+
+/* MATCH CARD */
 
 .match{
 background:#1e293b;
+margin:20px auto;
+width:90%;
+max-width:1100px;
+border-radius:12px;
 padding:15px;
-border-radius:10px;
-margin-bottom:20px;
+box-shadow:0 0 10px rgba(0,0,0,0.4);
 }
+
+.match-info{
+text-align:center;
+font-size:13px;
+color:#cbd5f5;
+margin-top:10px;
+}
+
+
+
+/* TEAMS */
 
 .teams{
 display:flex;
-justify-content:space-between;
 align-items:center;
+justify-content:space-between;
 }
 
 .team{
 width:45%;
 }
 
+
+
+/* PLAYER ROW */
+
 .player{
 display:flex;
 align-items:center;
-margin:5px;
-background:#334155;
-padding:6px;
+margin:6px 0;
+padding:5px;
 border-radius:6px;
 }
 
+.player:hover{
+background:#334155;
+}
+
+
+
+/* CHAMPION */
+
 .champ{
-width:36px;
-margin-right:6px;
+width:42px;
+height:42px;
+border-radius:6px;
+margin-right:8px;
+}
+
+
+
+/* PLAYER INFO */
+
+.player-info{
+width:160px;
+}
+
+.name{
+font-size:13px;
+font-weight:bold;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
 }
 
 .kda{
-width:90px;
+font-size:12px;
+color:#cbd5f5;
+}
+
+.gold{
+font-size:11px;
+color:#facc15;
+}
+
+
+
+/* ITEMS */
+
+.items{
+display:flex;
+align-items:center;
+margin-left:auto;
 }
 
 .items img{
 width:24px;
-margin-right:2px;
+height:24px;
+margin-left:3px;
+border-radius:4px;
+}
+
+
+
+/* VS */
+
+.vs{
+width:10%;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+color:#94a3b8;
+}
+
+
+
+/* RESPONSIVE */
+
+@media (max-width:900px){
+
+.teams{
+flex-direction:column;
+}
+
+.team{
+width:100%;
 }
 
 .vs{
-font-size:28px;
-font-weight:bold;
-animation:pulse 1s infinite;
+margin:10px 0;
 }
 
-.match-info{
-margin-top:8px;
-opacity:0.7;
-}
-
-@keyframes pulse{
-0%{transform:scale(1)}
-50%{transform:scale(1.2)}
-100%{transform:scale(1)}
 }
