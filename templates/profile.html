@@ -4,133 +4,53 @@
 <head>
 
 <title>{{ name }}</title>
-
 <link rel="stylesheet" href="/static/style.css">
 
 </head>
 
-<body class="profile-page">
+<body class="profile">
 
-<div class="top">
+<div class="header">
 
-<div class="profile-header">
-
-<img class="profile-icon"
+<img
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.png">
 
 <div>
 
 <h1>{{ name }}</h1>
-
-<div class="level">Level {{ level }}</div>
-<div class="rank">{{ rank }}</div>
-
-</div>
-
-</div>
-
-<div class="stats">
-
-<div>KDA<br>{{ avg_k }}/{{ avg_d }}/{{ avg_a }}</div>
-
-<div>Winrate<br>{{ winrate }}%</div>
+<p>Level {{ level }}</p>
+<p class="rank">{{ rank }}</p>
 
 </div>
 
 </div>
 
+<h2>Recent Games</h2>
 
 {% for game in games %}
 
-<div class="match">
+<div class="match {% if game.win %}win{% else %}lose{% endif %}">
 
-<div class="match-header">
-
-<img class="champ"
+<img
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champion }}.png">
+
+<div class="stats">
 
 <div class="kda">
 {{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
 </div>
 
+<div class="extra">
+
+CS: {{ game.cs }}  
+Damage: {{ game.damage }}  
+Gold: {{ game.gold }}
+
+</div>
+
 <div class="duration">
+
 {{ game.duration }} min
-</div>
-
-{% if game.win %}
-<div class="win">WIN</div>
-{% else %}
-<div class="lose">LOSE</div>
-{% endif %}
-
-</div>
-
-
-<div class="teams">
-
-<div class="team">
-
-{% for p in game.allies %}
-
-<div class="player">
-
-<img class="champicon"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
-
-<span class="pname">{{ p.name }}</span>
-
-<span class="pkda">{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
-
-<div class="items">
-
-{% for item in p.build %}
-
-<img class="item"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
-onerror="this.style.display='none'">
-
-{% endfor %}
-
-</div>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-
-<div class="vs">VS</div>
-
-
-<div class="team">
-
-{% for p in game.enemies %}
-
-<div class="player">
-
-<img class="champicon"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
-
-<span class="pname">{{ p.name }}</span>
-
-<span class="pkda">{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
-
-<div class="items">
-
-{% for item in p.build %}
-
-<img class="item"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
-onerror="this.style.display='none'">
-
-{% endfor %}
-
-</div>
-
-</div>
-
-{% endfor %}
 
 </div>
 
