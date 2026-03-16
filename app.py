@@ -4,17 +4,17 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-API_KEY = os.getenv("RIOT_API_KEY")
+API_KEY = os.environ.get("RIOT_API_KEY")
 
-ACCOUNT = "https://europe.api.riotgames.com"
-MATCH = "https://europe.api.riotgames.com"
-SUMMONER = "https://euw1.api.riotgames.com"
-LEAGUE = "https://euw1.api.riotgames.com"
-
+REGION = "europe"
+MATCH_REGION = "europe"
+PLATFORM = "euw1"
 
 def riot(url):
-    headers = {"X-Riot-Token": API_KEY}
-    r = requests.get(url, headers=headers)
+    headers = {
+        "X-Riot-Token": API_KEY
+    }
+    r = requests.get(f"https://{url}", headers=headers)
     return r.json()
 
 
@@ -29,65 +29,67 @@ def search():
     player = request.args.get("player")
 
     if "#" not in player:
-        return "Use name#tag"
+        return "Use format: Name#TAG"
 
     name, tag = player.split("#")
 
-    account = riot(f"{ACCOUNT}/riot/account/v1/accounts/by-riot-id/{name}/{tag}")
-    puuid = account["puuid"]
+    # account by riot id
+    acc = riot(f"{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}")
 
-    summ = riot(f"{SUMMONER}/lol/summoner/v4/summoners/by-puuid/{puuid}")
+    if "puuid" not in acc:
+        return "Player not found"
 
-    ranked = riot(f"{LEAGUE}/lol/league/v4/entries/by-summoner/{summ['id']}")
+    puuid = acc["puuid"]
+
+    # summoner info
+    summ = riot(f"{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}")
+
+    # ranked
+    ranked = riot(f"{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}")
 
     rank = None
-    if len(ranked) > 0:
+    if isinstance(ranked, list) and len(ranked) > 0:
         rank = ranked[0]
 
-    match_ids = riot(
-        f"{MATCH}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
-    )
+    # match history
+    matches = riot(f"{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=20")
 
     games = []
 
-    for mid in match_ids:
+    for m in matches:
 
-        match = riot(f"{MATCH}/lol/match/v5/matches/{mid}")
+        match = riot(f"{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{m}")
+
         info = match["info"]
+        participants = info["participants"]
 
-        blue = []
-        red = []
+        player_data = None
 
-        for p in info["participants"]:
+        for p in participants:
+            if p["puuid"] == puuid:
+                player_data = p
+                break
 
-            pdata = {
-                "name": p["summonerName"],
-                "champ": p["championName"],
-                "kills": p["kills"],
-                "deaths": p["deaths"],
-                "assists": p["assists"],
-                "gold": p["goldEarned"],
-                "win": p["win"],
-                "items_list": [
-                    p["item0"],
-                    p["item1"],
-                    p["item2"],
-                    p["item3"],
-                    p["item4"],
-                    p["item5"]
-                ]
-            }
+        if not player_data:
+            continue
 
-            if p["teamId"] == 100:
-                blue.append(pdata)
-            else:
-                red.append(pdata)
+        items = [
+            player_data["item0"],
+            player_data["item1"],
+            player_data["item2"],
+            player_data["item3"],
+            player_data["item4"],
+            player_data["item5"],
+        ]
 
         games.append({
-            "mode": info["gameMode"],
-            "duration": int(info["gameDuration"]/60),
-            "blue": blue,
-            "red": red
+            "champion": player_data["championName"],
+            "kills": player_data["kills"],
+            "deaths": player_data["deaths"],
+            "assists": player_data["assists"],
+            "win": player_data["win"],
+            "items": items,
+            "duration": int(info["gameDuration"] / 60)
         })
 
     return render_template(
@@ -99,5 +101,4 @@ def search():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run()
