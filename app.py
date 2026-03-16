@@ -1,12 +1,13 @@
 from flask import Flask, render_template, request
 import requests
 import time
-from collections import Counter
+import os
 import urllib.parse
+from collections import Counter
 
 app = Flask(__name__)
 
-RIOT_API_KEY = "YOUR_RIOT_API_KEY"
+RIOT_API_KEY = os.getenv("RIOT_API_KEY")
 
 CACHE = {}
 CACHE_TIME = 300
@@ -37,7 +38,7 @@ def search():
         player = request.args.get("player")
 
         if not player or "#" not in player:
-            return "Use format: Name#TAG"
+            return "Use format Name#TAG"
 
         cached = get_cache(player)
         if cached:
@@ -48,24 +49,28 @@ def search():
         name = urllib.parse.quote(name)
         tag = urllib.parse.quote(tag)
 
+        headers = {
+            "X-Riot-Token": RIOT_API_KEY
+        }
+
         acc_res = requests.get(
             f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
-            headers={"X-Riot-Token": RIOT_API_KEY}
+            headers=headers
         )
-
-        if acc_res.status_code != 200:
-            return f"Riot API error ({acc_res.status_code})"
 
         acc = acc_res.json()
 
+        if acc_res.status_code != 200:
+            return f"Riot API Error {acc_res.status_code}: {acc}"
+
         if "puuid" not in acc:
-            return "Player not found"
+            return f"Player not found"
 
         puuid = acc["puuid"]
 
         summoner = requests.get(
             f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
-            headers={"X-Riot-Token": RIOT_API_KEY}
+            headers=headers
         ).json()
 
         level = summoner["summonerLevel"]
@@ -73,7 +78,7 @@ def search():
 
         league = requests.get(
             f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner['id']}",
-            headers={"X-Riot-Token": RIOT_API_KEY}
+            headers=headers
         ).json()
 
         rank = "Unranked"
@@ -89,7 +94,7 @@ def search():
 
         matches_id = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
-            headers={"X-Riot-Token": RIOT_API_KEY}
+            headers=headers
         ).json()
 
         matches = []
@@ -99,7 +104,7 @@ def search():
 
             data = requests.get(
                 f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
-                headers={"X-Riot-Token": RIOT_API_KEY}
+                headers=headers
             ).json()
 
             info = data["info"]
