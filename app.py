@@ -103,13 +103,13 @@ def search():
             ]
 
             player_data = {
-                "name": p.get("riotIdGameName", "Unknown"),
+                "name": p.get("riotIdGameName", "Player"),
                 "champion": p["championName"],
                 "kills": p["kills"],
                 "deaths": p["deaths"],
                 "assists": p["assists"],
                 "build": build,
-                "win": p["win"]
+                "team": p["teamId"]
             }
 
             if p["teamId"] == 100:
