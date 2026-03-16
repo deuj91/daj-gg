@@ -30,10 +30,9 @@
 
 <div class="game {{ 'win' if game.win else 'lose' }}">
 
-<div class="game-header">
+<div class="header">
 
-<img
-class="champion"
+<img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champion }}.png">
 
 <div class="kda">
@@ -42,7 +41,7 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champio
 
 </div>
 
-<div class="duration">
+<div class="time">
 
 {{ game.duration }} min
 
@@ -59,17 +58,16 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champio
 
 <div class="player">
 
-<img
-class="champ"
+<img class="champ-small"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
 
-<span class="name">{{ p.name }}</span>
+<span>{{ p.name }}</span>
 
 <span class="gold">{{ p.gold }}g</span>
 
 <div class="items">
 
-{% for item in p["items"] %}
+{% for item in p.items %}
 {% if item != 0 %}
 <img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 {% endif %}
@@ -83,7 +81,9 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }
 
 </div>
 
+
 <div class="vs">VS</div>
+
 
 <div class="team">
 
@@ -91,17 +91,16 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }
 
 <div class="player">
 
-<img
-class="champ"
+<img class="champ-small"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.champion }}.png">
 
-<span class="name">{{ p.name }}</span>
+<span>{{ p.name }}</span>
 
 <span class="gold">{{ p.gold }}g</span>
 
 <div class="items">
 
-{% for item in p["items"] %}
+{% for item in p.items %}
 {% if item != 0 %}
 <img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
 {% endif %}
