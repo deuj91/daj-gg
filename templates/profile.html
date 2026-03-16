@@ -9,44 +9,71 @@
 
 <div class="profile">
 
-<h2>{{ name }}</h2>
-
-<p>Level {{ level }}</p>
-<p>{{ rank }}</p>
-
-<div class="stats">
-Winrate {{ winrate }}% | KDA {{ kda }} | CS {{ cs_avg }}
-</div>
+<h1>{{ name }}#{{ tag }}</h1>
+<p>Level {{ level }} | {{ rank }}</p>
 
 {% for match in matches %}
 
-<div class="match {{ 'win' if match['win'] else 'lose' }}">
+<div class="match">
 
-<img class="champion"
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ match['champion'] }}.png">
+<div class="team">
+
+{% for p in match["teams"]["blue"] %}
+
+<div class="player">
+
+<img class="champ"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p['champion'] }}.png">
+
+<div class="name">{{ p["name"] }}</div>
 
 <div class="kda">
-{{ match["kills"] }}/{{ match["deaths"] }}/{{ match["assists"] }}
+{{ p["kills"] }}/{{ p["deaths"] }}/{{ p["assists"] }}
 </div>
 
 <div class="items">
-
-{% for item in match["build"] %}
-
+{% for item in p["build"] %}
 {% if item != 0 %}
-
 <img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
-
 {% endif %}
+{% endfor %}
+</div>
+
+</div>
 
 {% endfor %}
 
 </div>
 
-<div class="extra">
-CS {{ match["cs"] }} |
-DMG {{ match["damage"] }} |
-Gold {{ match["gold"] }}
+<div class="vs">VS</div>
+
+<div class="team">
+
+{% for p in match["teams"]["red"] %}
+
+<div class="player">
+
+<img class="champ"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p['champion'] }}.png">
+
+<div class="name">{{ p["name"] }}</div>
+
+<div class="kda">
+{{ p["kills"] }}/{{ p["deaths"] }}/{{ p["assists"] }}
+</div>
+
+<div class="items">
+{% for item in p["build"] %}
+{% if item != 0 %}
+<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+{% endif %}
+{% endfor %}
+</div>
+
+</div>
+
+{% endfor %}
+
 </div>
 
 </div>
