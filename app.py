@@ -6,12 +6,11 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
-ACCOUNT_REGION = "europe"
-MATCH_REGION = "europe"
+REGION = "europe"
 PLATFORM = "euw1"
 
 
-def riot_get(url):
+def riot(url):
     headers = {"X-Riot-Token": API_KEY}
     r = requests.get(url, headers=headers)
 
@@ -32,44 +31,41 @@ def search():
     player = request.args.get("player")
 
     if not player or "#" not in player:
-        return "Use format: name#tag"
+        return "Use name#tag"
 
     name, tag = player.split("#")
 
-    account = riot_get(
-        f"https://{ACCOUNT_REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+    account = riot(
+        f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
     )
 
-    if not account or "puuid" not in account:
+    if not account:
         return "Player not found"
 
     puuid = account["puuid"]
 
-    summoner = riot_get(
+    summoner = riot(
         f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
     )
 
-    if not summoner:
-        return "Summoner error"
-
-    ranked = riot_get(
+    ranked = riot(
         f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}"
     )
 
-    rank = ranked[0] if ranked and len(ranked) > 0 else None
+    rank = ranked[0] if ranked else None
 
-    match_ids = riot_get(
-        f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=20"
+    matches = riot(
+        f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=20"
     )
 
     games = []
 
-    if match_ids:
+    if matches:
 
-        for match_id in match_ids:
+        for match_id in matches:
 
-            match = riot_get(
-                f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
+            match = riot(
+                f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
             )
 
             if not match:
@@ -77,33 +73,37 @@ def search():
 
             info = match["info"]
 
-            player = None
+            blue = []
+            red = []
 
             for p in info["participants"]:
-                if p["puuid"] == puuid:
-                    player = p
-                    break
 
-            if not player:
-                continue
+                data = {
+                    "name": p["summonerName"],
+                    "champ": p["championName"],
+                    "kills": p["kills"],
+                    "deaths": p["deaths"],
+                    "assists": p["assists"],
+                    "items": [
+                        p["item0"],
+                        p["item1"],
+                        p["item2"],
+                        p["item3"],
+                        p["item4"],
+                        p["item5"]
+                    ]
+                }
 
-            items_list = [
-                player["item0"],
-                player["item1"],
-                player["item2"],
-                player["item3"],
-                player["item4"],
-                player["item5"]
-            ]
+                if p["teamId"] == 100:
+                    blue.append(data)
+                else:
+                    red.append(data)
 
             games.append({
-                "champ": player["championName"],
-                "kills": player["kills"],
-                "deaths": player["deaths"],
-                "assists": player["assists"],
-                "win": player["win"],
+                "mode": info["gameMode"],
                 "duration": int(info["gameDuration"]/60),
-                "items_list": items_list
+                "blue": blue,
+                "red": red
             })
 
     return render_template(
