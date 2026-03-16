@@ -25,7 +25,7 @@ def search():
 
     headers = {"X-Riot-Token": RIOT_API_KEY}
 
-    # ACCOUNT API
+    # ACCOUNT
     acc = requests.get(
         f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
         headers=headers
@@ -36,7 +36,7 @@ def search():
     if not puuid:
         return "Player not found"
 
-    # SUMMONER DATA
+    # SUMMONER
     summoner = requests.get(
         f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
         headers=headers
@@ -54,12 +54,10 @@ def search():
     rank = "Unranked"
 
     if league:
-        tier = league[0]["tier"]
-        division = league[0]["rank"]
-        rank = f"{tier} {division}"
+        rank = f"{league[0]['tier']} {league[0]['rank']}"
 
     # MATCH LIST
-    matches_ids = requests.get(
+    match_ids = requests.get(
         f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
         headers=headers
     ).json()
@@ -67,7 +65,7 @@ def search():
     matches = []
     champs = []
 
-    for match_id in matches_ids:
+    for match_id in match_ids:
 
         data = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
@@ -90,27 +88,19 @@ def search():
                 best_score = score
                 mvp = p["riotIdGameName"]
 
-            player_data = {
+            pdata = {
                 "name": p["riotIdGameName"],
                 "champ": p["championName"],
                 "k": p["kills"],
                 "d": p["deaths"],
                 "a": p["assists"],
-                "gold": p["goldEarned"],
-                "items": [
-                    p["item0"],
-                    p["item1"],
-                    p["item2"],
-                    p["item3"],
-                    p["item4"],
-                    p["item5"]
-                ]
+                "gold": p["goldEarned"]
             }
 
             if p["teamId"] == 100:
-                blue.append(player_data)
+                blue.append(pdata)
             else:
-                red.append(player_data)
+                red.append(pdata)
 
             if p["puuid"] == puuid:
                 champs.append(p["championName"])
@@ -134,8 +124,3 @@ def search():
         matches=matches,
         top_champs=top_champs
     )
-
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
