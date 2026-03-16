@@ -1,120 +1,76 @@
 body{
-
-margin:0;
 font-family:Arial;
+background:#0e0e10;
 color:white;
-
+margin:0;
 }
-
-/* HOME */
 
 .home{
-
-background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg");
-background-size:cover;
+display:flex;
 height:100vh;
-
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
 }
 
-.center{
-
+.search-box{
 text-align:center;
-padding-top:250px;
-
 }
 
 input{
-
-padding:15px;
-font-size:18px;
-border-radius:6px;
+padding:12px;
+width:260px;
 border:none;
-width:320px;
-
+border-radius:6px;
 }
 
 button{
-
-padding:15px 25px;
-font-size:18px;
-background:#2563eb;
+padding:12px;
+background:#5383e8;
 border:none;
 color:white;
 border-radius:6px;
-
+cursor:pointer;
 }
 
-/* RESULTS */
-
-.results{
-
-background:#0f172a;
-padding:20px;
-
+.games{
+width:900px;
+margin:auto;
+margin-top:40px;
 }
 
-.profile{
-
-text-align:center;
-margin-bottom:30px;
-
-}
-
-/* MATCH */
-
-.match{
-
+.game{
 display:flex;
 align-items:center;
 justify-content:space-between;
 padding:12px;
-margin-bottom:10px;
-border-radius:8px;
-
+margin-bottom:8px;
+border-radius:6px;
 }
 
 .win{
-
-background:#1e3a8a;
-
+background:#1f3a5f;
 }
 
 .lose{
-
-background:#7f1d1d;
-
+background:#5f1f1f;
 }
 
 .champ{
-
-width:50px;
-border-radius:6px;
-
-}
-
-.stats{
-
-width:200px;
-text-align:center;
-
+width:140px;
 }
 
 .kda{
-
-font-size:18px;
-
+width:120px;
 }
 
-.mode{
-
-font-size:12px;
-opacity:0.8;
-
+.duration{
+width:80px;
 }
 
 .items img{
-
-width:28px;
-margin:2px;
-
+width:32px;
+height:32px;
+margin-right:4px;
+border-radius:4px;
 }
