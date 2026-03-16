@@ -49,37 +49,50 @@ def search():
         name = urllib.parse.quote(name)
         tag = urllib.parse.quote(tag)
 
-        headers = {
-            "X-Riot-Token": RIOT_API_KEY
-        }
+        headers = {"X-Riot-Token": RIOT_API_KEY}
 
+        # ACCOUNT API
         acc_res = requests.get(
             f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
             headers=headers
         )
 
+        if acc_res.status_code != 200:
+            return f"Account API error {acc_res.status_code}"
+
         acc = acc_res.json()
 
-        if acc_res.status_code != 200:
-            return f"Riot API Error {acc_res.status_code}: {acc}"
+        puuid = acc.get("puuid")
 
-        if "puuid" not in acc:
-            return f"Player not found"
+        if not puuid:
+            return "Player not found"
 
-        puuid = acc["puuid"]
-
-        summoner = requests.get(
+        # SUMMONER API
+        summoner_res = requests.get(
             f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
             headers=headers
-        ).json()
+        )
 
-        level = summoner["summonerLevel"]
-        icon = summoner["profileIconId"]
+        if summoner_res.status_code != 200:
+            return f"Summoner API error {summoner_res.status_code}"
 
-        league = requests.get(
-            f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner['id']}",
+        summoner = summoner_res.json()
+
+        summoner_id = summoner.get("id")
+
+        if not summoner_id:
+            return "Summoner ID not found"
+
+        level = summoner.get("summonerLevel", 0)
+        icon = summoner.get("profileIconId", 29)
+
+        # RANK API
+        league_res = requests.get(
+            f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-summoner/{summoner_id}",
             headers=headers
-        ).json()
+        )
+
+        league = league_res.json() if league_res.status_code == 200 else []
 
         rank = "Unranked"
 
@@ -92,24 +105,32 @@ def search():
 
         rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier}.png"
 
-        matches_id = requests.get(
+        # MATCH LIST
+        matches_id_res = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
             headers=headers
-        ).json()
+        )
+
+        if matches_id_res.status_code != 200:
+            return "Match history error"
+
+        matches_id = matches_id_res.json()
 
         matches = []
         champions = []
 
         for match_id in matches_id:
 
-            data = requests.get(
+            match_res = requests.get(
                 f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
                 headers=headers
-            ).json()
+            )
 
-            info = data["info"]
+            if match_res.status_code != 200:
+                continue
 
-            mode = info["gameMode"]
+            data = match_res.json()
+            info = data.get("info", {})
 
             blue = []
             red = []
@@ -117,37 +138,37 @@ def search():
             mvp_score = -999
             mvp = "Unknown"
 
-            for p in info["participants"]:
+            for p in info.get("participants", []):
 
                 build = [
-                    p["item0"],
-                    p["item1"],
-                    p["item2"],
-                    p["item3"],
-                    p["item4"],
-                    p["item5"]
+                    p.get("item0",0),
+                    p.get("item1",0),
+                    p.get("item2",0),
+                    p.get("item3",0),
+                    p.get("item4",0),
+                    p.get("item5",0)
                 ]
 
                 player_data = {
-                    "name": p.get("riotIdGameName", "Player"),
-                    "champion": p["championName"],
-                    "kills": p["kills"],
-                    "deaths": p["deaths"],
-                    "assists": p["assists"],
-                    "gold": p["goldEarned"],
+                    "name": p.get("riotIdGameName","Player"),
+                    "champion": p.get("championName",""),
+                    "kills": p.get("kills",0),
+                    "deaths": p.get("deaths",0),
+                    "assists": p.get("assists",0),
+                    "gold": p.get("goldEarned",0),
                     "build": build
                 }
 
-                score = p["kills"] + p["assists"] - p["deaths"]
+                score = player_data["kills"] + player_data["assists"] - player_data["deaths"]
 
                 if score > mvp_score:
                     mvp_score = score
                     mvp = player_data["name"]
 
-                if p["puuid"] == puuid:
-                    champions.append(p["championName"])
+                if p.get("puuid") == puuid:
+                    champions.append(p.get("championName",""))
 
-                if p["teamId"] == 100:
+                if p.get("teamId") == 100:
                     blue.append(player_data)
                 else:
                     red.append(player_data)
@@ -155,7 +176,7 @@ def search():
             matches.append({
                 "blue": blue,
                 "red": red,
-                "mode": mode,
+                "mode": info.get("gameMode",""),
                 "mvp": mvp
             })
 
