@@ -9,14 +9,31 @@
 
 <div class="profile">
 
+<div class="player-header">
+
+<img class="icon"
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.png">
+
+<div>
+
 <h1>{{ name }}#{{ tag }}</h1>
-<p>Level {{ level }} | {{ rank }}</p>
+<p class="rank">Level {{ level }} • {{ rank }}</p>
+
+</div>
+
+</div>
+
+
+<h2 class="section-title">Match History</h2>
+
 
 {% for match in matches %}
 
 <div class="match">
 
 <div class="team">
+
+<div class="team-title blue">Blue Team</div>
 
 {% for p in match["teams"]["blue"] %}
 
@@ -32,22 +49,34 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p['champion'
 </span>
 
 <div class="items">
+
 {% for item in p["build"] %}
+
 {% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+
+<img
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
+onerror="this.style.display='none'">
+
 {% endif %}
-{% endfor %}
-</div>
-
-</div>
 
 {% endfor %}
 
 </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
 
 <div class="vs">VS</div>
 
+
 <div class="team">
+
+<div class="team-title red">Red Team</div>
 
 {% for p in match["teams"]["red"] %}
 
@@ -63,11 +92,19 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p['champion'
 </span>
 
 <div class="items">
+
 {% for item in p["build"] %}
+
 {% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+
+<img
+src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png"
+onerror="this.style.display='none'">
+
 {% endif %}
+
 {% endfor %}
+
 </div>
 
 </div>
