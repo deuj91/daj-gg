@@ -8,49 +8,89 @@
 
 </head>
 
-<body class="profile">
+<body class="profile"
+style="background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/{{ bg }}_0.jpg');">
 
-<div class="header">
+<div class="overlay">
 
-<img
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.png">
+<div class="player">
+
+<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.png">
 
 <div>
 
 <h1>{{ name }}</h1>
+
 <p>Level {{ level }}</p>
-<p class="rank">{{ rank }}</p>
-
-</div>
-
-</div>
-
-<h2>Recent Games</h2>
-
-{% for game in games %}
-
-<div class="match {% if game.win %}win{% else %}lose{% endif %}">
-
-<img
-src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ game.champion }}.png">
 
 <div class="stats">
 
-<div class="kda">
-{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
+<span>KDA {{ kda }}</span>
+<span>Winrate {{ winrate }}%</span>
+<span>Rank {{ rank }}</span>
+
 </div>
 
-<div class="extra">
+</div>
 
-CS: {{ game.cs }}  
-Damage: {{ game.damage }}  
-Gold: {{ game.gold }}
+</div>
+
+
+{% for match in matches %}
+
+<div class="match {% if match.win %}win{% else %}lose{% endif %}">
+
+<div class="match-header">
+
+<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ match.champion }}.png">
+
+<div class="kda">
+
+{{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
 
 </div>
 
 <div class="duration">
 
-{{ game.duration }} min
+{{ match.duration }} min
+
+</div>
+
+</div>
+
+<div class="teams">
+
+<div class="team">
+
+{% for p in match.teams[0] %}
+
+<div class="player-mini">
+
+<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.championName }}.png">
+
+<span>{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<div class="vs">VS</div>
+
+<div class="team">
+
+{% for p in match.teams[1] %}
+
+<div class="player-mini">
+
+<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.championName }}.png">
+
+<span>{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
+
+</div>
+
+{% endfor %}
 
 </div>
 
@@ -59,6 +99,8 @@ Gold: {{ game.gold }}
 </div>
 
 {% endfor %}
+
+</div>
 
 </body>
 
