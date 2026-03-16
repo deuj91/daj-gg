@@ -2,10 +2,8 @@
 <html>
 
 <head>
-
 <title>{{ name }}</title>
 <link rel="stylesheet" href="/static/style.css">
-
 </head>
 
 <body class="profile"
@@ -13,28 +11,27 @@ style="background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champio
 
 <div class="overlay">
 
-<div class="player">
+<div class="header">
 
 <img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.png">
 
 <div>
 
 <h1>{{ name }}</h1>
-
 <p>Level {{ level }}</p>
 
 <div class="stats">
 
 <span>KDA {{ kda }}</span>
 <span>Winrate {{ winrate }}%</span>
-<span>Rank {{ rank }}</span>
+<span>CS {{ cs_avg }}</span>
+<span>{{ rank }}</span>
 
 </div>
 
 </div>
 
 </div>
-
 
 {% for match in matches %}
 
@@ -44,53 +41,35 @@ style="background-image:url('https://ddragon.leagueoflegends.com/cdn/img/champio
 
 <img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ match.champion }}.png">
 
+<div>
+
 <div class="kda">
 
 {{ match.kills }}/{{ match.deaths }}/{{ match.assists }}
 
 </div>
 
+<div>
+
+CS {{ match.cs }}  
+Damage {{ match.damage }}  
+Gold {{ match.gold }}
+
+</div>
+
+</div>
+
+<div class="items">
+
+{% for item in match.items %}
+<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/item/{{ item }}.png">
+{% endfor %}
+
+</div>
+
 <div class="duration">
 
 {{ match.duration }} min
-
-</div>
-
-</div>
-
-<div class="teams">
-
-<div class="team">
-
-{% for p in match.teams[0] %}
-
-<div class="player-mini">
-
-<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.championName }}.png">
-
-<span>{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-<div class="vs">VS</div>
-
-<div class="team">
-
-{% for p in match.teams[1] %}
-
-<div class="player-mini">
-
-<img src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p.championName }}.png">
-
-<span>{{ p.kills }}/{{ p.deaths }}/{{ p.assists }}</span>
-
-</div>
-
-{% endfor %}
 
 </div>
 
