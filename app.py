@@ -1,12 +1,28 @@
 from flask import Flask, render_template, request
 import requests
 import os
+import time
 
 app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
+CACHE = {}
+CACHE_TIME = 120
+
 DDRAGON = "https://ddragon.leagueoflegends.com/cdn/14.6.1"
+
+
+def get_cache(key):
+    if key in CACHE:
+        data, timestamp = CACHE[key]
+        if time.time() - timestamp < CACHE_TIME:
+            return data
+    return None
+
+
+def set_cache(key, value):
+    CACHE[key] = (value, time.time())
 
 
 @app.route("/")
@@ -20,7 +36,11 @@ def search():
     player = request.args.get("player")
 
     if not player or "#" not in player:
-        return "Use format: name#tag"
+        return "Use format name#tag"
+
+    cached = get_cache(player)
+    if cached:
+        return cached
 
     name, tag = player.split("#")
 
@@ -30,9 +50,6 @@ def search():
         headers={"X-Riot-Token": API_KEY}
     ).json()
 
-    if "puuid" not in account:
-        return "Player not found"
-
     puuid = account["puuid"]
 
     # SUMMONER
@@ -41,31 +58,31 @@ def search():
         headers={"X-Riot-Token": API_KEY}
     ).json()
 
-    icon = summoner.get("profileIconId", 29)
-    level = summoner.get("summonerLevel", 0)
+    icon = summoner["profileIconId"]
+    level = summoner["summonerLevel"]
 
     # RANK
     rank = "Unranked"
 
-    rank_req = requests.get(
+    ranks = requests.get(
         f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}",
-        headers={"X-Riot-Token": API_KEY}
-    )
-
-    if rank_req.status_code == 200:
-        ranks = rank_req.json()
-
-        for r in ranks:
-            if r["queueType"] == "RANKED_SOLO_5x5":
-                rank = f'{r["tier"]} {r["rank"]} - {r["leaguePoints"]} LP'
-
-    # MATCH LIST
-    match_ids = requests.get(
-        f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5",
         headers={"X-Riot-Token": API_KEY}
     ).json()
 
-    games = []
+    for r in ranks:
+        if r["queueType"] == "RANKED_SOLO_5x5":
+            rank = f'{r["tier"]} {r["rank"]} {r["leaguePoints"]}LP'
+
+    # MATCH LIST
+    match_ids = requests.get(
+        f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
+        headers={"X-Riot-Token": API_KEY}
+    ).json()
+
+    matches = []
+
+    wins = 0
+    total_k = total_d = total_a = 0
 
     for match_id in match_ids:
 
@@ -75,33 +92,51 @@ def search():
         ).json()
 
         info = match["info"]
-
-        duration = int(info["gameDuration"] / 60)
-
         participants = info["participants"]
 
         player_data = next(p for p in participants if p["puuid"] == puuid)
 
-        games.append({
+        if player_data["win"]:
+            wins += 1
+
+        total_k += player_data["kills"]
+        total_d += player_data["deaths"]
+        total_a += player_data["assists"]
+
+        teams = [participants[:5], participants[5:]]
+
+        matches.append({
             "champion": player_data["championName"],
             "kills": player_data["kills"],
             "deaths": player_data["deaths"],
             "assists": player_data["assists"],
-            "cs": player_data["totalMinionsKilled"],
-            "damage": player_data["totalDamageDealtToChampions"],
-            "gold": player_data["goldEarned"],
             "win": player_data["win"],
-            "duration": duration
+            "duration": int(info["gameDuration"]/60),
+            "teams": teams
         })
 
-    return render_template(
+    games = len(match_ids)
+
+    kda = f"{total_k/games:.1f}/{total_d/games:.1f}/{total_a/games:.1f}"
+    winrate = int((wins/games)*100)
+
+    bg = matches[0]["champion"]
+
+    html = render_template(
         "profile.html",
         name=player,
         icon=icon,
         level=level,
         rank=rank,
-        games=games
+        matches=matches,
+        kda=kda,
+        winrate=winrate,
+        bg=bg
     )
+
+    set_cache(player, html)
+
+    return html
 
 
 if __name__ == "__main__":
