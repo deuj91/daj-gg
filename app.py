@@ -34,16 +34,18 @@ def home():
 @app.route("/search")
 def search():
 
-    player = request.args.get("player")
+    player_input = request.args.get("player")
 
-    if "#" not in player:
-        return "Use format: Name#TAG"
+    if not player_input or "#" not in player_input:
+        return "Format: Name#TAG"
 
-    cached = get_cache(player)
+    name, tag = player_input.split("#")
+
+    cache_key = f"{name}#{tag}"
+
+    cached = get_cache(cache_key)
     if cached:
         return cached
-
-    name, tag = player.split("#")
 
     account = requests.get(
         f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
@@ -80,20 +82,16 @@ def search():
 
     for match_id in match_ids:
 
-        match_data = requests.get(
+        data = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
             headers=headers
         ).json()
 
-        info = match_data["info"]
-        participants = info["participants"]
+        info = data["info"]
 
-        teams = {
-            "blue": [],
-            "red": []
-        }
+        teams = {"blue": [], "red": []}
 
-        for p in participants:
+        for p in info["participants"]:
 
             build = [
                 p["item0"],
@@ -104,27 +102,22 @@ def search():
                 p["item5"]
             ]
 
-            player = {
-                "name": p["riotIdGameName"],
-                "tag": p["riotIdTagline"],
+            player_data = {
+                "name": p.get("riotIdGameName", "Unknown"),
                 "champion": p["championName"],
                 "kills": p["kills"],
                 "deaths": p["deaths"],
                 "assists": p["assists"],
-                "cs": p["totalMinionsKilled"],
-                "damage": p["totalDamageDealtToChampions"],
                 "build": build,
                 "win": p["win"]
             }
 
             if p["teamId"] == 100:
-                teams["blue"].append(player)
+                teams["blue"].append(player_data)
             else:
-                teams["red"].append(player)
+                teams["red"].append(player_data)
 
-        matches.append({
-            "teams": teams
-        })
+        matches.append({"teams": teams})
 
     bg = matches[0]["teams"]["blue"][0]["champion"]
 
@@ -139,7 +132,7 @@ def search():
         bg=bg
     )
 
-    set_cache(player, html)
+    set_cache(cache_key, html)
 
     return html
 
