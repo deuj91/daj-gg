@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<link rel="stylesheet" href="/static/style.css">
+
+</head>
+
+<body>
+
+<h1>Match History</h1>
+
+{% for game in games %}
+
+<div class="match">
+
+<div class="mode">{{game.mode}}</div>
+
+<div class="teams">
+
+<div class="team">
+
+{% for p in game.blue %}
+
+<div class="player">
+
+<div class="champ">{{p.champion}}</div>
+
+<div class="kda">
+{{p.kills}} / {{p.deaths}} / {{p.assists}}
+</div>
+
+<div class="gold">
+{{p.gold}} gold
+</div>
+
+<div class="items">
+
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item0}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item1}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item2}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item3}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item4}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item5}}.png">
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<div class="vs">
+
+VS
+
+<div class="mvp">
+⭐ MVP : {{game.mvp}}
+</div>
+
+</div>
+
+<div class="team">
+
+{% for p in game.red %}
+
+<div class="player">
+
+<div class="champ">{{p.champion}}</div>
+
+<div class="kda">
+{{p.kills}} / {{p.deaths}} / {{p.assists}}
+</div>
+
+<div class="gold">
+{{p.gold}} gold
+</div>
+
+<div class="items">
+
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item0}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item1}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item2}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item3}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item4}}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item5}}.png">
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</body>
+
+</html>
