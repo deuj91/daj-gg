@@ -12,6 +12,8 @@ CACHE_TIME = 120
 
 DDRAGON = "https://ddragon.leagueoflegends.com/cdn/14.6.1"
 
+headers = {"X-Riot-Token": API_KEY}
+
 
 def get_cache(key):
     if key in CACHE:
@@ -38,7 +40,7 @@ def search():
         player = request.args.get("player")
 
         if not player or "#" not in player:
-            return "Use format name#tag"
+            return "Use name#tag"
 
         cached = get_cache(player)
         if cached:
@@ -46,9 +48,6 @@ def search():
 
         name, tag = player.split("#")
 
-        headers = {"X-Riot-Token": API_KEY}
-
-        # ACCOUNT
         account = requests.get(
             f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
             headers=headers,
@@ -57,7 +56,6 @@ def search():
 
         puuid = account["puuid"]
 
-        # SUMMONER
         summoner = requests.get(
             f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
             headers=headers,
@@ -67,22 +65,20 @@ def search():
         icon = summoner["profileIconId"]
         level = summoner["summonerLevel"]
 
-        # RANK
         rank = "Unranked"
 
-        ranks = requests.get(
+        leagues = requests.get(
             f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}",
             headers=headers,
             timeout=10
         ).json()
 
-        for r in ranks:
+        for r in leagues:
             if r["queueType"] == "RANKED_SOLO_5x5":
                 rank = f'{r["tier"]} {r["rank"]} {r["leaguePoints"]}LP'
 
-        # MATCHES (LIMIT 3)
         match_ids = requests.get(
-            f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=3",
+            f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
             headers=headers,
             timeout=10
         ).json()
@@ -91,6 +87,7 @@ def search():
 
         wins = 0
         total_k = total_d = total_a = 0
+        total_cs = 0
 
         for match_id in match_ids:
 
@@ -111,6 +108,16 @@ def search():
             total_k += player_data["kills"]
             total_d += player_data["deaths"]
             total_a += player_data["assists"]
+            total_cs += player_data["totalMinionsKilled"]
+
+            items = [
+                player_data["item0"],
+                player_data["item1"],
+                player_data["item2"],
+                player_data["item3"],
+                player_data["item4"],
+                player_data["item5"]
+            ]
 
             teams = [participants[:5], participants[5:]]
 
@@ -119,6 +126,10 @@ def search():
                 "kills": player_data["kills"],
                 "deaths": player_data["deaths"],
                 "assists": player_data["assists"],
+                "items": items,
+                "cs": player_data["totalMinionsKilled"],
+                "damage": player_data["totalDamageDealtToChampions"],
+                "gold": player_data["goldEarned"],
                 "win": player_data["win"],
                 "duration": int(info["gameDuration"]/60),
                 "teams": teams
@@ -128,6 +139,7 @@ def search():
 
         kda = f"{total_k/games:.1f}/{total_d/games:.1f}/{total_a/games:.1f}"
         winrate = int((wins/games)*100)
+        cs_avg = int(total_cs/games)
 
         bg = matches[0]["champion"]
 
@@ -140,6 +152,7 @@ def search():
             matches=matches,
             kda=kda,
             winrate=winrate,
+            cs_avg=cs_avg,
             bg=bg
         )
 
@@ -148,7 +161,6 @@ def search():
         return html
 
     except Exception as e:
-
         return f"Server error: {str(e)}"
 
 
