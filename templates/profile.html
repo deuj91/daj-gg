@@ -1,75 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <link rel="stylesheet" href="/static/style.css">
-
 </head>
 
 <body>
 
-<div class="profile">
-
-<img src="https://ddragon.leagueoflegends.com/cdn/13.24.1/img/profileicon/{{icon}}.png">
-
 <h2>{{name}}#{{tag}}</h2>
-
 <p>Level {{level}}</p>
-
-{% if rank_icon %}
-<img class="rank" src="{{rank_icon}}">
-{% endif %}
-
-<p>{{rank}}</p>
-
-</div>
-
+<p>Rank: {{rank}}</p>
 
 {% for match in matches %}
 
 <div class="match">
 
-<div class="team blue">
+<div class="team">
 
 {% for p in match.blue %}
-
-<div class="player">
-<b>{{p.name}}</b>
-{{p.champ}}
-{{p.kills}}/{{p.deaths}}/{{p.assists}}
-💰{{p.gold}}
-</div>
-
+<div>{{p.name}} {{p.k}}/{{p.d}}/{{p.a}}</div>
 {% endfor %}
 
 </div>
 
-<div class="vs">
+<div class="vs">VS</div>
 
-VS
-
-<div class="mode">{{match.mode}}</div>
-
-<div class="mvp">⭐ MVP {{match.mvp}}</div>
-
-</div>
-
-<div class="team red">
+<div class="team">
 
 {% for p in match.red %}
-
-<div class="player">
-<b>{{p.name}}</b>
-{{p.champ}}
-{{p.kills}}/{{p.deaths}}/{{p.assists}}
-💰{{p.gold}}
-</div>
-
+<div>{{p.name}} {{p.k}}/{{p.d}}/{{p.a}}</div>
 {% endfor %}
 
 </div>
 
 </div>
+
+<p class="mvp">⭐ MVP : {{match.mvp}}</p>
 
 {% endfor %}
 
