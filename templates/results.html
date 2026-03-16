@@ -7,93 +7,54 @@
 
 </head>
 
-<body>
+<body class="results">
 
-<h1>Match History</h1>
+<div class="profile">
+
+<h2>{{summoner.name}}</h2>
+
+<p>Level {{summoner.summonerLevel}}</p>
+
+</div>
 
 {% for game in games %}
 
-<div class="match">
+<div class="match {% if game.win %}win{% else %}lose{% endif %}">
 
-<div class="mode">{{game.mode}}</div>
+<div class="left">
 
-<div class="teams">
+<img class="champ"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{game.champ}}.png">
 
-<div class="team">
-
-{% for p in game.blue %}
-
-<div class="player">
-
-<div class="champ">{{p.champion}}</div>
-
-<div class="kda">
-{{p.kills}} / {{p.deaths}} / {{p.assists}}
 </div>
 
-<div class="gold">
-{{p.gold}} gold
+<div class="stats">
+
+<div class="kda">
+
+{{game.kills}} / {{game.deaths}} / {{game.assists}}
+
+</div>
+
+<div class="mode">
+
+{{game.mode}} • {{game.duration}} min
+
+</div>
+
 </div>
 
 <div class="items">
 
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item0}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item1}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item2}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item3}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item4}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item5}}.png">
+{% for item in game.items %}
 
-</div>
+{% if item != 0 %}
 
-</div>
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
+
+{% endif %}
 
 {% endfor %}
-
-</div>
-
-<div class="vs">
-
-VS
-
-<div class="mvp">
-⭐ MVP : {{game.mvp}}
-</div>
-
-</div>
-
-<div class="team">
-
-{% for p in game.red %}
-
-<div class="player">
-
-<div class="champ">{{p.champion}}</div>
-
-<div class="kda">
-{{p.kills}} / {{p.deaths}} / {{p.assists}}
-</div>
-
-<div class="gold">
-{{p.gold}} gold
-</div>
-
-<div class="items">
-
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item0}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item1}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item2}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item3}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item4}}.png">
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{p.item5}}.png">
-
-</div>
-
-</div>
-
-{% endfor %}
-
-</div>
 
 </div>
 
@@ -102,5 +63,4 @@ VS
 {% endfor %}
 
 </body>
-
 </html>
