@@ -1,39 +1,92 @@
 body{
+
 background:#0f172a;
-color:white;
 font-family:Arial;
+color:white;
+}
+
+.center{
+
 text-align:center;
+margin-top:200px;
+}
+
+input{
+
+padding:15px;
+font-size:18px;
+border-radius:6px;
+border:none;
+width:300px;
+}
+
+button{
+
+padding:15px 25px;
+background:#2563eb;
+border:none;
+color:white;
+font-size:18px;
+border-radius:6px;
 }
 
 .match{
-display:flex;
-justify-content:center;
-align-items:center;
-margin:40px;
-}
 
-.team{
-width:300px;
 background:#1e293b;
-padding:15px;
+margin:30px;
+padding:20px;
 border-radius:10px;
 }
 
+.teams{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.team{
+
+width:40%;
+}
+
+.player{
+
+background:#334155;
+margin:10px;
+padding:10px;
+border-radius:6px;
+}
+
 .vs{
+
 font-size:40px;
-margin:0 30px;
-font-weight:bold;
-color:#facc15;
-animation: pulse 1s infinite;
+text-align:center;
+animation:pulse 1s infinite;
 }
 
 .mvp{
-color:#22c55e;
-font-weight:bold;
+
+font-size:14px;
+margin-top:10px;
+color:gold;
+}
+
+.items img{
+
+width:30px;
+margin:2px;
+}
+
+.gold{
+
+color:#facc15;
 }
 
 @keyframes pulse{
-0%{transform:scale(1);}
-50%{transform:scale(1.2);}
-100%{transform:scale(1);}
+
+0%{transform:scale(1)}
+50%{transform:scale(1.2)}
+100%{transform:scale(1)}
+
 }
