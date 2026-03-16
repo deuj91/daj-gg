@@ -2,21 +2,28 @@
 <html>
 
 <head>
-<title>LoL Tracker</title>
+
+<title>LoL AI Analyzer</title>
+
 <link rel="stylesheet" href="/static/style.css">
+
 </head>
 
-<body class="home">
+<body>
 
-<div class="search-box">
+<div class="search">
 
-<h1>League Tracker</h1>
+<h1>League AI Analyzer</h1>
 
 <form action="/search">
 
-<input name="player" placeholder="name#tag">
+<input
+type="text"
+name="player"
+placeholder="Summoner#TAG"
+required>
 
-<button>Search</button>
+<button type="submit">Analyze</button>
 
 </form>
 
