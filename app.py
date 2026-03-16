@@ -19,7 +19,7 @@ def riot(url):
     r = requests.get(url, headers=headers)
 
     if r.status_code != 200:
-        print("RIOT ERROR:", r.text)
+        print("RIOT ERROR:", r.status_code, r.text)
         return None
 
     return r.json()
@@ -27,27 +27,27 @@ def riot(url):
 
 def analyse(p):
 
-    score = p["kills"] + p["assists"] - p["deaths"]
-
     tips = []
 
-    if p["kills"] >= 8:
-        tips.append("Très bon impact offensif.")
+    kda = (p["kills"] + p["assists"]) / max(1, p["deaths"])
 
-    if p["deaths"] >= 7:
-        tips.append("Trop de morts, attention au positionnement.")
+    if kda > 4:
+        tips.append("Excellent impact dans les fights.")
+
+    if p["deaths"] > 7:
+        tips.append("Trop de morts, joue plus safe en midgame.")
 
     if p["visionScore"] < 15:
-        tips.append("Vision faible. Utilise plus de wards.")
+        tips.append("Vision trop faible, pose plus de wards.")
 
-    if p["goldEarned"] > 13000:
+    if p["goldEarned"] > 14000:
         tips.append("Très bon farm et génération de gold.")
 
-    if score > 10:
-        tips.append("Excellente performance globale.")
+    if p["damageDealtToChampions"] > 25000:
+        tips.append("Très gros dégâts infligés.")
 
     if not tips:
-        tips.append("Performance correcte mais améliorable.")
+        tips.append("Game correcte mais peut être optimisée.")
 
     return " ".join(tips)
 
@@ -62,8 +62,8 @@ def search():
 
     player = request.args.get("player")
 
-    if "#" not in player:
-        return "Format : Summoner#TAG"
+    if not player or "#" not in player:
+        return "Format requis : Summoner#TAG"
 
     name, tag = player.split("#")
 
@@ -72,7 +72,7 @@ def search():
     )
 
     if not account:
-        return "Player not found"
+        return "Joueur introuvable"
 
     puuid = account["puuid"]
 
@@ -80,35 +80,32 @@ def search():
         f"{SUMMONER_URL}/lol/summoner/v4/summoners/by-puuid/{puuid}"
     )
 
-    if not summ:
-        return "Summoner error"
+    if not summ or "id" not in summ:
+        return "Erreur récupération summoner"
 
     ranked = riot(
         f"{LEAGUE_URL}/lol/league/v4/entries/by-summoner/{summ['id']}"
     )
 
-    rank = None
-
-    if ranked and len(ranked) > 0:
-        rank = ranked[0]
+    rank = ranked[0] if ranked else None
 
     match_ids = riot(
-        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
+        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
     )
+
+    if not match_ids:
+        return "Aucun match trouvé"
 
     games = []
 
     for match_id in match_ids:
 
-        match = riot(
-            f"{MATCH_URL}/lol/match/v5/matches/{match_id}"
-        )
+        match = riot(f"{MATCH_URL}/lol/match/v5/matches/{match_id}")
 
         if not match:
             continue
 
         info = match["info"]
-
         participants = info["participants"]
 
         player_data = None
@@ -116,6 +113,10 @@ def search():
         for p in participants:
             if p["puuid"] == puuid:
                 player_data = p
+                break
+
+        if not player_data:
+            continue
 
         team1 = []
         team2 = []
