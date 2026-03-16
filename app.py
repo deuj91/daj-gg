@@ -16,7 +16,6 @@ LEAGUE_URL = f"https://{REGION}.api.riotgames.com"
 
 def riot(url):
     headers = {"X-Riot-Token": API_KEY}
-
     r = requests.get(url, headers=headers)
 
     if r.status_code != 200:
@@ -28,6 +27,8 @@ def riot(url):
 
 def analyse(p):
 
+    score = p["kills"] + p["assists"] - p["deaths"]
+
     tips = []
 
     if p["kills"] >= 8:
@@ -37,13 +38,16 @@ def analyse(p):
         tips.append("Trop de morts, attention au positionnement.")
 
     if p["visionScore"] < 15:
-        tips.append("Vision faible. Utilise plus de wards.")
+        tips.append("Vision faible, pose plus de wards.")
 
     if p["goldEarned"] > 13000:
         tips.append("Très bon farm et génération de gold.")
 
+    if score > 10:
+        tips.append("Excellente performance globale.")
+
     if not tips:
-        tips.append("Game correcte mais améliorable.")
+        tips.append("Performance correcte mais améliorable.")
 
     return " ".join(tips)
 
@@ -59,7 +63,7 @@ def search():
     player = request.args.get("player")
 
     if not player or "#" not in player:
-        return "Format: Pseudo#TAG"
+        return "Format : Summoner#TAG"
 
     name, tag = player.split("#")
 
@@ -68,7 +72,7 @@ def search():
     )
 
     if not account:
-        return "Player introuvable"
+        return "Erreur récupération compte"
 
     puuid = account["puuid"]
 
@@ -79,27 +83,27 @@ def search():
     if not summ:
         return "Erreur récupération summoner"
 
-    ranked = riot(
-        f"{LEAGUE_URL}/lol/league/v4/entries/by-summoner/{summ['id']}"
-    )
+    summoner_id = summ.get("id")
 
     rank = None
-    if ranked and len(ranked) > 0:
-        rank = ranked[0]
+
+    if summoner_id:
+
+        ranked = riot(
+            f"{LEAGUE_URL}/lol/league/v4/entries/by-summoner/{summoner_id}"
+        )
+
+        if ranked and len(ranked) > 0:
+            rank = ranked[0]
 
     match_ids = riot(
         f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
     )
 
-    games = []
-
     if not match_ids:
-        return render_template(
-            "results.html",
-            games=[],
-            summoner=summ,
-            rank=rank
-        )
+        return "Aucune game trouvée"
+
+    games = []
 
     for match_id in match_ids:
 
@@ -111,6 +115,7 @@ def search():
             continue
 
         info = match["info"]
+
         participants = info["participants"]
 
         player_data = None
