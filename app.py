@@ -6,12 +6,13 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
-REGION_SUMMONER = "https://euw1.api.riotgames.com"
-REGION_ACCOUNT = "https://europe.api.riotgames.com"
-REGION_MATCH = "https://europe.api.riotgames.com"
+ACCOUNT = "https://europe.api.riotgames.com"
+MATCH = "https://europe.api.riotgames.com"
+SUMMONER = "https://euw1.api.riotgames.com"
+LEAGUE = "https://euw1.api.riotgames.com"
 
 
-def riot_get(url):
+def riot(url):
     headers = {"X-Riot-Token": API_KEY}
     r = requests.get(url, headers=headers)
     return r.json()
@@ -32,28 +33,26 @@ def search():
 
     name, tag = player.split("#")
 
-    acc = riot_get(
-        f"{REGION_ACCOUNT}/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
-    )
+    account = riot(f"{ACCOUNT}/riot/account/v1/accounts/by-riot-id/{name}/{tag}")
+    puuid = account["puuid"]
 
-    puuid = acc["puuid"]
+    summ = riot(f"{SUMMONER}/lol/summoner/v4/summoners/by-puuid/{puuid}")
 
-    summ = riot_get(
-        f"{REGION_SUMMONER}/lol/summoner/v4/summoners/by-puuid/{puuid}"
-    )
+    ranked = riot(f"{LEAGUE}/lol/league/v4/entries/by-summoner/{summ['id']}")
 
-    match_ids = riot_get(
-        f"{REGION_MATCH}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
+    rank = None
+    if len(ranked) > 0:
+        rank = ranked[0]
+
+    match_ids = riot(
+        f"{MATCH}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
     )
 
     games = []
 
     for mid in match_ids:
 
-        match = riot_get(
-            f"{REGION_MATCH}/lol/match/v5/matches/{mid}"
-        )
-
+        match = riot(f"{MATCH}/lol/match/v5/matches/{mid}")
         info = match["info"]
 
         blue = []
@@ -68,9 +67,14 @@ def search():
                 "deaths": p["deaths"],
                 "assists": p["assists"],
                 "gold": p["goldEarned"],
-                "items": [
-                    p["item0"], p["item1"], p["item2"],
-                    p["item3"], p["item4"], p["item5"]
+                "win": p["win"],
+                "items_list": [
+                    p["item0"],
+                    p["item1"],
+                    p["item2"],
+                    p["item3"],
+                    p["item4"],
+                    p["item5"]
                 ]
             }
 
@@ -81,7 +85,7 @@ def search():
 
         games.append({
             "mode": info["gameMode"],
-            "duration": int(info["gameDuration"] / 60),
+            "duration": int(info["gameDuration"]/60),
             "blue": blue,
             "red": red
         })
@@ -89,7 +93,8 @@ def search():
     return render_template(
         "results.html",
         games=games,
-        summoner=summ
+        summoner=summ,
+        rank=rank
     )
 
 
