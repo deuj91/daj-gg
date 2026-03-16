@@ -12,20 +12,20 @@ align-items:center;
 background:#0f172a;
 }
 
-.center{
+.search-box{
 text-align:center;
 }
 
 input{
 padding:12px;
-border-radius:6px;
 border:none;
+border-radius:6px;
 }
 
 button{
 padding:12px 20px;
-border-radius:6px;
 border:none;
+border-radius:6px;
 background:#2563eb;
 color:white;
 cursor:pointer;
@@ -37,18 +37,18 @@ background-position:center;
 }
 
 .overlay{
-background:rgba(0,0,0,0.75);
+background:rgba(0,0,0,0.8);
 min-height:100vh;
 padding:40px;
 }
 
-.player{
+.header{
 display:flex;
 align-items:center;
 gap:20px;
 }
 
-.player img{
+.header img{
 width:80px;
 }
 
@@ -57,8 +57,8 @@ margin-right:20px;
 }
 
 .match{
-margin-top:25px;
 background:#1e293b;
+margin-top:20px;
 padding:15px;
 border-radius:10px;
 }
@@ -81,29 +81,7 @@ gap:15px;
 width:50px;
 }
 
-.teams{
-display:flex;
-justify-content:space-between;
-margin-top:15px;
-}
-
-.team{
-width:45%;
-}
-
-.player-mini{
-display:flex;
-align-items:center;
-gap:10px;
-margin-bottom:6px;
-}
-
-.player-mini img{
-width:30px;
-}
-
-.vs{
-display:flex;
-align-items:center;
-font-weight:bold;
+.items img{
+width:28px;
+margin-right:3px;
 }
