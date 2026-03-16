@@ -1,75 +1,39 @@
 body{
-background:#0e1117;
+background:#0f172a;
 color:white;
 font-family:Arial;
-}
-
-.search-box{
 text-align:center;
-margin-top:200px;
-}
-
-input{
-padding:10px;
-font-size:18px;
-}
-
-button{
-padding:10px;
-}
-
-.profile{
-text-align:center;
-margin:40px;
-}
-
-.rank{
-width:120px;
 }
 
 .match{
 display:flex;
 justify-content:center;
-margin:30px;
+align-items:center;
+margin:40px;
 }
 
 .team{
-width:400px;
-padding:10px;
-}
-
-.blue{
-background:#1f3a5f;
-}
-
-.red{
-background:#5f1f1f;
-}
-
-.player{
-margin:5px;
+width:300px;
+background:#1e293b;
+padding:15px;
+border-radius:10px;
 }
 
 .vs{
 font-size:40px;
-padding:40px;
+margin:0 30px;
+font-weight:bold;
+color:#facc15;
 animation: pulse 1s infinite;
-text-align:center;
-}
-
-.mode{
-font-size:14px;
 }
 
 .mvp{
-font-size:16px;
-color:gold;
+color:#22c55e;
+font-weight:bold;
 }
 
 @keyframes pulse{
-
-0%{transform:scale(1)}
-50%{transform:scale(1.2)}
-100%{transform:scale(1)}
-
+0%{transform:scale(1);}
+50%{transform:scale(1.2);}
+100%{transform:scale(1);}
 }
