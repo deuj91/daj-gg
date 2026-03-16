@@ -6,46 +6,50 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
-SUMMONER_URL = "https://euw1.api.riotgames.com"
-MATCH_URL = "https://europe.api.riotgames.com"
-LEAGUE_URL = "https://euw1.api.riotgames.com"
+REGION = "euw1"
+MATCH_REGION = "europe"
+
+SUMMONER_URL = f"https://{REGION}.api.riotgames.com"
+MATCH_URL = f"https://{MATCH_REGION}.api.riotgames.com"
+LEAGUE_URL = f"https://{REGION}.api.riotgames.com"
+
 
 def riot(url):
     headers = {"X-Riot-Token": API_KEY}
     r = requests.get(url, headers=headers)
+
     if r.status_code != 200:
+        print("RIOT ERROR:", r.text)
         return None
+
     return r.json()
 
 
-def analyse_game(p):
+def analyse(p):
 
     score = p["kills"] + p["assists"] - p["deaths"]
 
-    analysis = []
+    tips = []
 
-    if p["kills"] >= 10:
-        analysis.append("Très forte pression offensive.")
+    if p["kills"] >= 8:
+        tips.append("Très bon impact offensif.")
 
     if p["deaths"] >= 7:
-        analysis.append("Beaucoup de morts, attention au positionnement.")
+        tips.append("Trop de morts, attention au positionnement.")
 
     if p["visionScore"] < 15:
-        analysis.append("Vision trop faible. Pense à ward davantage.")
+        tips.append("Vision faible. Utilise plus de wards.")
 
     if p["goldEarned"] > 13000:
-        analysis.append("Très bon farm et génération de gold.")
-
-    if p["damageDealtToChampions"] > 20000:
-        analysis.append("Gros impact en teamfight.")
+        tips.append("Très bon farm et génération de gold.")
 
     if score > 10:
-        analysis.append("Game très solide avec bon impact global.")
+        tips.append("Excellente performance globale.")
 
-    if len(analysis) == 0:
-        analysis.append("Game assez neutre avec impact limité.")
+    if not tips:
+        tips.append("Performance correcte mais améliorable.")
 
-    return " ".join(analysis)
+    return " ".join(tips)
 
 
 @app.route("/")
@@ -58,11 +62,17 @@ def search():
 
     player = request.args.get("player")
 
+    if "#" not in player:
+        return "Format : Summoner#TAG"
+
     name, tag = player.split("#")
 
     account = riot(
         f"{MATCH_URL}/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
     )
+
+    if not account:
+        return "Player not found"
 
     puuid = account["puuid"]
 
@@ -70,16 +80,20 @@ def search():
         f"{SUMMONER_URL}/lol/summoner/v4/summoners/by-puuid/{puuid}"
     )
 
+    if not summ:
+        return "Summoner error"
+
     ranked = riot(
         f"{LEAGUE_URL}/lol/league/v4/entries/by-summoner/{summ['id']}"
     )
 
     rank = None
+
     if ranked and len(ranked) > 0:
         rank = ranked[0]
 
     match_ids = riot(
-        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=15"
+        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
     )
 
     games = []
@@ -90,7 +104,11 @@ def search():
             f"{MATCH_URL}/lol/match/v5/matches/{match_id}"
         )
 
+        if not match:
+            continue
+
         info = match["info"]
+
         participants = info["participants"]
 
         player_data = None
@@ -107,9 +125,6 @@ def search():
             pdata = {
                 "name": p["summonerName"],
                 "champion": p["championName"],
-                "kills": p["kills"],
-                "deaths": p["deaths"],
-                "assists": p["assists"],
                 "gold": p["goldEarned"],
                 "items": [
                     p["item0"],
@@ -128,13 +143,13 @@ def search():
                 team2.append(pdata)
 
         game = {
-            "duration": int(info["gameDuration"] / 60),
             "win": player_data["win"],
             "champion": player_data["championName"],
             "kills": player_data["kills"],
             "deaths": player_data["deaths"],
             "assists": player_data["assists"],
-            "analysis": analyse_game(player_data),
+            "duration": int(info["gameDuration"] / 60),
+            "analysis": analyse(player_data),
             "team1": team1,
             "team2": team2
         }
