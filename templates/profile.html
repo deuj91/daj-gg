@@ -32,7 +32,7 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.p
 
 </div>
 
-<h2 class="section-title">Most Played Champions</h2>
+<h2>Most Played Champions</h2>
 
 <div class="top-champs">
 
@@ -52,12 +52,11 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/profileicon/{{ icon }}.p
 
 </div>
 
-<h2 class="section-title">Match History</h2>
+<h2>Match History</h2>
 
 {% for match in matches %}
 
 <div class="mode">🎮 {{ match.mode }}</div>
-
 <div class="mvp">⭐ MVP : {{ match.mvp }}</div>
 
 <div class="match">
