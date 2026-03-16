@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 <link rel="stylesheet" href="/static/style.css">
 </head>
@@ -25,11 +24,11 @@
 <img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p['champion'] }}.png">
 
-<div class="name">{{ p["name"] }}</div>
+<span class="name">{{ p["name"] }}</span>
 
-<div class="kda">
+<span class="kda">
 {{ p["kills"] }}/{{ p["deaths"] }}/{{ p["assists"] }}
-</div>
+</span>
 
 <div class="items">
 {% for item in p["build"] %}
@@ -56,11 +55,11 @@ src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p['champion'
 <img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/14.6.1/img/champion/{{ p['champion'] }}.png">
 
-<div class="name">{{ p["name"] }}</div>
+<span class="name">{{ p["name"] }}</span>
 
-<div class="kda">
+<span class="kda">
 {{ p["kills"] }}/{{ p["deaths"] }}/{{ p["assists"] }}
-</div>
+</span>
 
 <div class="items">
 {% for item in p["build"] %}
