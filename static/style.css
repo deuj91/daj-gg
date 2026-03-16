@@ -5,24 +5,40 @@ font-family:Arial;
 margin:0;
 }
 
-.search{
-text-align:center;
-margin-top:150px;
+.hero{
+
+height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:linear-gradient(#020617,#0f172a);
+
+}
+
+.hero h1{
+font-size:50px;
+margin-bottom:10px;
+}
+
+.hero p{
+color:#94a3b8;
+margin-bottom:30px;
 }
 
 input{
-padding:12px;
-width:250px;
-border-radius:6px;
+padding:14px;
+width:280px;
 border:none;
+border-radius:8px;
 }
 
 button{
-padding:12px 20px;
+padding:14px 20px;
 border:none;
 background:#6366f1;
 color:white;
-border-radius:6px;
+border-radius:8px;
 cursor:pointer;
 }
 
@@ -37,10 +53,10 @@ height:60px;
 
 .game{
 background:#1e293b;
-margin:30px auto;
+margin:25px auto;
 width:1200px;
-border-radius:12px;
 padding:20px;
+border-radius:12px;
 }
 
 .win{
@@ -51,29 +67,28 @@ border-left:6px solid #22c55e;
 border-left:6px solid #ef4444;
 }
 
-.game-header{
+.header{
 display:flex;
 align-items:center;
 gap:20px;
 margin-bottom:20px;
 }
 
-.champion{
+.champ{
 height:60px;
 }
 
 .kda{
-font-size:20px;
+font-size:22px;
 }
 
-.duration{
+.time{
 margin-left:auto;
 }
 
 .teams{
 display:grid;
 grid-template-columns:1fr 80px 1fr;
-align-items:center;
 }
 
 .team{
@@ -91,13 +106,8 @@ border-radius:6px;
 gap:10px;
 }
 
-.champ{
-height:30px;
-}
-
-.name{
-flex:1;
-font-size:13px;
+.champ-small{
+height:28px;
 }
 
 .gold{
@@ -106,8 +116,7 @@ font-size:12px;
 }
 
 .items img{
-height:22px;
-margin-right:3px;
+height:20px;
 }
 
 .vs{
@@ -121,5 +130,4 @@ margin-top:15px;
 background:#0f172a;
 padding:10px;
 border-radius:8px;
-font-size:13px;
 }
