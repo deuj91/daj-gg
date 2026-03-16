@@ -1,126 +1,109 @@
-from flask import Flask, render_template, request
-import requests
 import os
-from collections import Counter
+import requests
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 RIOT_API_KEY = os.getenv("RIOT_API_KEY")
 
+REGION = "euw1"
+MATCH_REGION = "europe"
+
+def riot_get(url):
+    headers = {"X-Riot-Token": RIOT_API_KEY}
+    r = requests.get(url, headers=headers)
+    return r.json()
 
 @app.route("/")
-def index():
+def home():
     return render_template("index.html")
 
 
 @app.route("/search")
 def search():
-
     player = request.args.get("player")
 
-    if not player or "#" not in player:
-        return "Use format: name#tag"
+    if "#" not in player:
+        return "Use format: Name#TAG"
 
     name, tag = player.split("#")
 
-    headers = {"X-Riot-Token": RIOT_API_KEY}
+    # account
+    acc = riot_get(
+        f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+    )
 
-    # ACCOUNT
-    acc = requests.get(
-        f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
-        headers=headers
-    ).json()
+    puuid = acc["puuid"]
 
-    puuid = acc.get("puuid")
+    # summoner
+    summ = riot_get(
+        f"https://{REGION}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
+    )
 
-    if not puuid:
-        return "Player not found"
+    # matches
+    matches = riot_get(
+        f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
+    )
 
-    # SUMMONER
-    summoner = requests.get(
-        f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
-        headers=headers
-    ).json()
+    games = []
 
-    level = summoner.get("summonerLevel", 0)
-    icon = summoner.get("profileIconId", 29)
+    for m in matches:
 
-    # RANK
-    league = requests.get(
-        f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}",
-        headers=headers
-    ).json()
-
-    rank = "Unranked"
-
-    if league:
-        rank = f"{league[0]['tier']} {league[0]['rank']}"
-
-    # MATCH LIST
-    match_ids = requests.get(
-        f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
-        headers=headers
-    ).json()
-
-    matches = []
-    champs = []
-
-    for match_id in match_ids:
-
-        data = requests.get(
-            f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
-            headers=headers
-        ).json()
+        data = riot_get(
+            f"https://{MATCH_REGION}.api.riotgames.com/lol/match/v5/matches/{m}"
+        )
 
         info = data["info"]
 
-        blue = []
-        red = []
+        players = info["participants"]
 
-        best_score = -999
-        mvp = ""
+        teams = {"blue": [], "red": []}
 
-        for p in info["participants"]:
+        mvp = None
+        best_score = 0
 
-            score = p["kills"] + p["assists"] - p["deaths"]
+        for p in players:
 
-            if score > best_score:
-                best_score = score
-                mvp = p["riotIdGameName"]
+            kda = (p["kills"] + p["assists"]) / max(1, p["deaths"])
 
-            pdata = {
-                "name": p["riotIdGameName"],
-                "champ": p["championName"],
-                "k": p["kills"],
-                "d": p["deaths"],
-                "a": p["assists"],
-                "gold": p["goldEarned"]
+            if kda > best_score:
+                best_score = kda
+                mvp = p
+
+            player_data = {
+                "champion": p["championName"],
+                "kills": p["kills"],
+                "deaths": p["deaths"],
+                "assists": p["assists"],
+                "gold": p["goldEarned"],
+                "item0": p["item0"],
+                "item1": p["item1"],
+                "item2": p["item2"],
+                "item3": p["item3"],
+                "item4": p["item4"],
+                "item5": p["item5"],
             }
 
             if p["teamId"] == 100:
-                blue.append(pdata)
+                teams["blue"].append(player_data)
             else:
-                red.append(pdata)
+                teams["red"].append(player_data)
 
-            if p["puuid"] == puuid:
-                champs.append(p["championName"])
-
-        matches.append({
-            "blue": blue,
-            "red": red,
-            "mode": info["gameMode"],
-            "mvp": mvp
-        })
-
-    top_champs = Counter(champs).most_common(5)
+        games.append(
+            {
+                "mode": info["gameMode"],
+                "blue": teams["blue"],
+                "red": teams["red"],
+                "mvp": mvp["championName"],
+            }
+        )
 
     return render_template(
-        "profile.html",
-        name=name,
-        tag=tag,
-        level=level,
-        icon=icon,
-        rank=rank,
-        matches=matches,
-        top_champs=top_champs
+        "results.html",
+        games=games,
+        summoner=summ
     )
+
+
+if __name__ == "__main__":
+    app.run()
