@@ -10,7 +10,8 @@ API_KEY = os.getenv("RIOT_API_KEY")
 CACHE = {}
 CACHE_TIME = 120
 
-DDRAGON = "https://ddragon.leagueoflegends.com/cdn/14.6.1"
+VERSION = "14.6.1"
+DDRAGON = f"https://ddragon.leagueoflegends.com/cdn/{VERSION}"
 
 headers = {"X-Riot-Token": API_KEY}
 
@@ -40,7 +41,7 @@ def search():
         player = request.args.get("player")
 
         if not player or "#" not in player:
-            return "Use name#tag"
+            return "Use format: name#tag"
 
         cached = get_cache(player)
         if cached:
@@ -48,6 +49,7 @@ def search():
 
         name, tag = player.split("#")
 
+        # ACCOUNT
         account = requests.get(
             f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
             headers=headers,
@@ -56,6 +58,7 @@ def search():
 
         puuid = account["puuid"]
 
+        # SUMMONER
         summoner = requests.get(
             f"https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}",
             headers=headers,
@@ -65,6 +68,7 @@ def search():
         icon = summoner["profileIconId"]
         level = summoner["summonerLevel"]
 
+        # RANK
         rank = "Unranked"
 
         leagues = requests.get(
@@ -77,6 +81,7 @@ def search():
             if r["queueType"] == "RANKED_SOLO_5x5":
                 rank = f'{r["tier"]} {r["rank"]} {r["leaguePoints"]}LP'
 
+        # MATCHES
         match_ids = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
             headers=headers,
@@ -110,7 +115,7 @@ def search():
             total_a += player_data["assists"]
             total_cs += player_data["totalMinionsKilled"]
 
-            items = [
+            build = [
                 player_data["item0"],
                 player_data["item1"],
                 player_data["item2"],
@@ -119,20 +124,17 @@ def search():
                 player_data["item5"]
             ]
 
-            teams = [participants[:5], participants[5:]]
-
             matches.append({
                 "champion": player_data["championName"],
                 "kills": player_data["kills"],
                 "deaths": player_data["deaths"],
                 "assists": player_data["assists"],
-                "items": items,
+                "build": build,
                 "cs": player_data["totalMinionsKilled"],
                 "damage": player_data["totalDamageDealtToChampions"],
                 "gold": player_data["goldEarned"],
                 "win": player_data["win"],
-                "duration": int(info["gameDuration"]/60),
-                "teams": teams
+                "duration": int(info["gameDuration"]/60)
             })
 
         games = len(match_ids)
@@ -161,6 +163,7 @@ def search():
         return html
 
     except Exception as e:
+
         return f"Server error: {str(e)}"
 
 
