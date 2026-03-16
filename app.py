@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 import requests
-import time
 import os
+import time
 import urllib.parse
 from collections import Counter
 
@@ -44,28 +44,30 @@ def search():
         if cached:
             return cached
 
-        name, tag = player.split("#")
+        name, tag = player.split("#", 1)
 
-        name = urllib.parse.quote(name)
-        tag = urllib.parse.quote(tag)
+        name_encoded = urllib.parse.quote(name)
+        tag_encoded = urllib.parse.quote(tag)
 
-        headers = {"X-Riot-Token": RIOT_API_KEY}
+        headers = {
+            "X-Riot-Token": RIOT_API_KEY
+        }
 
         # ACCOUNT API
         acc_res = requests.get(
-            f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}",
+            f"https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name_encoded}/{tag_encoded}",
             headers=headers
         )
 
         if acc_res.status_code != 200:
-            return f"Account API error {acc_res.status_code}"
+            return f"Account API error {acc_res.status_code}: {acc_res.text}"
 
         acc = acc_res.json()
 
         puuid = acc.get("puuid")
 
         if not puuid:
-            return "Player not found"
+            return f"Invalid account response: {acc}"
 
         # SUMMONER API
         summoner_res = requests.get(
@@ -74,17 +76,16 @@ def search():
         )
 
         if summoner_res.status_code != 200:
-            return f"Summoner API error {summoner_res.status_code}"
+            return f"Summoner API error {summoner_res.status_code}: {summoner_res.text}"
 
         summoner = summoner_res.json()
 
         summoner_id = summoner.get("id")
-
-        if not summoner_id:
-            return "Summoner ID not found"
-
         level = summoner.get("summonerLevel", 0)
         icon = summoner.get("profileIconId", 29)
+
+        if not summoner_id:
+            return f"Invalid summoner response: {summoner}"
 
         # RANK API
         league_res = requests.get(
@@ -97,24 +98,24 @@ def search():
         rank = "Unranked"
 
         if league:
-            tier = league[0]["tier"]
-            div = league[0]["rank"]
+            tier = league[0].get("tier", "")
+            div = league[0].get("rank", "")
             rank = f"{tier} {div}"
 
-        tier = rank.split()[0].lower() if rank != "Unranked" else "unranked"
+        tier_icon = rank.split()[0].lower() if rank != "Unranked" else "unranked"
 
-        rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier}.png"
+        rank_icon = f"https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{tier_icon}.png"
 
-        # MATCH LIST
-        matches_id_res = requests.get(
+        # MATCH HISTORY
+        matches_res = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=5",
             headers=headers
         )
 
-        if matches_id_res.status_code != 200:
-            return "Match history error"
+        if matches_res.status_code != 200:
+            return f"Match list error {matches_res.status_code}"
 
-        matches_id = matches_id_res.json()
+        matches_id = matches_res.json()
 
         matches = []
         champions = []
