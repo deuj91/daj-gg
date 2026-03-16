@@ -5,7 +5,7 @@ font-family:Arial;
 margin:0;
 }
 
-.home{
+.center{
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -14,37 +14,21 @@ height:100vh;
 }
 
 input{
-padding:12px;
+padding:10px;
 font-size:16px;
-border-radius:8px;
-border:none;
-margin-right:10px;
+width:250px;
 }
 
 button{
-padding:12px 20px;
-background:#3b82f6;
-border:none;
-border-radius:8px;
-color:white;
-cursor:pointer;
+padding:10px 20px;
+margin-left:10px;
 }
 
-.match{
+.game{
 background:#1e293b;
-margin:30px;
+margin:20px;
 padding:20px;
 border-radius:10px;
-}
-
-.player{
-font-size:18px;
-margin-bottom:10px;
-}
-
-.analysis{
-color:#94a3b8;
-margin-bottom:15px;
 }
 
 .teams{
@@ -57,17 +41,20 @@ justify-content:center;
 width:40%;
 }
 
-.vs{
-width:10%;
-text-align:center;
-font-size:28px;
-}
-
-.p{
-margin-bottom:10px;
+.player{
+display:flex;
+justify-content:space-between;
+margin:5px 0;
 }
 
 .items img{
-width:26px;
-margin-right:4px;
+width:25px;
+margin-left:2px;
+}
+
+.vs{
+width:20%;
+text-align:center;
+font-weight:bold;
+font-size:20px;
 }
