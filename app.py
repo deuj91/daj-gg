@@ -6,9 +6,9 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
-REGION = "europe"
-PLATFORM = "euw1"
-
+SUMMONER_URL = "https://euw1.api.riotgames.com"
+MATCH_URL = "https://europe.api.riotgames.com"
+LEAGUE_URL = "https://euw1.api.riotgames.com"
 
 def riot(url):
     headers = {"X-Riot-Token": API_KEY}
@@ -18,42 +18,34 @@ def riot(url):
     return r.json()
 
 
-def performance_score(k, d, a, gold):
+def analyse_game(p):
 
-    score = k*3 + a*2 - d + gold/1000
+    score = p["kills"] + p["assists"] - p["deaths"]
 
-    if score > 30:
-        return "S+"
-    elif score > 25:
-        return "S"
-    elif score > 20:
-        return "A"
-    elif score > 15:
-        return "B"
-    else:
-        return "C"
+    analysis = []
 
+    if p["kills"] >= 10:
+        analysis.append("Très forte pression offensive.")
 
-def ai_analysis(stats):
+    if p["deaths"] >= 7:
+        analysis.append("Beaucoup de morts, attention au positionnement.")
 
-    report = []
+    if p["visionScore"] < 15:
+        analysis.append("Vision trop faible. Pense à ward davantage.")
 
-    if stats["kda"] > 3:
-        report.append("✔ Good KDA overall.")
-    else:
-        report.append("⚠ Low KDA, try to die less.")
+    if p["goldEarned"] > 13000:
+        analysis.append("Très bon farm et génération de gold.")
 
-    if stats["winrate"] > 55:
-        report.append("✔ Good winrate.")
-    else:
-        report.append("⚠ Winrate could improve.")
+    if p["damageDealtToChampions"] > 20000:
+        analysis.append("Gros impact en teamfight.")
 
-    if stats["gold"] > 12000:
-        report.append("✔ Good gold income.")
-    else:
-        report.append("⚠ Gold income is low.")
+    if score > 10:
+        analysis.append("Game très solide avec bon impact global.")
 
-    return report
+    if len(analysis) == 0:
+        analysis.append("Game assez neutre avec impact limité.")
+
+    return " ".join(analysis)
 
 
 @app.route("/")
@@ -66,128 +58,96 @@ def search():
 
     player = request.args.get("player")
 
-    if "#" not in player:
-        return "Use format name#tag"
-
     name, tag = player.split("#")
 
     account = riot(
-        f"https://{REGION}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+        f"{MATCH_URL}/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
     )
 
     puuid = account["puuid"]
 
-    summoner = riot(
-        f"https://{PLATFORM}.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/{puuid}"
+    summ = riot(
+        f"{SUMMONER_URL}/lol/summoner/v4/summoners/by-puuid/{puuid}"
     )
 
     ranked = riot(
-        f"https://{PLATFORM}.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}"
+        f"{LEAGUE_URL}/lol/league/v4/entries/by-summoner/{summ['id']}"
     )
 
-    rank = ranked[0] if ranked else None
+    rank = None
+    if ranked and len(ranked) > 0:
+        rank = ranked[0]
 
-    matches = riot(
-        f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?count=20"
+    match_ids = riot(
+        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=15"
     )
 
     games = []
 
-    kills = deaths = assists = gold_total = wins = 0
-    champions = {}
-
-    for match_id in matches:
+    for match_id in match_ids:
 
         match = riot(
-            f"https://{REGION}.api.riotgames.com/lol/match/v5/matches/{match_id}"
+            f"{MATCH_URL}/lol/match/v5/matches/{match_id}"
         )
 
         info = match["info"]
+        participants = info["participants"]
 
-        blue = []
-        red = []
+        player_data = None
 
-        mvp_score = 0
-        mvp_name = ""
+        for p in participants:
+            if p["puuid"] == puuid:
+                player_data = p
 
-        for p in info["participants"]:
+        team1 = []
+        team2 = []
 
-            score = p["kills"]*3 + p["assists"]*2 - p["deaths"] + p["goldEarned"]/1000
+        for i, p in enumerate(participants):
 
-            if score > mvp_score:
-                mvp_score = score
-                mvp_name = p["summonerName"]
-
-            data = {
+            pdata = {
                 "name": p["summonerName"],
-                "champ": p["championName"],
+                "champion": p["championName"],
                 "kills": p["kills"],
                 "deaths": p["deaths"],
                 "assists": p["assists"],
                 "gold": p["goldEarned"],
                 "items": [
-                    p["item0"], p["item1"], p["item2"],
-                    p["item3"], p["item4"], p["item5"]
-                ],
-                "score": performance_score(
-                    p["kills"], p["deaths"], p["assists"], p["goldEarned"]
-                )
+                    p["item0"],
+                    p["item1"],
+                    p["item2"],
+                    p["item3"],
+                    p["item4"],
+                    p["item5"],
+                    p["item6"]
+                ]
             }
 
-            if p["puuid"] == puuid:
-
-                kills += p["kills"]
-                deaths += p["deaths"]
-                assists += p["assists"]
-                gold_total += p["goldEarned"]
-
-                if p["win"]:
-                    wins += 1
-
-                champions[p["championName"]] = champions.get(
-                    p["championName"], 0) + 1
-
-            if p["teamId"] == 100:
-                blue.append(data)
+            if i < 5:
+                team1.append(pdata)
             else:
-                red.append(data)
+                team2.append(pdata)
 
-        games.append({
-            "mode": info["gameMode"],
+        game = {
             "duration": int(info["gameDuration"] / 60),
-            "blue": blue,
-            "red": red,
-            "win": p["win"],
-            "mvp": mvp_name
-        })
+            "win": player_data["win"],
+            "champion": player_data["championName"],
+            "kills": player_data["kills"],
+            "deaths": player_data["deaths"],
+            "assists": player_data["assists"],
+            "analysis": analyse_game(player_data),
+            "team1": team1,
+            "team2": team2
+        }
 
-    total = len(games)
-
-    stats = {
-        "kda": (kills + assists) / max(1, deaths),
-        "winrate": wins / max(1, total) * 100,
-        "gold": gold_total / max(1, total)
-    }
-
-    analysis = ai_analysis(stats)
-
-    top_champs = sorted(
-        champions.items(),
-        key=lambda x: x[1],
-        reverse=True
-    )[:3]
+        games.append(game)
 
     return render_template(
         "results.html",
         games=games,
-        summoner=summoner,
-        rank=rank,
-        stats=stats,
-        analysis=analysis,
-        champs=top_champs
+        summoner=summ,
+        rank=rank
     )
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=10000)
