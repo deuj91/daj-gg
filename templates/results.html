@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
-
 <head>
+
 <title>Match History</title>
 <link rel="stylesheet" href="/static/style.css">
+
 </head>
 
 <body class="results">
@@ -15,10 +16,10 @@
 {% if rank %}
 <div class="rank">
 
-<img
+<img class="rank-icon"
 src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{{ rank.tier|lower }}.png">
 
-<span>
+<span class="rank-text">
 {{ rank.tier }} {{ rank.rank }} • {{ rank.leaguePoints }} LP
 </span>
 
@@ -27,11 +28,17 @@ src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/glo
 
 </div>
 
+
 {% for game in games %}
 
 <div class="match">
 
+<div class="match-info">
+{{ game.mode }} • {{ game.duration }} min
+</div>
+
 <div class="teams">
+
 
 <!-- TEAM BLUE -->
 <div class="team">
@@ -43,8 +50,16 @@ src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/glo
 <img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{ p.champ }}.png">
 
+<div class="player-info">
+
+<div class="name">
+{{ p.name }}
+</div>
+
 <div class="kda">
 {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
+</div>
+
 </div>
 
 <div class="items">
@@ -52,7 +67,8 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{ p.champ }}.p
 {% for item in p["items"] %}
 
 {% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{ item }}.png">
+<img class="item"
+src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{ item }}.png">
 {% endif %}
 
 {% endfor %}
@@ -82,8 +98,16 @@ VS
 <img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{ p.champ }}.png">
 
+<div class="player-info">
+
+<div class="name">
+{{ p.name }}
+</div>
+
 <div class="kda">
 {{ p.kills }}/{{ p.deaths }}/{{ p.assists }}
+</div>
+
 </div>
 
 <div class="items">
@@ -91,7 +115,8 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{ p.champ }}.p
 {% for item in p["items"] %}
 
 {% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{ item }}.png">
+<img class="item"
+src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{ item }}.png">
 {% endif %}
 
 {% endfor %}
@@ -104,10 +129,6 @@ src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/champion/{{ p.champ }}.p
 
 </div>
 
-</div>
-
-<div class="match-info">
-{{ game.mode }} • {{ game.duration }} min
 </div>
 
 </div>
