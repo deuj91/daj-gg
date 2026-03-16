@@ -9,13 +9,14 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:#0f172a;
+background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg");
+background-size:cover;
 }
 
-.home-box{
-background:#1e293b;
+.search-box{
+background:rgba(0,0,0,0.6);
 padding:40px;
-border-radius:10px;
+border-radius:12px;
 text-align:center;
 }
 
@@ -28,16 +29,15 @@ border:none;
 
 button{
 padding:12px 20px;
-background:#2563eb;
 border:none;
+background:#2563eb;
 color:white;
 border-radius:6px;
-cursor:pointer;
 }
 
 .results{
 background:#020617;
-padding:40px;
+padding:30px;
 }
 
 .profile{
@@ -52,65 +52,59 @@ align-items:center;
 gap:10px;
 }
 
-.rank-icon{
+.rank img{
 width:60px;
 }
 
 .match{
+background:#1e293b;
+padding:15px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+.teams{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.team{
+width:45%;
+}
+
+.player{
 display:flex;
 align-items:center;
-justify-content:space-between;
-background:#1e293b;
-margin-bottom:10px;
-padding:10px;
-border-radius:8px;
+margin:5px;
+background:#334155;
+padding:6px;
+border-radius:6px;
 }
 
-.match.win{
-border-left:6px solid #22c55e;
-}
-
-.match.lose{
-border-left:6px solid #ef4444;
-}
-
-.champ img{
-width:42px;
-}
-
-.stats{
-width:150px;
+.champ{
+width:36px;
+margin-right:6px;
 }
 
 .kda{
-font-weight:bold;
-}
-
-.duration{
-font-size:12px;
-opacity:0.7;
+width:90px;
 }
 
 .items img{
-width:28px;
-margin-right:3px;
-}
-
-.result{
-width:80px;
-}
-
-.victory{
-color:#22c55e;
-}
-
-.defeat{
-color:#ef4444;
+width:24px;
+margin-right:2px;
 }
 
 .vs{
+font-size:28px;
 font-weight:bold;
 animation:pulse 1s infinite;
+}
+
+.match-info{
+margin-top:8px;
+opacity:0.7;
 }
 
 @keyframes pulse{
