@@ -6,6 +6,8 @@ app = Flask(__name__)
 
 API_KEY = os.getenv("RIOT_API_KEY")
 
+DDRAGON = "https://ddragon.leagueoflegends.com/cdn/14.6.1"
+
 
 @app.route("/")
 def home():
@@ -39,18 +41,33 @@ def search():
         headers={"X-Riot-Token": API_KEY}
     ).json()
 
-    icon = summoner.get("profileIconId", 0)
+    icon = summoner.get("profileIconId", 29)
     level = summoner.get("summonerLevel", 0)
 
+    # RANK
+    rank = "Unranked"
+
+    rank_req = requests.get(
+        f"https://euw1.api.riotgames.com/lol/league/v4/entries/by-puuid/{puuid}",
+        headers={"X-Riot-Token": API_KEY}
+    )
+
+    if rank_req.status_code == 200:
+        ranks = rank_req.json()
+
+        for r in ranks:
+            if r["queueType"] == "RANKED_SOLO_5x5":
+                rank = f'{r["tier"]} {r["rank"]} - {r["leaguePoints"]} LP'
+
     # MATCH LIST
-    matches = requests.get(
+    match_ids = requests.get(
         f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5",
         headers={"X-Riot-Token": API_KEY}
     ).json()
 
     games = []
 
-    for match_id in matches:
+    for match_id in match_ids:
 
         match = requests.get(
             f"https://europe.api.riotgames.com/lol/match/v5/matches/{match_id}",
@@ -58,6 +75,8 @@ def search():
         ).json()
 
         info = match["info"]
+
+        duration = int(info["gameDuration"] / 60)
 
         participants = info["participants"]
 
@@ -68,7 +87,11 @@ def search():
             "kills": player_data["kills"],
             "deaths": player_data["deaths"],
             "assists": player_data["assists"],
-            "win": player_data["win"]
+            "cs": player_data["totalMinionsKilled"],
+            "damage": player_data["totalDamageDealtToChampions"],
+            "gold": player_data["goldEarned"],
+            "win": player_data["win"],
+            "duration": duration
         })
 
     return render_template(
@@ -76,6 +99,7 @@ def search():
         name=player,
         icon=icon,
         level=level,
+        rank=rank,
         games=games
     )
 
