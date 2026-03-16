@@ -4,56 +4,16 @@ from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-RIOT_API_KEY = os.getenv("RIOT_API_KEY")
+API_KEY = os.getenv("RIOT_API_KEY")
 
+REGION_SUMMONER = "https://euw1.api.riotgames.com"
 REGION_ACCOUNT = "https://europe.api.riotgames.com"
 REGION_MATCH = "https://europe.api.riotgames.com"
-REGION_SUMMONER = "https://euw1.api.riotgames.com"
 
 
-def get_puuid(name, tag):
-    url = f"{REGION_ACCOUNT}/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
-    headers = {"X-Riot-Token": RIOT_API_KEY}
+def riot_get(url):
+    headers = {"X-Riot-Token": API_KEY}
     r = requests.get(url, headers=headers)
-
-    if r.status_code != 200:
-        return None
-
-    return r.json()["puuid"]
-
-
-def get_summoner(puuid):
-    url = f"{REGION_SUMMONER}/lol/summoner/v4/summoners/by-puuid/{puuid}"
-    headers = {"X-Riot-Token": RIOT_API_KEY}
-    r = requests.get(url, headers=headers)
-
-    if r.status_code != 200:
-        return None
-
-    return r.json()
-
-
-def get_matches(puuid):
-    url = f"{REGION_MATCH}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=20"
-    headers = {"X-Riot-Token": RIOT_API_KEY}
-
-    r = requests.get(url, headers=headers)
-
-    if r.status_code != 200:
-        return []
-
-    return r.json()
-
-
-def get_match(match_id):
-    url = f"{REGION_MATCH}/lol/match/v5/matches/{match_id}"
-    headers = {"X-Riot-Token": RIOT_API_KEY}
-
-    r = requests.get(url, headers=headers)
-
-    if r.status_code != 200:
-        return None
-
     return r.json()
 
 
@@ -68,51 +28,63 @@ def search():
     player = request.args.get("player")
 
     if "#" not in player:
-        return "Format: pseudo#TAG"
+        return "Use name#tag"
 
     name, tag = player.split("#")
 
-    puuid = get_puuid(name, tag)
+    acc = riot_get(
+        f"{REGION_ACCOUNT}/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+    )
 
-    if not puuid:
-        return "Player not found"
+    puuid = acc["puuid"]
 
-    summ = get_summoner(puuid)
+    summ = riot_get(
+        f"{REGION_SUMMONER}/lol/summoner/v4/summoners/by-puuid/{puuid}"
+    )
 
-    matches = get_matches(puuid)
+    match_ids = riot_get(
+        f"{REGION_MATCH}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
+    )
 
     games = []
 
-    for m in matches:
+    for mid in match_ids:
 
-        data = get_match(m)
+        match = riot_get(
+            f"{REGION_MATCH}/lol/match/v5/matches/{mid}"
+        )
 
-        if not data:
-            continue
+        info = match["info"]
 
-        info = data["info"]
+        blue = []
+        red = []
 
         for p in info["participants"]:
-            if p["puuid"] == puuid:
 
-                items = [
-                    p["item0"],
-                    p["item1"],
-                    p["item2"],
-                    p["item3"],
-                    p["item4"],
-                    p["item5"],
+            pdata = {
+                "name": p["summonerName"],
+                "champ": p["championName"],
+                "kills": p["kills"],
+                "deaths": p["deaths"],
+                "assists": p["assists"],
+                "gold": p["goldEarned"],
+                "items": [
+                    p["item0"], p["item1"], p["item2"],
+                    p["item3"], p["item4"], p["item5"]
                 ]
+            }
 
-                games.append({
-                    "champ": p["championName"],
-                    "kills": p["kills"],
-                    "deaths": p["deaths"],
-                    "assists": p["assists"],
-                    "win": p["win"],
-                    "items_list": items,
-                    "duration": int(info["gameDuration"] / 60)
-                })
+            if p["teamId"] == 100:
+                blue.append(pdata)
+            else:
+                red.append(pdata)
+
+        games.append({
+            "mode": info["gameMode"],
+            "duration": int(info["gameDuration"] / 60),
+            "blue": blue,
+            "red": red
+        })
 
     return render_template(
         "results.html",
@@ -122,4 +94,5 @@ def search():
 
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
