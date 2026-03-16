@@ -1,14 +1,26 @@
 body{
 
-background:#0f172a;
+margin:0;
 font-family:Arial;
 color:white;
+
+}
+
+/* HOME */
+
+.home{
+
+background:url("https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg");
+background-size:cover;
+height:100vh;
+
 }
 
 .center{
 
 text-align:center;
-margin-top:200px;
+padding-top:250px;
+
 }
 
 input{
@@ -17,76 +29,92 @@ padding:15px;
 font-size:18px;
 border-radius:6px;
 border:none;
-width:300px;
+width:320px;
+
 }
 
 button{
 
 padding:15px 25px;
+font-size:18px;
 background:#2563eb;
 border:none;
 color:white;
-font-size:18px;
 border-radius:6px;
+
 }
+
+/* RESULTS */
+
+.results{
+
+background:#0f172a;
+padding:20px;
+
+}
+
+.profile{
+
+text-align:center;
+margin-bottom:30px;
+
+}
+
+/* MATCH */
 
 .match{
 
-background:#1e293b;
-margin:30px;
-padding:20px;
-border-radius:10px;
-}
-
-.teams{
-
 display:flex;
-justify-content:space-between;
 align-items:center;
+justify-content:space-between;
+padding:12px;
+margin-bottom:10px;
+border-radius:8px;
+
 }
 
-.team{
+.win{
 
-width:40%;
+background:#1e3a8a;
+
 }
 
-.player{
+.lose{
 
-background:#334155;
-margin:10px;
-padding:10px;
+background:#7f1d1d;
+
+}
+
+.champ{
+
+width:50px;
 border-radius:6px;
+
 }
 
-.vs{
+.stats{
 
-font-size:40px;
+width:200px;
 text-align:center;
-animation:pulse 1s infinite;
+
 }
 
-.mvp{
+.kda{
 
-font-size:14px;
-margin-top:10px;
-color:gold;
+font-size:18px;
+
+}
+
+.mode{
+
+font-size:12px;
+opacity:0.8;
+
 }
 
 .items img{
 
-width:30px;
+width:28px;
 margin:2px;
-}
-
-.gold{
-
-color:#facc15;
-}
-
-@keyframes pulse{
-
-0%{transform:scale(1)}
-50%{transform:scale(1.2)}
-100%{transform:scale(1)}
 
 }
