@@ -1,20 +1,18 @@
 body{
-font-family:Arial;
 margin:0;
+font-family:Arial;
 color:white;
-background:#0f172a;
 }
 
-/* HOME */
-
 .home{
+height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
+background:#0f172a;
 }
 
-.search-box{
+.center{
 text-align:center;
 }
 
@@ -26,47 +24,43 @@ border:none;
 
 button{
 padding:12px 20px;
+border-radius:6px;
 border:none;
 background:#2563eb;
 color:white;
-border-radius:6px;
 cursor:pointer;
 }
 
-/* PROFILE */
-
 .profile{
+background-size:cover;
+background-position:center;
+}
+
+.overlay{
+background:rgba(0,0,0,0.75);
+min-height:100vh;
 padding:40px;
-max-width:900px;
-margin:auto;
 }
 
-.header{
+.player{
 display:flex;
-gap:20px;
 align-items:center;
+gap:20px;
 }
 
-.header img{
+.player img{
 width:80px;
 }
 
-.rank{
-color:#60a5fa;
+.stats span{
+margin-right:20px;
 }
 
 .match{
-display:flex;
-align-items:center;
-gap:15px;
+margin-top:25px;
 background:#1e293b;
-padding:12px;
-margin-top:15px;
-border-radius:8px;
-}
-
-.match img{
-width:50px;
+padding:15px;
+border-radius:10px;
 }
 
 .win{
@@ -77,12 +71,39 @@ border-left:5px solid #22c55e;
 border-left:5px solid #ef4444;
 }
 
-.kda{
-font-size:18px;
-font-weight:bold;
+.match-header{
+display:flex;
+align-items:center;
+gap:15px;
 }
 
-.extra{
-font-size:14px;
-opacity:0.8;
+.match-header img{
+width:50px;
+}
+
+.teams{
+display:flex;
+justify-content:space-between;
+margin-top:15px;
+}
+
+.team{
+width:45%;
+}
+
+.player-mini{
+display:flex;
+align-items:center;
+gap:10px;
+margin-bottom:6px;
+}
+
+.player-mini img{
+width:30px;
+}
+
+.vs{
+display:flex;
+align-items:center;
+font-weight:bold;
 }
