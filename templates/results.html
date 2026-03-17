@@ -18,9 +18,17 @@
 <h1>{{ summoner.name }}</h1>
 
 {% if rank %}
+
 <div class="rank">
-{{ rank.tier }} {{ rank.rank }} — {{ rank.leaguePoints }} LP
+
+<img src="https://opgg-static.akamaized.net/images/medals/{{ rank.tier | lower }}.png">
+
+<span>
+{{ rank.tier }} {{ rank.rank }} - {{ rank.leaguePoints }} LP
+</span>
+
 </div>
+
 {% endif %}
 
 </div>
@@ -31,13 +39,9 @@
 
 <div class="match-top">
 
-<div>
+<div class="champion">
 
-<strong>{{ game.champion }}</strong>
-
-<div class="duration">
-{{ game.duration }} min
-</div>
+{{ game.champion }}
 
 </div>
 
@@ -46,6 +50,12 @@
 {{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
 
 </div>
+
+</div>
+
+<div>
+
+Durée : {{ game.duration }} min
 
 </div>
 
@@ -59,9 +69,35 @@
 
 <div class="player">
 
-<span>{{ p.name }}</span>
+<div>
 
-<span>{{ p.champion }}</span>
+<strong>{{ p.name }}</strong>
+
+<br>
+
+{{ p.champion }}
+
+</div>
+
+<div>
+
+{{ p.gold }} gold
+
+</div>
+
+</div>
+
+<div class="items">
+
+{% for item in p.items %}
+
+{% if item != 0 %}
+
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png">
+
+{% endif %}
+
+{% endfor %}
 
 </div>
 
@@ -77,9 +113,35 @@
 
 <div class="player">
 
-<span>{{ p.name }}</span>
+<div>
 
-<span>{{ p.champion }}</span>
+<strong>{{ p.name }}</strong>
+
+<br>
+
+{{ p.champion }}
+
+</div>
+
+<div>
+
+{{ p.gold }} gold
+
+</div>
+
+</div>
+
+<div class="items">
+
+{% for item in p.items %}
+
+{% if item != 0 %}
+
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png">
+
+{% endif %}
+
+{% endfor %}
 
 </div>
 
