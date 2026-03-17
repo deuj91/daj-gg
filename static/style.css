@@ -1,11 +1,11 @@
 body{
 margin:0;
 font-family:Arial, Helvetica, sans-serif;
-background:linear-gradient(180deg,#020617,#0f172a);
+background:#0f172a;
 color:white;
 }
 
-/* NAV */
+/* HEADER */
 
 .header{
 background:#020617;
@@ -15,7 +15,7 @@ border-bottom:1px solid #1e293b;
 }
 
 .logo{
-font-size:32px;
+font-size:30px;
 font-weight:bold;
 color:#3b82f6;
 }
@@ -25,13 +25,13 @@ color:#3b82f6;
 .search-box{
 display:flex;
 justify-content:center;
-margin-top:40px;
+margin-top:80px;
 gap:10px;
 }
 
 .search-box input{
 padding:14px;
-width:320px;
+width:300px;
 border-radius:10px;
 border:none;
 font-size:16px;
@@ -45,14 +45,13 @@ background:#3b82f6;
 color:white;
 font-weight:bold;
 cursor:pointer;
-transition:0.2s;
 }
 
 .search-box button:hover{
 background:#2563eb;
 }
 
-/* RESULTS PAGE */
+/* CONTAINER */
 
 .container{
 max-width:1200px;
@@ -60,33 +59,35 @@ margin:auto;
 padding:30px;
 }
 
+/* SUMMONER */
+
 .summoner{
 background:#1e293b;
 padding:20px;
 border-radius:12px;
 margin-bottom:30px;
-}
-
-.summoner h1{
-margin:0;
-font-size:28px;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
 .rank{
-margin-top:5px;
-color:#94a3b8;
+display:flex;
+align-items:center;
+gap:10px;
 }
 
-/* MATCH CARD */
+.rank img{
+width:40px;
+}
+
+/* MATCH */
 
 .match{
 background:#1e293b;
 border-radius:12px;
 padding:20px;
 margin-bottom:20px;
-display:flex;
-flex-direction:column;
-gap:15px;
 }
 
 .victory{
@@ -97,19 +98,23 @@ border-left:6px solid #22c55e;
 border-left:6px solid #ef4444;
 }
 
+/* MATCH TOP */
+
 .match-top{
 display:flex;
 justify-content:space-between;
 align-items:center;
+margin-bottom:10px;
 }
 
-.kda{
-font-size:20px;
+.champion{
+font-size:18px;
 font-weight:bold;
 }
 
-.duration{
-color:#94a3b8;
+.kda{
+font-size:18px;
+font-weight:bold;
 }
 
 /* TEAMS */
@@ -117,20 +122,29 @@ color:#94a3b8;
 .teams{
 display:grid;
 grid-template-columns:1fr 1fr;
-gap:30px;
+gap:20px;
+margin-top:10px;
 }
 
 .player{
 display:flex;
 justify-content:space-between;
 background:#020617;
-padding:8px 12px;
+padding:8px 10px;
 border-radius:6px;
 margin-bottom:6px;
 font-size:14px;
 }
 
+.items img{
+width:22px;
+margin-right:2px;
+}
+
+/* ANALYSIS */
+
 .analysis{
+margin-top:12px;
 background:#020617;
 padding:12px;
 border-radius:8px;
