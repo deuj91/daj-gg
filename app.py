@@ -16,7 +16,6 @@ LEAGUE_URL = f"https://{REGION}.api.riotgames.com"
 
 def riot(url):
     headers = {"X-Riot-Token": API_KEY}
-
     r = requests.get(url, headers=headers)
 
     if r.status_code != 200:
@@ -73,14 +72,14 @@ def search():
     if not account:
         return "Compte introuvable"
 
-    puuid = account.get("puuid")
+    puuid = account["puuid"]
 
     summ = riot(
         f"{SUMMONER_URL}/lol/summoner/v4/summoners/by-puuid/{puuid}"
     )
 
     if not summ:
-        return "Erreur récupération summoner"
+        return "Erreur summoner"
 
     summoner_id = summ.get("id")
 
@@ -99,69 +98,68 @@ def search():
         f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
     )
 
-    if not match_ids:
-        return "Aucune partie trouvée"
-
     games = []
 
-    for match_id in match_ids:
+    if match_ids:
 
-        match = riot(
-            f"{MATCH_URL}/lol/match/v5/matches/{match_id}"
-        )
+        for match_id in match_ids:
 
-        if not match:
-            continue
+            match = riot(
+                f"{MATCH_URL}/lol/match/v5/matches/{match_id}"
+            )
 
-        info = match["info"]
-        participants = info["participants"]
+            if not match:
+                continue
 
-        player_data = None
+            info = match["info"]
+            participants = info["participants"]
 
-        for p in participants:
-            if p["puuid"] == puuid:
-                player_data = p
+            player_data = None
 
-        if not player_data:
-            continue
+            for p in participants:
+                if p["puuid"] == puuid:
+                    player_data = p
 
-        team1 = []
-        team2 = []
+            if not player_data:
+                continue
 
-        for i, p in enumerate(participants):
+            team1 = []
+            team2 = []
 
-            pdata = {
-                "name": p["summonerName"],
-                "champion": p["championName"],
-                "gold": p["goldEarned"],
-                "items_list": [
-                    p["item0"],
-                    p["item1"],
-                    p["item2"],
-                    p["item3"],
-                    p["item4"],
-                    p["item5"],
-                    p["item6"]
-                ]
+            for i, p in enumerate(participants):
+
+                pdata = {
+                    "name": p["summonerName"],
+                    "champion": p["championName"],
+                    "gold": p["goldEarned"],
+                    "items_list": [
+                        p["item0"],
+                        p["item1"],
+                        p["item2"],
+                        p["item3"],
+                        p["item4"],
+                        p["item5"],
+                        p["item6"]
+                    ]
+                }
+
+                if i < 5:
+                    team1.append(pdata)
+                else:
+                    team2.append(pdata)
+
+            game = {
+                "champion": player_data["championName"],
+                "kills": player_data["kills"],
+                "deaths": player_data["deaths"],
+                "assists": player_data["assists"],
+                "win": player_data["win"],
+                "analysis": analyse(player_data),
+                "team1": team1,
+                "team2": team2
             }
 
-            if i < 5:
-                team1.append(pdata)
-            else:
-                team2.append(pdata)
-
-        game = {
-            "champion": player_data["championName"],
-            "kills": player_data["kills"],
-            "deaths": player_data["deaths"],
-            "assists": player_data["assists"],
-            "win": player_data["win"],
-            "analysis": analyse(player_data),
-            "team1": team1,
-            "team2": team2
-        }
-
-        games.append(game)
+            games.append(game)
 
     return render_template(
         "results.html",
