@@ -2,49 +2,45 @@
 <html>
 
 <head>
-<title>Results</title>
+
 <link rel="stylesheet" href="/static/style.css">
+<title>Results</title>
+
 </head>
 
 <body>
 
-<h1>{{ summoner.name }}</h1>
+<h1>{{summoner.name}}</h1>
 
 {% if rank %}
-<p>{{ rank.tier }} {{ rank.rank }} - {{ rank.leaguePoints }} LP</p>
+<h2>{{rank.tier}} {{rank.rank}}</h2>
 {% endif %}
 
 {% for g in games %}
 
-<div class="game">
+<div class="match">
 
-<h3>
-{{ g.champion }} 
-{{ g.kills }}/{{ g.deaths }}/{{ g.assists }}
-- {{ g.duration }} min
-</h3>
+<h3>{{g.champion}} | {{g.kills}}/{{g.deaths}}/{{g.assists}}</h3>
 
-<p>{{ g.analysis }}</p>
+<p>{{g.analysis}}</p>
 
 <div class="teams">
 
 <div>
 
-<h4>Team 1</h4>
-
 {% for p in g.team1 %}
 
 <div class="player">
 
-<b>{{ p.name }}</b> - {{ p.gold }}g
+{{p.name}} {{p.champion}} {{p.gold}}g
 
 <div>
 
-{% for item in p["items"] %}
+{% for item in p.items_list %}
 
 {% if item != 0 %}
 
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
 
 {% endif %}
 
@@ -60,21 +56,19 @@
 
 <div>
 
-<h4>Team 2</h4>
-
 {% for p in g.team2 %}
 
 <div class="player">
 
-<b>{{ p.name }}</b> - {{ p.gold }}g
+{{p.name}} {{p.champion}} {{p.gold}}g
 
 <div>
 
-{% for item in p["items"] %}
+{% for item in p.items_list %}
 
 {% if item != 0 %}
 
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{ item }}.png">
+<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
 
 {% endif %}
 
