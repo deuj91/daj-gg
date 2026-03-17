@@ -1,70 +1,69 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-
 <link rel="stylesheet" href="/static/style.css">
-
 </head>
 
 <body>
 
+<div class="header">
+<div class="logo">DAJ.GG</div>
+</div>
+
+<div class="container">
+
+<div class="summoner">
+
 <h1>{{ summoner.name }}</h1>
 
 {% if rank %}
-
-<p>
-{{ rank.tier }} {{ rank.rank }} - {{ rank.leaguePoints }} LP
-</p>
-
+<div class="rank">
+{{ rank.tier }} {{ rank.rank }} — {{ rank.leaguePoints }} LP
+</div>
 {% endif %}
+
+</div>
 
 {% for game in games %}
 
-<div class="game">
+<div class="match {% if game.win %}victory{% else %}defeat{% endif %}">
 
-<h3>
+<div class="match-top">
 
-{% if game.win %}
-Victory
-{% else %}
-Defeat
-{% endif %}
+<div>
 
-- {{ game.champion }}
+<strong>{{ game.champion }}</strong>
 
-</h3>
+<div class="duration">
+{{ game.duration }} min
+</div>
 
-<p>
+</div>
+
+<div class="kda">
 
 {{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
 
-</p>
+</div>
 
-<p>
-
-Durée : {{ game.duration }} min
-
-</p>
-
-<p>
-
-Analyse : {{ game.analysis }}
-
-</p>
+</div>
 
 <div class="teams">
 
 <div>
 
-<h4>Team 1</h4>
+<h3>Team 1</h3>
 
 {% for p in game.team1 %}
 
-<p>
+<div class="player">
 
-{{ p.name }} - {{ p.champion }}
+<span>{{ p.name }}</span>
 
-</p>
+<span>{{ p.champion }}</span>
+
+</div>
 
 {% endfor %}
 
@@ -72,25 +71,36 @@ Analyse : {{ game.analysis }}
 
 <div>
 
-<h4>Team 2</h4>
+<h3>Team 2</h3>
 
 {% for p in game.team2 %}
 
-<p>
+<div class="player">
 
-{{ p.name }} - {{ p.champion }}
+<span>{{ p.name }}</span>
 
-</p>
-
-{% endfor %}
-
-</div>
-
-</div>
+<span>{{ p.champion }}</span>
 
 </div>
 
 {% endfor %}
+
+</div>
+
+</div>
+
+<div class="analysis">
+
+{{ game.analysis }}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
 
 </body>
+
 </html>
