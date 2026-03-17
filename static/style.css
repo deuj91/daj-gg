@@ -6,55 +6,34 @@ margin:0;
 }
 
 .center{
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-height:100vh;
+text-align:center;
+margin-top:150px;
 }
 
 input{
-padding:10px;
-font-size:16px;
-width:250px;
+padding:12px;
+width:300px;
+border-radius:8px;
+border:none;
 }
 
 button{
-padding:10px 20px;
-margin-left:10px;
+padding:12px;
+background:#3b82f6;
+border:none;
+border-radius:8px;
+color:white;
+cursor:pointer;
 }
 
 .game{
 background:#1e293b;
-margin:20px;
 padding:20px;
+margin:20px;
 border-radius:10px;
 }
 
 .teams{
 display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.team{
-width:40%;
-}
-
-.player{
-display:flex;
 justify-content:space-between;
-margin:5px 0;
-}
-
-.items img{
-width:25px;
-margin-left:2px;
-}
-
-.vs{
-width:20%;
-text-align:center;
-font-weight:bold;
-font-size:20px;
 }
