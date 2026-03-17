@@ -15,13 +15,12 @@ LEAGUE_URL = f"https://{REGION}.api.riotgames.com"
 
 
 def riot(url):
-
     headers = {"X-Riot-Token": API_KEY}
 
     r = requests.get(url, headers=headers)
 
     if r.status_code != 200:
-        print("RIOT ERROR:", r.text)
+        print("Riot error:", r.text)
         return None
 
     return r.json()
@@ -37,20 +36,17 @@ def analyse(p):
     if kda >= 4:
         tips.append("Excellent KDA")
 
-    if p["deaths"] >= 7:
-        tips.append("Trop de morts")
+    if cs > 200:
+        tips.append("Très bon farm")
 
-    if cs >= 200:
-        tips.append("Farm très solide")
+    if p["deaths"] > 7:
+        tips.append("Trop de morts")
 
     if p["visionScore"] < 15:
         tips.append("Vision faible")
 
-    if p["goldEarned"] > 14000:
-        tips.append("Très bonne économie")
-
     if not tips:
-        tips.append("Game correcte")
+        tips.append("Performance correcte")
 
     return " | ".join(tips)
 
@@ -77,7 +73,7 @@ def search():
     if not account:
         return "Compte introuvable"
 
-    puuid = account["puuid"]
+    puuid = account.get("puuid")
 
     summ = riot(
         f"{SUMMONER_URL}/lol/summoner/v4/summoners/by-puuid/{puuid}"
@@ -88,18 +84,23 @@ def search():
 
     summoner_id = summ.get("id")
 
-    ranked = None
+    rank = None
 
     if summoner_id:
+
         ranked = riot(
             f"{LEAGUE_URL}/lol/league/v4/entries/by-summoner/{summoner_id}"
         )
 
-    rank = ranked[0] if ranked else None
+        if ranked:
+            rank = ranked[0]
 
     match_ids = riot(
-        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
+        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
     )
+
+    if not match_ids:
+        return "Aucune partie trouvée"
 
     games = []
 
@@ -120,6 +121,9 @@ def search():
         for p in participants:
             if p["puuid"] == puuid:
                 player_data = p
+
+        if not player_data:
+            continue
 
         team1 = []
         team2 = []
@@ -152,7 +156,6 @@ def search():
             "deaths": player_data["deaths"],
             "assists": player_data["assists"],
             "win": player_data["win"],
-            "duration": int(info["gameDuration"] / 60),
             "analysis": analyse(player_data),
             "team1": team1,
             "team2": team2
