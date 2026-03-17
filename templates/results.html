@@ -3,49 +3,65 @@
 
 <head>
 
-<link rel="stylesheet" href="/static/style.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
 </head>
 
 <body>
 
+<div class="profile">
+
 <h1>{{summoner.name}}</h1>
 
 {% if rank %}
-<h2>{{rank.tier}} {{rank.rank}}</h2>
+
+<div class="rank">
+
+<img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{{rank.tier|lower}}.png">
+
+<span>{{rank.tier}} {{rank.rank}}</span>
+
+</div>
+
 {% endif %}
+
+</div>
+
 
 {% for g in games %}
 
 <div class="match">
 
-<h3>{{g.champion}} | {{g.kills}} / {{g.deaths}} / {{g.assists}}</h3>
+<div class="match-header">
 
-<p>{{g.analysis}}</p>
+<img class="champion"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{g.champion}}.png">
+
+<div>
+
+{{g.kills}} / {{g.deaths}} / {{g.assists}}
+
+</div>
+
+</div>
+
+<p class="analysis">{{g.analysis}}</p>
+
 
 <div class="teams">
 
-<div>
+<div class="team">
 
 {% for p in g.team1 %}
 
 <div class="player">
 
-{{p.name}} - {{p.champion}} - {{p.gold}}g
+<img class="champion-small"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{p.champion}}.png">
 
-<div>
+{{p.name}}
 
-{% for item in p.items_list %}
-
-{% if item != 0 %}
-
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
-
-{% endif %}
-
-{% endfor %}
-
-</div>
+<span>{{p.gold}}g</span>
 
 </div>
 
@@ -53,27 +69,19 @@
 
 </div>
 
-<div>
+
+<div class="team">
 
 {% for p in g.team2 %}
 
 <div class="player">
 
-{{p.name}} - {{p.champion}} - {{p.gold}}g
+<img class="champion-small"
+src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{p.champion}}.png">
 
-<div>
+{{p.name}}
 
-{% for item in p.items_list %}
-
-{% if item != 0 %}
-
-<img src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/item/{{item}}.png">
-
-{% endif %}
-
-{% endfor %}
-
-</div>
+<span>{{p.gold}}g</span>
 
 </div>
 
