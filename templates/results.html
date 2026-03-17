@@ -2,51 +2,29 @@
 <html>
 
 <head>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
+<title>Results</title>
+<link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<div class="profile">
+<a href="/">Retour</a>
 
-<h1>{{summoner.name}}</h1>
+<h2>{{summoner.name}}</h2>
 
 {% if rank %}
-
-<div class="rank">
-
-<img src="https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-{{rank.tier|lower}}.png">
-
-<span>{{rank.tier}} {{rank.rank}}</span>
-
-</div>
-
+<p>{{rank.tier}} {{rank.rank}} - {{rank.leaguePoints}} LP</p>
 {% endif %}
-
-</div>
-
 
 {% for g in games %}
 
-<div class="match">
+<div class="match {% if g.win %}win{% else %}lose{% endif %}">
 
-<div class="match-header">
+<h3>{{g.champion}} - {{g.kills}}/{{g.deaths}}/{{g.assists}}</h3>
 
-<img class="champion"
-src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{g.champion}}.png">
-
-<div>
-
-{{g.kills}} / {{g.deaths}} / {{g.assists}}
-
-</div>
-
-</div>
+<p>{{g.duration}} min</p>
 
 <p class="analysis">{{g.analysis}}</p>
-
 
 <div class="teams">
 
@@ -56,12 +34,12 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{g.champion}}.
 
 <div class="player">
 
-<img class="champion-small"
+<img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{p.champion}}.png">
 
-{{p.name}}
+<span>{{p.name}}</span>
 
-<span>{{p.gold}}g</span>
+<span class="gold">{{p.gold}}g</span>
 
 </div>
 
@@ -69,6 +47,7 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{p.champion}}.
 
 </div>
 
+<div class="vs">VS</div>
 
 <div class="team">
 
@@ -76,12 +55,12 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{p.champion}}.
 
 <div class="player">
 
-<img class="champion-small"
+<img class="champ"
 src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{p.champion}}.png">
 
-{{p.name}}
+<span>{{p.name}}</span>
 
-<span>{{p.gold}}g</span>
+<span class="gold">{{p.gold}}g</span>
 
 </div>
 
@@ -96,5 +75,4 @@ src="https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/{{p.champion}}.
 {% endfor %}
 
 </body>
-
 </html>
