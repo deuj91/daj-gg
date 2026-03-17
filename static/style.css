@@ -1,14 +1,14 @@
 body{
 
 background:#0f172a;
-color:white;
 font-family:Arial;
+color:white;
 margin:0;
 padding:40px;
 
 }
 
-.center{
+.search-box{
 
 display:flex;
 flex-direction:column;
@@ -39,12 +39,53 @@ cursor:pointer;
 
 }
 
+.profile{
+
+margin-bottom:40px;
+
+}
+
+.rank{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+}
+
+.rank img{
+
+width:60px;
+
+}
+
 .match{
 
 background:#1e293b;
 padding:20px;
-margin:20px 0;
 border-radius:10px;
+margin-bottom:20px;
+
+}
+
+.match-header{
+
+display:flex;
+align-items:center;
+gap:15px;
+font-size:20px;
+
+}
+
+.champion{
+
+width:50px;
+
+}
+
+.analysis{
+
+color:#94a3b8;
 
 }
 
@@ -52,18 +93,27 @@ border-radius:10px;
 
 display:flex;
 justify-content:space-between;
+margin-top:15px;
+
+}
+
+.team{
+
+width:45%;
 
 }
 
 .player{
 
-margin:6px 0;
+display:flex;
+align-items:center;
+gap:10px;
+margin:5px 0;
 
 }
 
-img{
+.champion-small{
 
-width:28px;
-height:28px;
+width:24px;
 
 }
