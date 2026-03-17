@@ -15,7 +15,9 @@ LEAGUE_URL = f"https://{REGION}.api.riotgames.com"
 
 
 def riot(url):
+
     headers = {"X-Riot-Token": API_KEY}
+
     r = requests.get(url, headers=headers)
 
     if r.status_code != 200:
@@ -27,8 +29,6 @@ def riot(url):
 
 def analyse(p):
 
-    score = p["kills"] + p["assists"] - p["deaths"]
-
     tips = []
 
     if p["kills"] >= 8:
@@ -38,16 +38,13 @@ def analyse(p):
         tips.append("Trop de morts, attention au positionnement.")
 
     if p["visionScore"] < 15:
-        tips.append("Vision faible, pose plus de wards.")
+        tips.append("Vision trop faible.")
 
     if p["goldEarned"] > 13000:
-        tips.append("Très bon farm et génération de gold.")
-
-    if score > 10:
-        tips.append("Excellente performance globale.")
+        tips.append("Très bon farm.")
 
     if not tips:
-        tips.append("Performance correcte mais améliorable.")
+        tips.append("Performance correcte.")
 
     return " ".join(tips)
 
@@ -72,7 +69,7 @@ def search():
     )
 
     if not account:
-        return "Erreur récupération compte"
+        return "Compte introuvable"
 
     puuid = account["puuid"]
 
@@ -115,7 +112,6 @@ def search():
             continue
 
         info = match["info"]
-
         participants = info["participants"]
 
         player_data = None
