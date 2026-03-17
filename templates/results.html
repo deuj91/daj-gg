@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Results</title>
+
 <link rel="stylesheet" href="/static/style.css">
+
 </head>
 
 <body>
@@ -10,68 +11,76 @@
 <h1>{{ summoner.name }}</h1>
 
 {% if rank %}
-<p>{{ rank.tier }} {{ rank.rank }} - {{ rank.leaguePoints }} LP</p>
+
+<p>
+{{ rank.tier }} {{ rank.rank }} - {{ rank.leaguePoints }} LP
+</p>
+
 {% endif %}
 
-{% for g in games %}
+{% for game in games %}
 
 <div class="game">
 
-<h3>{{ g.champion }} | {{ g.kills }}/{{ g.deaths }}/{{ g.assists }} | {{ g.duration }} min</h3>
+<h3>
 
-<p>{{ g.analysis }}</p>
+{% if game.win %}
+Victory
+{% else %}
+Defeat
+{% endif %}
+
+- {{ game.champion }}
+
+</h3>
+
+<p>
+
+{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
+
+</p>
+
+<p>
+
+Durée : {{ game.duration }} min
+
+</p>
+
+<p>
+
+Analyse : {{ game.analysis }}
+
+</p>
 
 <div class="teams">
 
-<div class="team">
+<div>
 
-{% for p in g.team1 %}
+<h4>Team 1</h4>
 
-<div class="player">
+{% for p in game.team1 %}
 
-<span>{{ p.name }}</span>
+<p>
 
-<span>{{ p.gold }}g</span>
+{{ p.name }} - {{ p.champion }}
 
-<div class="items">
-
-{% for item in p.items %}
-{% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{item}}.png">
-{% endif %}
-{% endfor %}
-
-</div>
-
-</div>
+</p>
 
 {% endfor %}
 
 </div>
 
-<div class="vs">VS</div>
+<div>
 
-<div class="team">
+<h4>Team 2</h4>
 
-{% for p in g.team2 %}
+{% for p in game.team2 %}
 
-<div class="player">
+<p>
 
-<span>{{ p.name }}</span>
+{{ p.name }} - {{ p.champion }}
 
-<span>{{ p.gold }}g</span>
-
-<div class="items">
-
-{% for item in p.items %}
-{% if item != 0 %}
-<img src="https://ddragon.leagueoflegends.com/cdn/13.6.1/img/item/{{item}}.png">
-{% endif %}
-{% endfor %}
-
-</div>
-
-</div>
+</p>
 
 {% endfor %}
 
