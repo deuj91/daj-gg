@@ -1,119 +1,73 @@
 body{
-
 background:#0f172a;
-font-family:Arial;
 color:white;
-margin:0;
-padding:40px;
-
+font-family:Arial;
+margin:40px;
 }
 
 .search-box{
-
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-height:80vh;
-
+text-align:center;
 }
 
 input{
-
-padding:12px;
-font-size:18px;
-border-radius:8px;
-border:none;
-
+padding:10px;
+font-size:16px;
 }
 
 button{
-
-padding:12px 18px;
-margin-left:10px;
-background:#2563eb;
-border:none;
-border-radius:8px;
-color:white;
-cursor:pointer;
-
-}
-
-.profile{
-
-margin-bottom:40px;
-
-}
-
-.rank{
-
-display:flex;
-align-items:center;
-gap:10px;
-
-}
-
-.rank img{
-
-width:60px;
-
+padding:10px 20px;
 }
 
 .match{
-
 background:#1e293b;
 padding:20px;
-border-radius:10px;
 margin-bottom:20px;
-
+border-radius:10px;
 }
 
-.match-header{
-
-display:flex;
-align-items:center;
-gap:15px;
-font-size:20px;
-
+.win{
+border-left:5px solid #22c55e;
 }
 
-.champion{
-
-width:50px;
-
-}
-
-.analysis{
-
-color:#94a3b8;
-
+.lose{
+border-left:5px solid #ef4444;
 }
 
 .teams{
-
 display:flex;
+align-items:center;
 justify-content:space-between;
-margin-top:15px;
-
+margin-top:10px;
 }
 
 .team{
-
 width:45%;
-
 }
 
 .player{
-
 display:flex;
 align-items:center;
 gap:10px;
 margin:5px 0;
-
 }
 
-.champion-small{
+.champ{
+width:32px;
+height:32px;
+border-radius:6px;
+}
 
-width:24px;
+.gold{
+color:#facc15;
+}
 
+.vs{
+font-size:20px;
+font-weight:bold;
+color:#facc15;
+}
+
+.analysis{
+margin-top:10px;
+color:#cbd5f5;
 }
