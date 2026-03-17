@@ -19,7 +19,7 @@ def riot(url):
     r = requests.get(url, headers=headers)
 
     if r.status_code != 200:
-        print("RIOT ERROR:", r.text)
+        print("Riot API error:", r.text)
         return None
 
     return r.json()
@@ -38,22 +38,22 @@ def analyse(p):
     kda = (kills + assists) / max(1, deaths)
 
     if kda >= 4:
-        messages.append("Excellente performance globale.")
+        messages.append("Excellente performance.")
     elif kda >= 2:
         messages.append("Bonne contribution aux combats.")
     else:
-        messages.append("Impact limité dans la partie.")
+        messages.append("Impact limité.")
 
     if kills >= 10:
         messages.append("Très forte pression offensive.")
 
     if deaths >= 8:
-        messages.append("Beaucoup de morts, attention au positionnement.")
+        messages.append("Beaucoup de morts.")
 
     if gold >= 15000:
         messages.append("Excellent farm.")
     elif gold < 9000:
-        messages.append("Farm faible pour la durée du match.")
+        messages.append("Farm faible.")
 
     if vision < 10:
         messages.append("Vision très faible.")
