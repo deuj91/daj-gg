@@ -2,94 +2,45 @@
 <html>
 
 <head>
+<title>Results</title>
 <link rel="stylesheet" href="/static/style.css">
 </head>
 
 <body>
 
-<div class="header">
-<div class="logo">DAJ.GG</div>
-</div>
-
-<div class="container">
-
-<div class="summoner">
-
 <h1>{{ summoner.name }}</h1>
 
 {% if rank %}
-
-<div class="rank">
-
-<img src="https://opgg-static.akamaized.net/images/medals/{{ rank.tier | lower }}.png">
-
-<span>
-{{ rank.tier }} {{ rank.rank }} - {{ rank.leaguePoints }} LP
-</span>
-
-</div>
-
+<p>{{ rank.tier }} {{ rank.rank }} - {{ rank.leaguePoints }} LP</p>
 {% endif %}
 
-</div>
+{% for g in games %}
 
-{% for game in games %}
+<div class="game">
 
-<div class="match {% if game.win %}victory{% else %}defeat{% endif %}">
+<h3>
+{{ g.champion }} 
+{{ g.kills }}/{{ g.deaths }}/{{ g.assists }}
+- {{ g.duration }} min
+</h3>
 
-<div class="match-top">
-
-<div class="champion">
-
-{{ game.champion }}
-
-</div>
-
-<div class="kda">
-
-{{ game.kills }}/{{ game.deaths }}/{{ game.assists }}
-
-</div>
-
-</div>
-
-<div>
-
-Durée : {{ game.duration }} min
-
-</div>
+<p>{{ g.analysis }}</p>
 
 <div class="teams">
 
 <div>
 
-<h3>Team 1</h3>
+<h4>Team 1</h4>
 
-{% for p in game.team1 %}
+{% for p in g.team1 %}
 
 <div class="player">
 
-<div>
-
-<strong>{{ p.name }}</strong>
-
-<br>
-
-{{ p.champion }}
-
-</div>
+<b>{{ p.name }}</b> - {{ p.gold }}g
 
 <div>
 
-{{ p.gold }} gold
-
-</div>
-
-</div>
-
-<div class="items">
-
-{% for item in p.items %}
+{% for item in p["items"] %}
 
 {% if item != 0 %}
 
@@ -101,39 +52,25 @@ Durée : {{ game.duration }} min
 
 </div>
 
+</div>
+
 {% endfor %}
 
 </div>
 
 <div>
 
-<h3>Team 2</h3>
+<h4>Team 2</h4>
 
-{% for p in game.team2 %}
+{% for p in g.team2 %}
 
 <div class="player">
 
-<div>
-
-<strong>{{ p.name }}</strong>
-
-<br>
-
-{{ p.champion }}
-
-</div>
+<b>{{ p.name }}</b> - {{ p.gold }}g
 
 <div>
 
-{{ p.gold }} gold
-
-</div>
-
-</div>
-
-<div class="items">
-
-{% for item in p.items %}
+{% for item in p["items"] %}
 
 {% if item != 0 %}
 
@@ -145,23 +82,17 @@ Durée : {{ game.duration }} min
 
 </div>
 
+</div>
+
 {% endfor %}
 
 </div>
-
-</div>
-
-<div class="analysis">
-
-{{ game.analysis }}
 
 </div>
 
 </div>
 
 {% endfor %}
-
-</div>
 
 </body>
 
