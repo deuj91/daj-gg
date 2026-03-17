@@ -15,9 +15,7 @@ LEAGUE_URL = f"https://{REGION}.api.riotgames.com"
 
 
 def riot(url):
-
     headers = {"X-Riot-Token": API_KEY}
-
     r = requests.get(url, headers=headers)
 
     if r.status_code != 200:
@@ -32,21 +30,21 @@ def analyse(p):
     tips = []
 
     if p["kills"] >= 8:
-        tips.append("Très bon impact offensif.")
+        tips.append("Bon impact offensif")
 
     if p["deaths"] >= 7:
-        tips.append("Trop de morts, attention au positionnement.")
+        tips.append("Trop de morts, attention au positionnement")
 
     if p["visionScore"] < 15:
-        tips.append("Vision trop faible.")
+        tips.append("Vision faible")
 
     if p["goldEarned"] > 13000:
-        tips.append("Très bon farm.")
+        tips.append("Bon farm")
 
     if not tips:
-        tips.append("Performance correcte.")
+        tips.append("Performance correcte")
 
-    return " ".join(tips)
+    return " • ".join(tips)
 
 
 @app.route("/")
@@ -60,7 +58,7 @@ def search():
     player = request.args.get("player")
 
     if not player or "#" not in player:
-        return "Format : Summoner#TAG"
+        return "Format : Pseudo#TAG"
 
     name, tag = player.split("#")
 
@@ -69,7 +67,7 @@ def search():
     )
 
     if not account:
-        return "Compte introuvable"
+        return "Erreur récupération account"
 
     puuid = account["puuid"]
 
@@ -80,27 +78,20 @@ def search():
     if not summ:
         return "Erreur récupération summoner"
 
-    summoner_id = summ.get("id")
+    ranked = riot(
+        f"{LEAGUE_URL}/lol/league/v4/entries/by-summoner/{summ['id']}"
+    )
 
-    rank = None
-
-    if summoner_id:
-
-        ranked = riot(
-            f"{LEAGUE_URL}/lol/league/v4/entries/by-summoner/{summoner_id}"
-        )
-
-        if ranked and len(ranked) > 0:
-            rank = ranked[0]
+    rank = ranked[0] if ranked else None
 
     match_ids = riot(
-        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=10"
+        f"{MATCH_URL}/lol/match/v5/matches/by-puuid/{puuid}/ids?start=0&count=5"
     )
+
+    games = []
 
     if not match_ids:
         return "Aucune game trouvée"
-
-    games = []
 
     for match_id in match_ids:
 
@@ -119,9 +110,6 @@ def search():
         for p in participants:
             if p["puuid"] == puuid:
                 player_data = p
-
-        if not player_data:
-            continue
 
         team1 = []
         team2 = []
